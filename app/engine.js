@@ -327,6 +327,53 @@
     return { sections, tags, todos, counts: { pos, neg, mix }, lines: all.length };
   }
 
-  const api = { normalizeRegion, classify, extract, analyze, parseMoney, empty, extractComplexName, organize, segment, tidy, fixSTT };
+  /* ── 기본 정보: 녹음에서 말한 내용으로 항목 채우기 ── */
+  function facts(text, org) {
+    org = org || organize(text);
+    const a = extract(text), f = {};
+    const lines = k => (org.sections.find(s => s.key === k) || { items: [] }).items.map(i => i.text);
+    const short = s => s.length > 46 ? s.slice(0, 44) + '…' : s;
+    const has = t => org.tags.includes(t);
+    // 규모
+    if (a.households) f.size = `${a.households.toLocaleString()}세대`;
+    else if (has('대단지')) f.size = '대단지';
+    else if (/소단지|나홀로/.test(text)) f.size = '소단지';
+    if (a.area_pyeong) f.area = `${a.area_pyeong}평`;
+    if (a.built_year) f.built = `${a.built_year}년`;
+    else { const m = text.match(/연식이\s?(좀\s)?(돼|된|오래|있)|(\d+)\s?년\s?(차|된)/); if (m) f.built = m[3] ? `${m[3]}년차` : '연식 있음(오래됨)'; }
+    // 역 · 교통
+    const st = [];
+    for (const m of text.matchAll(/([가-힣]{2,6}역)(?:이|에서|까지|으로|에)?\s?(?:도|는)?\s?(바로\s?앞|바로\s?옆|앞|근처|가깝|가까|걸어서\s?\d+\s?분|도보\s?\d+\s?분|\d+\s?분)?/g)) {
+      const name = m[1]; if (/^(역세|초역)/.test(name) || st.some(x => x.startsWith(name))) continue;
+      const q = (m[2] || '').replace(/가깝|가까/, '가까움').replace(/걸어서\s?|도보\s?/, '도보 ').replace(/\s+/g, ' ');
+      st.push(q ? `${name} ${q}` : name);
+    }
+    const line = [...new Set((text.match(/\d+\s?호선/g) || []).map(s => s.replace(/\s/g, '')))];
+    const stTxt = [st.join(' · '), has('초역세권') ? '초역세권' : has('역세권') ? '역세권' : '', line.join('·')].filter(Boolean).join(' · ');
+    if (stTxt) f.station = stTxt;
+    const commute = org.tags.filter(t => /출퇴근$/.test(t)); if (commute.length) f.commute = commute.join(', ');
+    // 주차 · 관리
+    if (a.parking_per_household != null) f.parking = `세대당 ${a.parking_per_household}대`;
+    else { const p = lines('parking')[0]; if (p) f.parking = short(p.replace(/^주차는\s?/, '')); }
+    if (a.mgmt_fee != null) f.fee = `${a.mgmt_fee}만원`;
+    else { const p = lines('manage').find(x => /관리비/.test(x)); if (p) f.fee = short(p.replace(/^.*관리비는?\s?/, '')); }
+    const mg = lines('manage').filter(x => !/관리비/.test(x)); if (mg.length) f.manage = short(mg.join(' / '));
+    // 내부
+    const inner = org.tags.filter(t => /화장실|리모델링/.test(t)).concat(org.tags.filter(t => t[0] === '!').map(t => t.slice(1)));
+    if (/방음[^.]{0,10}(무난|괜찮|좋)/.test(text)) inner.push('방음 무난');
+    if (inner.length) f.inner = [...new Set(inner)].join(' · ');
+    // 학교 · 생활
+    const sch = org.tags.filter(t => /초등학교/.test(t)).concat(has('초품아') ? ['초품아'] : []);
+    if (!sch.length && /학교/.test(text)) sch.push(short(lines('school')[0] || '학교 인근'));
+    if (sch.length) f.school = sch.join(' · ');
+    const life = [];
+    for (const w of ['상권', '마트', '공원', '성당', '병원', '학원가', '시장', '편의점']) { const m = text.match(new RegExp(`([가-힣]{0,6}${w})`)); if (m) life.push(m[1].replace(/^(주변|근처|바로|인근|단지|앞에|이)\s?/, '')); }
+    if (has('상권 양호') && !life.includes('상권')) life.unshift('상권 양호');
+    if (life.length) f.life = [...new Set(life)].slice(0, 5).join(' · ');
+    if (has('살기 좋음')) f.overall = '살기 좋다는 인상';
+    return f;
+  }
+
+  const api = { normalizeRegion, classify, extract, analyze, parseMoney, empty, extractComplexName, organize, segment, tidy, fixSTT, facts };
   if (typeof module !== "undefined" && module.exports) module.exports = api; else root.ZipEngine = api;
 })(typeof window !== "undefined" ? window : globalThis);

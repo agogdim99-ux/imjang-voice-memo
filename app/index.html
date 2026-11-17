@@ -180,6 +180,8 @@ textarea.edit:focus,input.field:focus{outline:none;border-color:var(--blue)}
 .htags{display:flex;flex-wrap:wrap;gap:6px}
 .htag{font-size:13.5px;font-weight:800;padding:6px 11px;border-radius:999px;background:var(--blue-soft);color:var(--blue)}
 .htag.warn{background:var(--bad-bg);color:var(--bad)}
+.recb{display:inline-block;margin-left:6px;font-size:10.5px;font-weight:800;color:var(--blue);background:var(--blue-soft);border-radius:5px;padding:1px 5px;vertical-align:1px}
+table.info td{line-height:1.5}
 ul.todo{list-style:none;margin:6px 0 0;padding:0;font-size:14.5px}
 ul.todo li{position:relative;padding:5px 0 5px 24px;color:var(--ink)}
 ul.todo li::before{content:"";position:absolute;left:2px;top:9px;width:13px;height:13px;border:2px solid var(--blue);border-radius:4px}
@@ -460,22 +462,34 @@ function detail(id, q){
   const tab = q.tab || 'info';
   const crumbs = [SIDO_SHORT[p.sido], p.sigungu, p.station_name || p.dong].filter(Boolean);
 
-  /* 기본 정보 */
-  const row = (k, val) => `<tr><th>${k}</th><td>${val==null||val===''?'<span class="needtxt">확인 필요</span>':esc(val)}</td></tr>`;
+  /* 녹음 정리 (기본 정보·현장 메모·한눈에 보기가 함께 쓴다) */
+  const org = p.transcript ? ZipEngine.organize(ZipEngine.fixSTT(p.transcript), p.complex_name || p.custom_name) : null;
+  const fx = p.transcript ? ZipEngine.facts(ZipEngine.fixSTT(p.transcript), org) : {};
+
+  /* 기본 정보: 검색값(있으면) → 녹음에서 말한 내용 → 확인 필요 */
+  const REC_B = '<span class="recb">녹음</span>';
+  const row = (k, val, rec, optional) => (val==null||val==='') ? (optional ? '' : `<tr><th>${k}</th><td><span class="needtxt">확인 필요</span></td></tr>`)
+    : `<tr><th>${k}</th><td>${esc(val)}${rec?REC_B:''}</td></tr>`;
   const hh = c.households ?? p.households, by = c.built_year ?? p.built_year, pk = c.parking_per_household ?? p.parking_per_household;
-  const st = c.nearest_station || p.station_name, sw = c.station_walk_min ?? p.station_walk_min;
-  const info = `<section class="card pane ${tab==='info'?'on':''}"><div class="cardhd">기본 정보 ${a?'<span class="src">웹 검색 · AI</span>':''}</div>
-    <table class="info">${row('단지명', c.name || nameOf(p))}${row('세대수', hh?hh.toLocaleString()+'세대'+(hh>=1000?' · 대단지':hh<300?' · 소단지':''):null)}
-      ${row('위치', c.address || [p.sido, p.sigungu, p.dong].filter(Boolean).join(' ') || null)}${row('준공', by?`${by}년 (${2026-by}년차)`:null)}
-      ${row('역', st||sw!=null?[st, sw!=null?'도보 '+sw+'분':null].filter(Boolean).join(' · '):null)}${row('주차', pk!=null?`세대당 ${pk}대 (${pk>=1?'1대 이상':'1대 미만'})`:null)}
-      ${a?row('동·층', [c.buildings?c.buildings+'개 동':null, c.floors_max?'최고 '+c.floors_max+'층':null].filter(Boolean).join(' · ')||null)+row('시공사', c.builder):''}
-      ${!a&&p.mgmt_fee!=null?row('관리비', p.mgmt_fee+'만원'):''}${row('토허', p.zone?.label)}</table>
+  const st = c.nearest_station, sw = c.station_walk_min;
+  const pair = (searched, recorded) => searched != null && searched !== '' ? [searched, false] : [recorded, true];
+  const [vSize, rSize] = pair(hh ? hh.toLocaleString()+'세대'+(hh>=1000?' · 대단지':hh<300?' · 소단지':'') : null, fx.size);
+  const [vBuilt, rBuilt] = pair(by ? `${by}년 (${2026-by}년차)` : null, fx.built);
+  const [vSt, rSt] = pair(a && (st||sw!=null) ? [st, sw!=null?'도보 '+sw+'분':null].filter(Boolean).join(' · ') : null, fx.station || (p.station_name ? [p.station_name, p.station_walk_min!=null?'도보 '+p.station_walk_min+'분':null].filter(Boolean).join(' · ') : null));
+  const [vPk, rPk] = pair(a && pk!=null ? `세대당 ${pk}대 (${pk>=1?'1대 이상':'1대 미만'})` : null, fx.parking);
+  const info = `<section class="card pane ${tab==='info'?'on':''}"><div class="cardhd">기본 정보 <span class="src">${a?'웹 검색 + 녹음':'녹음에서 정리'}</span></div>
+    <table class="info">${row('단지명', c.name || nameOf(p))}${row('위치', c.address || [p.sido, p.sigungu, p.dong].filter(Boolean).join(' ') || null)}
+      ${row('평형', p.area_pyeong ? p.area_pyeong+'평' : fx.area, !a || !p.area_pyeong)}${row('규모', vSize, rSize)}${row('준공', vBuilt, rBuilt)}
+      ${row('역 · 교통', vSt, rSt)}${row('출퇴근', fx.commute, true, true)}${row('주차', vPk, rPk)}
+      ${row('관리비', a ? null : fx.fee, true)}${row('관리 상태', fx.manage, true, true)}${row('내부', fx.inner, true, true)}
+      ${row('학교', fx.school, true, true)}${row('생활 편의', fx.life, true, true)}${row('총평', fx.overall, true, true)}
+      ${a?row('동·층', [c.buildings?c.buildings+'개 동':null, c.floors_max?'최고 '+c.floors_max+'층':null].filter(Boolean).join(' · ')||null, false, true)+row('시공사', c.builder, false, true):''}
+      ${row('토허', p.zone?.label)}</table>
     ${a && (a.sources||[]).length ? `<details class="srcs"><summary>출처 ${a.sources.length}개</summary>${a.sources.map(s=>`<a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.title||s.url)}</a>`).join('')}</details>` : ''}</section>`;
 
   /* 현장 메모 */
   const li = arr => arr.map(x=>`<li>${esc(x)}</li>`).join('');
   const sec = (lab, arr) => arr && arr.length ? `<div class="lab">${lab}</div><ul>${li([...new Set(arr)])}</ul>` : '';
-  const org = p.transcript ? ZipEngine.organize(ZipEngine.fixSTT(p.transcript), p.complex_name || p.custom_name) : null;
   const MOOD = {pos:['+','좋음'], neg:['−','아쉬움'], mix:['±','장단점'], neu:['·','']};
   let memoBody;
   if (a) memoBody = `${v.summary?`<p class="sum">${esc(v.summary)}</p>`:''}${sec('좋았던 점', v.pros)}${sec('아쉬운 점', v.cons)}${sec('하자 · 수리', v.defects)}${sec('관리 상태', v.management)}${sec('입지', v.location)}
