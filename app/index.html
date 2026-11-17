@@ -179,11 +179,19 @@ textarea.edit:focus,input.field:focus{outline:none;border-color:var(--blue)}
 .glance{margin-top:14px;border-color:var(--blue-line);background:linear-gradient(180deg,#F7F9FF,#fff)}
 .htags{display:flex;flex-wrap:wrap;gap:6px}
 .htag{font-size:13.5px;font-weight:800;padding:6px 11px;border-radius:999px;background:var(--blue-soft);color:var(--blue)}
-ul.todo{list-style:none;margin:6px 0 0;padding:0;font-size:14px} ul.todo li{padding:4px 0;color:var(--ink)}
-ul.olist{list-style:none;margin:6px 0 0;padding:0}
-ul.olist li{display:flex;gap:8px;align-items:flex-start;padding:7px 10px;border-radius:10px;margin:4px 0;font-size:14.5px;line-height:1.5;background:var(--soft)}
-ul.olist li.pos{background:#EEF7F1} ul.olist li.neg{background:#FDF0F0} ul.olist li.mix{background:#FFF7E6}
-ul.olist .mi{flex:none;width:20px;text-align:center}
+.htag.warn{background:var(--bad-bg);color:var(--bad)}
+ul.todo{list-style:none;margin:6px 0 0;padding:0;font-size:14.5px}
+ul.todo li{position:relative;padding:5px 0 5px 24px;color:var(--ink)}
+ul.todo li::before{content:"";position:absolute;left:2px;top:9px;width:13px;height:13px;border:2px solid var(--blue);border-radius:4px}
+.memo .lab{font-size:17px;font-weight:800;color:var(--ink);margin:20px 0 6px;padding-left:10px;border-left:4px solid var(--blue);line-height:1.25}
+.memo .lab:first-of-type{margin-top:6px}
+ul.olist{list-style:none;margin:0;padding:0}
+ul.olist li{display:flex;gap:10px;align-items:flex-start;padding:8px 2px;border-bottom:1px solid var(--line2);font-size:15px;line-height:1.55}
+ul.olist li:last-child{border-bottom:0}
+.mi,.mk{flex:none;display:inline-grid;place-items:center;width:20px;height:20px;margin-top:1px;border-radius:6px;font-size:14px;font-weight:900;line-height:1;background:var(--na-bg);color:var(--na)}
+.mk{width:18px;height:18px;font-size:12px;vertical-align:-3px;margin:0 2px 0 0}
+li.neu .mi{background:transparent;color:var(--muted);font-size:18px}
+li.pos .mi,.mk.pos{background:var(--ok-bg);color:var(--ok)} li.neg .mi,.mk.neg{background:var(--bad-bg);color:var(--bad)} li.mix .mi,.mk.mix{background:var(--warn-bg);color:var(--warn)}
 
 /* 기록·내 정보 */
 .optgrid{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
@@ -468,14 +476,14 @@ function detail(id, q){
   const li = arr => arr.map(x=>`<li>${esc(x)}</li>`).join('');
   const sec = (lab, arr) => arr && arr.length ? `<div class="lab">${lab}</div><ul>${li([...new Set(arr)])}</ul>` : '';
   const org = p.transcript ? ZipEngine.organize(ZipEngine.fixSTT(p.transcript), p.complex_name || p.custom_name) : null;
-  const MOOD = {pos:['👍','좋음'], neg:['👎','아쉬움'], mix:['⚖️','장단점'], neu:['•','']};
+  const MOOD = {pos:['+','좋음'], neg:['−','아쉬움'], mix:['±','장단점'], neu:['·','']};
   let memoBody;
-  if (a) memoBody = `${v.summary?`<p class="sum">${esc(v.summary)}</p>`:''}${sec('👍 좋았던 점', v.pros)}${sec('👎 아쉬운 점', v.cons)}${sec('🔧 하자 · 수리', v.defects)}${sec('🏢 관리 상태', v.management)}${sec('📍 입지', v.location)}
+  if (a) memoBody = `${v.summary?`<p class="sum">${esc(v.summary)}</p>`:''}${sec('좋았던 점', v.pros)}${sec('아쉬운 점', v.cons)}${sec('하자 · 수리', v.defects)}${sec('관리 상태', v.management)}${sec('입지', v.location)}
     ${(v.to_check||[]).length?`<div class="lab">다시 확인할 것</div><div class="tags">${v.to_check.map(x=>`<span class="tag">${esc(x)}</span>`).join('')}</div>`:''}`;
   else if (org && org.sections.length) memoBody = org.sections.map(s => `<div class="lab">${s.label}</div><ul class="olist">${s.items.map(i =>
       `<li class="${i.mood}"><span class="mi" aria-label="${MOOD[i.mood][1]}">${MOOD[i.mood][0]}</span><span>${esc(i.text)}</span></li>`).join('')}</ul>`).join('');
-  else memoBody = `${sec('🔧 하자 · 수리', p.defects)}${sec('📍 입지 · 관리', [p.commercial, p.middle_high, p.mgmt_office, p.elementary].filter(Boolean))}${sec('❓ 헷갈린 부분', p.uncertain)}`;
-  if (p.memo) memoBody = `<div class="lab">✍️ 내 메모</div><p class="sum" style="white-space:pre-wrap">${esc(p.memo)}</p>` + memoBody;
+  else memoBody = `${sec('하자 · 수리', p.defects)}${sec('입지 · 관리', [p.commercial, p.middle_high, p.mgmt_office, p.elementary].filter(Boolean))}${sec('헷갈린 부분', p.uncertain)}`;
+  if (p.memo) memoBody = `<div class="lab">내 메모</div><p class="sum" style="white-space:pre-wrap">${esc(p.memo)}</p>` + memoBody;
   if (!memoBody.trim()) memoBody = `<div class="empty" style="padding:10px">${p.visit==='planned'?'방문 후 녹음하거나 메모를 남겨 주세요.':'정리된 메모가 없어요.'}</div>`;
   const memo = `<section class="card pane memo ${tab==='memo'?'on':''}"><div class="cardhd">현장 메모 ${p.sample?'':`<button class="edit-btn" data-act="memo" data-id="${p.id}">${I.pen} 편집</button>`}</div>${memoBody}</section>`;
 
@@ -496,11 +504,11 @@ function detail(id, q){
   const tags = a ? [] : (org ? org.tags : []);
   const todos = (a ? (v.to_check||[]) : (org ? org.todos : [])).concat(missing(p).filter(x=>['매매가','전세가'].includes(x)).map(x=>`${x} 확인`));
   const cnt = org ? org.counts : null;
-  const summary = (p.visit==='planned' && !p.transcript) ? '' : `<section class="card glance"><div class="cardhd">한눈에 보기 ${cnt&&!a?`<span class="src">👍 ${cnt.pos} · ⚖️ ${cnt.mix} · 👎 ${cnt.neg}</span>`:''}</div>
+  const summary = (p.visit==='planned' && !p.transcript) ? '' : `<section class="card glance"><div class="cardhd">한눈에 보기 ${cnt&&!a?`<span class="src"><b class="mk pos">+</b> 좋음 ${cnt.pos} &nbsp;<b class="mk mix">±</b> 장단점 ${cnt.mix} &nbsp;<b class="mk neg">−</b> 아쉬움 ${cnt.neg}</span>`:''}</div>
     ${a && v.summary ? `<p class="sum" style="margin:0">${esc(v.summary)}</p>` : ''}
-    ${tags.length?`<div class="htags">${tags.map(t=>`<span class="htag">${esc(t)}</span>`).join('')}</div>`:''}
+    ${tags.length?`<div class="htags">${tags.map(t=>t[0]==='!'?`<span class="htag warn">${esc(t.slice(1))}</span>`:`<span class="htag">${esc(t)}</span>`).join('')}</div>`:''}
     ${!a && !tags.length ? '<p class="small muted" style="margin:0">녹음에서 뽑을 핵심 키워드가 없었어요. 단지 이름·역·평형·좋았던 점을 말해 보세요.</p>' : ''}
-    ${todos.length?`<div class="lab2" style="margin-top:12px">할 일 · 확인할 것</div><ul class="todo">${[...new Set(todos)].map(x=>`<li>☐ ${esc(x)}</li>`).join('')}</ul>`:''}
+    ${todos.length?`<div class="lab2" style="margin-top:12px">할 일 · 확인할 것</div><ul class="todo">${[...new Set(todos)].map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:''}
     ${p.status==='analyzing'?`<div class="row small" style="margin-top:10px;color:var(--blue)"><div class="spinner" style="width:18px;height:18px;border-width:3px;margin:0"></div>${esc(p.step||'자동 정리 중')}</div>`:''}
     ${p.status==='error'?`<p class="small" style="color:var(--bad);margin:10px 0 0">자동 정리 실패: ${esc(p.error)}</p>`:''}</section>`;
   const aiCard = '';
@@ -513,8 +521,8 @@ function detail(id, q){
     <div class="dact"><button class="btn line" data-act="rec" data-target="${p.sample?'':p.id}">${I.mic.replace('class="ic"','class="ic" style="width:18px;height:18px"')} 녹음 추가</button>
       <button class="btn" data-act="memo" data-id="${p.id}">${I.pen} 메모 작성</button></div></div>
   <div class="hero">${heroOf(p)}</div>
-  ${p.sample?'':`<div class="photobar"><label class="chip">📷 사진 추가<input type="file" accept="image/*" multiple hidden data-addphoto="${p.id}"></label>
-    <a class="chip" href="https://search.naver.com/search.naver?where=image&query=${encodeURIComponent((c.name||nameOf(p))+' 아파트')}" target="_blank" rel="noopener">🔎 단지 사진 보기</a></div>`}
+  ${p.sample?'':`<div class="photobar"><label class="chip">사진 추가<input type="file" accept="image/*" multiple hidden data-addphoto="${p.id}"></label>
+    <a class="chip" href="https://search.naver.com/search.naver?where=image&query=${encodeURIComponent((c.name||nameOf(p))+' 아파트')}" target="_blank" rel="noopener">단지 사진 보기</a></div>`}
   ${summary}
   <div class="dtabs">${[['info','기본 정보'],['memo','현장 메모'],['fund','자금 비교']].map(([k,t])=>`<button class="${k===tab?'on':''}" data-tab="${k}">${t}</button>`).join('')}</div>
   <div class="cols">${info}${memo}${fund}</div>
