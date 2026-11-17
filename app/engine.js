@@ -124,7 +124,7 @@
 
   /* 단지명 (extract_rules.extract_complex_name) */
   const BRANDS = ["자이","래미안","힐스테이트","아이파크","푸르지오","e편한세상","이편한세상","롯데캐슬","더샵","센트레빌","위브","아크로","하늘채","꿈에그린","스카이뷰","리첸시아","스위첸","데시앙","해링턴","포레나","휴먼시아","베르디움","어울림","캐슬","주공","트리마제","디에이치","써밋","블레스티지","헬리오시티"];
-  const NAME_STOP = new Set(["오늘","첫","두","세","네","다섯","번째","번째는","마지막","본","거","거는","건","게","매물","그","뭐지","이번","여기","저기","이","저","하나","집","보러","간","온","곳","일단","음","어","그리고","다음","본거"]);
+  const NAME_STOP = new Set(["지금","나는","저는","내가","난","우리","오늘은","방금","여기는","임장","임장하러","왔고","와서","오늘","첫","두","세","네","다섯","번째","번째는","마지막","본","거","거는","건","게","매물","그","뭐지","이번","여기","저기","이","저","하나","집","보러","간","온","곳","일단","음","어","그리고","다음","본거"]);
   const LOCATION_WORDS = new Set(["서울","인천","경기"]);
   function isStop(tok) {
     if (NB_INDEX.some(([w]) => w === tok && !w.endsWith("동"))) return false;   // "송도 더샵", "문래 자이"
@@ -135,7 +135,10 @@
   function nameBefore(tokens) {
     const picked = [];
     for (const tok of tokens.slice(-3).reverse()) { if (isStop(tok)) break; picked.push(tok); }
-    const name = picked.reverse().join(" ").trim();
+    picked.reverse();
+    // "문래 자이" → "문래자이" (동네 + 브랜드 두 단어는 붙여 쓴다)
+    if (picked.length === 2 && picked[0].length <= 3 && BRANDS.includes(picked[1])) picked.splice(0, 2, picked[0] + picked[1]);
+    const name = picked.join(" ").trim();
     return name.length >= 2 ? name : null;
   }
   function extractComplexName(text) {
@@ -223,6 +226,107 @@
     return p;
   }
 
-  const api = { normalizeRegion, classify, extract, analyze, parseMoney, empty, extractComplexName };
+  /* ── 녹음 정리기: 띄어쓰기·문장부호 없는 혼잣말 → 주제별 메모 ── */
+  const SPLIT_MARK = /\s(?=(?:아\s)?(?:그리고|그래서|근데|그런데|무엇보다|왜냐면|왜냐하면|게다가|일단|전반적으로|그리고는)\s)/g;
+  // 문장 끝으로 볼 어미 뒤에서 자른다 ('다'는 '베란다'처럼 명사 끝일 수 있어 동사 어간 뒤에서만)
+  const END_SPLIT = /(?<=(?:[가-힣](?:고|야|요|어|네|데|음|함|임))|같아|좋아|괜찮아|있어|없어|(?:있|없|좋|같|않|했|됐|된|이|한|많|넓|좁|크|싸)다)\s+/g;
+  const FILLERS = [/이거 뭐야/g, /뭐 이런/g, /이런 거(?=[여이]서|\s)/g, /이런 건/g, /(좀\s)?되던지요?/g,
+    /\S+\s아니\s(?=\S)/g,                                   // "뒤편으로는 아니 근처로는" → 고쳐 말한 앞말 삭제
+    /(^|\s)(음+|어+|그|뭐|막|아|저기|얘가|얘는|이제|그냥|약간 뭐|일단)(?=\s)/g];
+  const LEAD = /^(아\s)?(그리고|그래서|근데|그런데|무엇보다|왜냐면|왜냐하면|또|게다가|일단|그리고는)\s+/;
+  const ENDINGS = [
+    [/(것|거) 같(긴 한데|기도 하고|고|아요|아|네|음|은데|어)$/, '것 같음'],
+    [/있(고|어요|어|네|음|는데|다)$/, '있음'], [/없(고|어요|어|네|는데|다)$/, '없음'],
+    [/좋(고|아요|아|네|은데|다)$/, '좋음'], [/괜찮(고|아요|아|네|은데|다)$/, '괜찮음'],
+    [/가깝(고|네|다)$/, '가까움'], [/편해$|편하고$/, '편함'],
+    [/(해|하고|하네|해요|하다)$/, '함'], [/(이야|야|이에요|예요|이네|이다)$/, ''],
+    [/(이고|이며|인데|한데|는데|지만)$/, ''], [/있으니까$/, '있음'], [/(으니까|니까)$/, ''],
+    [/(많|넓|좁|작|높|낮|싸|않|나쁘지 않)(고|다|아|네)$/, '$1음'], [/크(고|다)$/, '큼'],
+  ];
+  const CATS = [
+    ['price',  '💰 가격',      /억|매매|전세|월세|시세|호가|가격|융자|대출/],
+    ['defect', '🔧 하자 · 내부', /누수|곰팡이|균열|금\s?간|결로|하자|수리|녹물|깨진|낡|리모델링|인테리어|공사|방음|소음|층간|내부|구조|화장실|방이|거실|주방|베란다|샷시|창호/],
+    ['traffic','🚇 교통 · 입지', /역|호선|지하철|버스|출퇴근|직장|도보|걸어서|여의도|강남|광화문|판교|입지|위치/],
+    ['parking','🚗 주차',      /주차/],
+    ['manage', '🧹 관리',      /관리|경비|청소|조경|커뮤니티|엘리베이터|관리비/],
+    ['school', '🏫 학군',      /초등|중학교|고등학교|학교|학원|초품아|학군/],
+    ['life',   '🛒 생활 · 상권', /마트|상가|상권|편의점|시장|병원|공원|산책|카페|백화점|성당|교회|도서관|살기/],
+    ['view',   '☀️ 향 · 채광',  /향|채광|햇빛|일조|뷰|조망|전망|밝/],
+    ['complex','🏢 단지 · 규모', /단지|세대|평|동\s?수|연식|년식|준공|오래된|신축|구축/],
+  ];
+  const POS = /좋|괜찮|깔끔|넉넉|편리|편하|가까|저렴|무난|넓|조용|밝|최고|만족|장점|초역세권|역세권|대단지|여유|적당|훌륭|잘\s?돼|잘\s?되|쾌적|깨끗|새것|신축/;
+  const NEG = /않|안\s?좋|별로|아쉽|불편|좁|비싸|시끄|어둡|낡|누수|곰팡이|균열|하자|부족|빡빡|멀|단점|걱정|문제|결로|오래돼|오래된|냄새|소음이|노후/;
+  const REQUEST = /(넣어|첨부|올려|찾아|알아봐|확인해|물어봐|체크해|해)\s?줘|해\s?주세요|해야\s?(돼|함|겠)|확인\s?필요|물어봐야|알아봐야|봐야\s?돼/;
+
+  const CONNECT = /^(아\s)?(그리고|그래서|근데|그런데|무엇보다|왜냐면|왜냐하면|또|게다가|일단|전반적으로|그리고는|아)$/;
+  const TRAIL_CONNECT = /(\s(아\s)?(그리고|그래서|근데|그런데|무엇보다|왜냐면|왜냐하면|또|게다가|일단|아))+$/;
+  function tidy(s) {
+    let t = ' ' + s + ' ';
+    for (const f of FILLERS) t = t.replace(f, ' ');
+    t = t.replace(/\s+/g, ' ').trim().replace(TRAIL_CONNECT, '').replace(LEAD, '').replace(/^(나는|저는|내가|난)\s+/, '').replace(/^(여기는|여기)\s+(?=여기)/, '');
+    for (const [re, rep] of ENDINGS) { if (re.test(t)) { t = t.replace(re, rep).trim(); break; } }
+    return t.replace(/\s+/g, ' ').trim();
+  }
+  function segment(text) {
+    const parts = text.replace(/[.?!]+(?!\d)|,(?!\d)/g, ' . ').split(/\s\.\s|\n+/)
+      .flatMap(s => s.split(SPLIT_MARK)).flatMap(s => s.split(END_SPLIT))
+      .map(s => s.trim().replace(TRAIL_CONNECT, '').trim()).filter(s => s && !CONNECT.test(s));
+    const out = [];
+    for (const s of parts) {
+      const prev = out[out.length - 1];
+      // 너무 짧거나, 앞 문장이 "~해서/~니까/~면"처럼 이어지는 말로 끝나면 합친다
+      if (prev && (s.replace(/\s/g, '').length < 5 || (/^(나쁘지\s?않|괜찮|좋|별로|무난)/.test(s) && s.length < 10) || /(어서|아서|해서|라서|니까|으면|면|는데|지만|거여서|이어서)$/.test(prev))) out[out.length - 1] = prev + ' ' + s;
+      else out.push(s);
+    }
+    return out;
+  }
+  /* 부동산 임장에서 자주 틀리는 음성인식 교정 (앱 녹음에만 적용) */
+  const STT_FIX = [
+    [/몰래(?=\s?(자이|힐스테이트|아파트|역|동|공원|초등|래미안|푸르지오|아이파크))/g, '문래'], [/주변\s?상관/g, '주변 상권'], [/상관(?=이\s?(좋|나쁘|괜찮))/g, '상권'],
+    [/초프마|초품화|초푸마/g, '초품아'], [/메물/g, '매물'], [/메매/g, '매매'], [/맴매/g, '매매'], [/용자(?=[는가도])/g, '융자'],
+    [/3대당/g, '세대당'], [/역세고/g, '역세권'], [/동양(?=\.|$|\s)/g, '동향'], [/남양이라/g, '남향이라'], [/체광/g, '채광'],
+    [/중계사/g, '중개사'], [/(\d)\s?대구(?=\s)/g, '$1대고'], [/관리 사무소/g, '관리사무소'], [/대규모 되던지요?/g, '대규모 단지'], [/공팡이/g, '곰팡이'],
+  ];
+  const fixSTT = t => STT_FIX.reduce((s, [re, rep]) => s.replace(re, rep), t);
+  const TAGS = [
+    [/초역세권/, () => '초역세권'], [/(?<!초)역세권/, () => '역세권'], [/대단지/, () => '대단지'],
+    [/([가-힣]+역)(?:이|에서|까지)?\s?바로\s?앞/, m => `${m[1]} 바로 앞`], [/(\d+)\s?호선/, m => `${m[1]}호선`],
+    [/화장실(?:이)?\s?(두|2|세|3)\s?개/, m => `화장실 ${({두:2,세:3})[m[1]] || m[1]}개`], [/(\d+)\s?평/, m => `${m[1]}평`],
+    [/리모델링/, () => '리모델링 세대'], [/초품아/, () => '초품아'], [/관리비[^.]{0,14}저렴/, () => '관리비 저렴'],
+    [/(여의도|강남|광화문|판교|종로)[^.]{0,12}(가깝|가까|직장|출퇴근)/, m => `${m[1]} 출퇴근`], [/조망|뷰가\s?좋/, () => '조망'],
+    [/대규모|대단지/, () => '대단지'], [/([가-힣]{2,}초등학교)/, m => `${m[1]} 인근`], [/([가-힣]{2,}공원)/, m => `${m[1]} 인근`],
+    [/상권[^.]{0,8}(좋|괜찮|나쁘지\s?않)/, () => '상권 양호'], [/살기[^.]{0,8}좋/, () => '살기 좋음'],
+    [/누수/, () => '⚠ 누수'], [/곰팡이/, () => '⚠ 곰팡이'], [/균열|금\s?간/, () => '⚠ 균열'], [/결로/, () => '⚠ 결로'], [/깨진|파손/, () => '⚠ 파손'],
+  ];
+  const polarityText = s => s.replace(/나쁘지\s?않/g, '괜찮').replace(/(넉넉|넓|크)지\s?않/g, '부족');
+  function organize(text, name) {
+    const segs = segment(text);
+    const groups = {}, todos = [];
+    for (let raw of segs) {
+      // "…사진은 …첨부해서 넣어 줘" → 앞부분은 메모로, 사진 요청은 할 일로
+      const pi = raw.search(/사진/);
+      if (pi >= 0 && REQUEST.test(raw.slice(pi))) { if (!todos.includes('사진 첨부하기')) todos.push('사진 첨부하기'); raw = raw.slice(0, pi).trim().replace(/있으니까$/, '있음').replace(/(으니까|니까|으니)$/, '').trim(); if (!raw) continue; }
+      else if (REQUEST.test(raw) && /확인|물어|알아|체크|찾아/.test(raw)) {   // 할 일에도 넣고, 메모에도 남긴다
+        todos.push(tidy(raw).replace(/\s?(해\s?줘|해\s?주세요)$/, '').replace(/(이|가|도)?\s?(좀\s)?있어서\s?/, ' ').replace(/\s+/g, ' ').trim());
+      }
+      const line = tidy(raw);
+      if (line.replace(/\s/g, '').length < 4 || /^아니\s/.test(line) && line.length < 10) continue;
+      // "지금 OO 아파트에 와 있음" 같은 도입부는 뺀다
+      const nameRe = name ? new RegExp(name.replace(/\s/g, '').split('').join('\\s?')) : null;
+      if (nameRe && nameRe.test(line) && /(와\s?있|왔|임장하러|보러)/.test(line) && !/평|세대|역|단지가|좋|별로/.test(line.replace(nameRe, ''))) continue;
+      const cat = (CATS.find(([, , re]) => re.test(raw)) || ['etc', '📝 기타'])[0];
+      const pt = polarityText(raw), pos = POS.test(pt), neg = NEG.test(pt);
+      const mood = pos && neg ? 'mix' : neg ? 'neg' : pos ? 'pos' : 'neu';
+      (groups[cat] = groups[cat] || []).push({ text: line, mood });
+    }
+    const tags = [];
+    for (const [re, fmt] of TAGS) { const m = text.match(re); if (m) { const t = fmt(m); if (!tags.includes(t) && !(t === '역세권' && tags.includes('초역세권'))) tags.push(t); } }
+    const all = Object.values(groups).flat();
+    const pos = all.filter(x => x.mood === 'pos').length, neg = all.filter(x => x.mood === 'neg').length, mix = all.filter(x => x.mood === 'mix').length;
+    const sections = CATS.concat([['etc', '📝 기타']]).filter(([k]) => groups[k]).map(([k, label]) => ({ key: k, label, items: groups[k] }));
+    return { sections, tags, todos, counts: { pos, neg, mix }, lines: all.length };
+  }
+
+  const api = { normalizeRegion, classify, extract, analyze, parseMoney, empty, extractComplexName, organize, segment, tidy, fixSTT };
   if (typeof module !== "undefined" && module.exports) module.exports = api; else root.ZipEngine = api;
 })(typeof window !== "undefined" ? window : globalThis);

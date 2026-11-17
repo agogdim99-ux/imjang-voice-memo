@@ -175,6 +175,16 @@ textarea.edit{min-height:150px;resize:vertical}
 textarea.edit:focus,input.field:focus{outline:none;border-color:var(--blue)}
 .steps2{margin:4px 0 12px;padding-left:20px;font-size:13.5px;color:var(--ink2)} .steps2 li{margin:4px 0}
 
+/* 녹음 정리 */
+.glance{margin-top:14px;border-color:var(--blue-line);background:linear-gradient(180deg,#F7F9FF,#fff)}
+.htags{display:flex;flex-wrap:wrap;gap:6px}
+.htag{font-size:13.5px;font-weight:800;padding:6px 11px;border-radius:999px;background:var(--blue-soft);color:var(--blue)}
+ul.todo{list-style:none;margin:6px 0 0;padding:0;font-size:14px} ul.todo li{padding:4px 0;color:var(--ink)}
+ul.olist{list-style:none;margin:6px 0 0;padding:0}
+ul.olist li{display:flex;gap:8px;align-items:flex-start;padding:7px 10px;border-radius:10px;margin:4px 0;font-size:14.5px;line-height:1.5;background:var(--soft)}
+ul.olist li.pos{background:#EEF7F1} ul.olist li.neg{background:#FDF0F0} ul.olist li.mix{background:#FFF7E6}
+ul.olist .mi{flex:none;width:20px;text-align:center}
+
 /* 기록·내 정보 */
 .optgrid{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
 .lab2{font-size:13px;font-weight:800;color:var(--ink2);margin-top:14px}
@@ -256,6 +266,7 @@ let MINE = store.get('mine', []);
 for (const p of MINE) {
   if (!p.visit) p.visit = p.transcript ? 'done' : 'planned';
   if (p.status === 'analyzing') { p.status = 'error'; p.error = '정리가 중간에 멈췄어요. 다시 시도해 주세요.'; }
+  if (p.transcript && !p.ai && !p.fixed) { p.fixed = true; const a = ZipEngine.analyze(ZipEngine.fixSTT(p.transcript)); if (!p.custom_name) p.complex_name = a.complex_name; }   // 예전 기록: 새 이름 인식 규칙으로 다시
   if (p.complex_name === undefined && p.transcript) { const a = ZipEngine.analyze(p.transcript); p.complex_name = a.complex_name; if (!p.sido && a.sido) { p.sido=a.sido; p.sigungu=a.sigungu; p.zone=a.zone; } }
 }
 let P = [], byId = {};
@@ -265,9 +276,10 @@ saveMine(); reload();
 const recent = () => { const r = store.get('recent', []), ids = P.map(p=>p.id); return r.filter(id=>ids.includes(id)).concat(ids.filter(id=>!r.includes(id))); };
 
 function newProp(extra){ const p = {id:'u'+Date.now(), sample:false, created:Date.now(), transcript:'', photos:[], ...extra}; MINE.push(p); saveMine(); reload(); return p; }
-function saveNew(text){ const a = ZipEngine.analyze(text); return newProp({...a, transcript:text, visit:'done'}); }
+function saveNew(text){ const fixed = ZipEngine.fixSTT(text); const a = ZipEngine.analyze(fixed); return newProp({...a, transcript:fixed, raw_transcript:text, visit:'done'}); }
 function mergeInto(id, text){
   const p = MINE.find(x=>x.id===id); if (!p) return saveNew(text);
+  text = ZipEngine.fixSTT(text);
   const a = ZipEngine.analyze(text);
   for (const [k,v] of Object.entries(a)) { if (k==='zone') continue; if (Array.isArray(v)) p[k] = [...new Set((p[k]||[]).concat(v))]; else if (v != null && (p[k] == null || !p.ai)) p[k] = v; }
   p.transcript = p.transcript ? p.transcript + '\n\n[추가 녹음] ' + text : text;
@@ -455,11 +467,14 @@ function detail(id, q){
   /* 현장 메모 */
   const li = arr => arr.map(x=>`<li>${esc(x)}</li>`).join('');
   const sec = (lab, arr) => arr && arr.length ? `<div class="lab">${lab}</div><ul>${li([...new Set(arr)])}</ul>` : '';
+  const org = p.transcript ? ZipEngine.organize(ZipEngine.fixSTT(p.transcript), p.complex_name || p.custom_name) : null;
+  const MOOD = {pos:['👍','좋음'], neg:['👎','아쉬움'], mix:['⚖️','장단점'], neu:['•','']};
   let memoBody;
   if (a) memoBody = `${v.summary?`<p class="sum">${esc(v.summary)}</p>`:''}${sec('👍 좋았던 점', v.pros)}${sec('👎 아쉬운 점', v.cons)}${sec('🔧 하자 · 수리', v.defects)}${sec('🏢 관리 상태', v.management)}${sec('📍 입지', v.location)}
     ${(v.to_check||[]).length?`<div class="lab">다시 확인할 것</div><div class="tags">${v.to_check.map(x=>`<span class="tag">${esc(x)}</span>`).join('')}</div>`:''}`;
-  else memoBody = `${sec('🔧 하자 · 수리', p.defects)}${sec('📍 입지 · 관리', [p.commercial, p.middle_high, p.mgmt_office, p.elementary].filter(Boolean))}${sec('❓ 헷갈린 부분', p.uncertain)}
-    ${missing(p).length?`<div class="lab">다시 확인할 것</div><div class="tags">${missing(p).map(x=>`<span class="tag">${x}</span>`).join('')}</div>`:''}`;
+  else if (org && org.sections.length) memoBody = org.sections.map(s => `<div class="lab">${s.label}</div><ul class="olist">${s.items.map(i =>
+      `<li class="${i.mood}"><span class="mi" aria-label="${MOOD[i.mood][1]}">${MOOD[i.mood][0]}</span><span>${esc(i.text)}</span></li>`).join('')}</ul>`).join('');
+  else memoBody = `${sec('🔧 하자 · 수리', p.defects)}${sec('📍 입지 · 관리', [p.commercial, p.middle_high, p.mgmt_office, p.elementary].filter(Boolean))}${sec('❓ 헷갈린 부분', p.uncertain)}`;
   if (p.memo) memoBody = `<div class="lab">✍️ 내 메모</div><p class="sum" style="white-space:pre-wrap">${esc(p.memo)}</p>` + memoBody;
   if (!memoBody.trim()) memoBody = `<div class="empty" style="padding:10px">${p.visit==='planned'?'방문 후 녹음하거나 메모를 남겨 주세요.':'정리된 메모가 없어요.'}</div>`;
   const memo = `<section class="card pane memo ${tab==='memo'?'on':''}"><div class="cardhd">현장 메모 ${p.sample?'':`<button class="edit-btn" data-act="memo" data-id="${p.id}">${I.pen} 편집</button>`}</div>${memoBody}</section>`;
@@ -477,18 +492,18 @@ function detail(id, q){
     ${f.tips?`<ul class="ul-sm">${f.tips.map(t=>`<li>${esc(t)}</li>`).join('')}</ul>`:''}
     <p class="fine">${f.basis?'대출 추정: '+esc(f.basis)+'<br>':''}${esc(p.zone?.reason||'')}<br>세금 미반영 · 대출은 은행 상담 필수 · ${esc(p.zone?.caution||'')}</p></section>`;
 
-  /* AI 정리 상태 */
-  let aiCard = '';
-  if (!p.sample) {
-    if (p.status === 'analyzing') aiCard = `<section class="card" style="text-align:center;padding:26px 16px"><div class="spinner"></div><div style="font-weight:800;margin-top:12px">${esc(p.step||'정리 중')}</div><p class="small muted" style="margin:6px 0 0">단지 정보·실거래가를 찾고 녹음을 정리하고 있어요 (30초~1분).</p></section>`;
-    else if (!a) aiCard = `${p.status==='error'?`<section class="card"><div class="cardhd">자동 정리하지 못했어요</div><p class="small" style="margin:0 0 10px">${esc(p.error)}</p><button class="btn line sm" data-act="reai" data-id="${p.id}">자동 정리 다시 시도</button></section>`:''}
-      <section class="card"><div class="cardhd">✨ 내 Claude·ChatGPT로 정리하기</div>
-        <ol class="steps2"><li>버튼을 누르면 <b>질문이 복사</b>되고 앱이 열려요 (비어 있으면 붙여넣기)</li><li>답이 나오면 <b>답 전체를 복사</b></li><li>여기에 붙여넣고 <b>화면에 적용</b></li></ol>
-        <div class="duo" style="margin-top:0"><button class="btn sm" data-act="handoff" data-to="claude" data-id="${p.id}">Claude에서 정리</button><button class="btn line sm" data-act="handoff" data-to="chatgpt" data-id="${p.id}">ChatGPT에서 정리</button></div>
-        <textarea class="edit" id="paste" style="min-height:100px;margin-top:12px" placeholder="Claude·ChatGPT의 답을 여기에 붙여넣기"></textarea>
-        <button class="btn sm" data-act="apply-paste" data-id="${p.id}" style="margin-top:8px">화면에 적용</button>
-        <p class="fine">웹 검색이 켜져 있어야 단지 정보·시세를 찾아요. 지금 쓰는 구독으로 추가 비용 없이 돼요. (API 키가 있으면 <a href="#/me?ai=1" style="color:var(--blue)">자동 정리</a>)</p></section>`;
-  }
+  /* 한눈에 보기 (녹음 정리 요약) */
+  const tags = a ? [] : (org ? org.tags : []);
+  const todos = (a ? (v.to_check||[]) : (org ? org.todos : [])).concat(missing(p).filter(x=>['매매가','전세가'].includes(x)).map(x=>`${x} 확인`));
+  const cnt = org ? org.counts : null;
+  const summary = (p.visit==='planned' && !p.transcript) ? '' : `<section class="card glance"><div class="cardhd">한눈에 보기 ${cnt&&!a?`<span class="src">👍 ${cnt.pos} · ⚖️ ${cnt.mix} · 👎 ${cnt.neg}</span>`:''}</div>
+    ${a && v.summary ? `<p class="sum" style="margin:0">${esc(v.summary)}</p>` : ''}
+    ${tags.length?`<div class="htags">${tags.map(t=>`<span class="htag">${esc(t)}</span>`).join('')}</div>`:''}
+    ${!a && !tags.length ? '<p class="small muted" style="margin:0">녹음에서 뽑을 핵심 키워드가 없었어요. 단지 이름·역·평형·좋았던 점을 말해 보세요.</p>' : ''}
+    ${todos.length?`<div class="lab2" style="margin-top:12px">할 일 · 확인할 것</div><ul class="todo">${[...new Set(todos)].map(x=>`<li>☐ ${esc(x)}</li>`).join('')}</ul>`:''}
+    ${p.status==='analyzing'?`<div class="row small" style="margin-top:10px;color:var(--blue)"><div class="spinner" style="width:18px;height:18px;border-width:3px;margin:0"></div>${esc(p.step||'자동 정리 중')}</div>`:''}
+    ${p.status==='error'?`<p class="small" style="color:var(--bad);margin:10px 0 0">자동 정리 실패: ${esc(p.error)}</p>`:''}</section>`;
+  const aiCard = '';
 
   return `
   <div class="phd det"><a class="iconbtn back" href="javascript:history.length>1?history.back():location.hash='#/'" aria-label="뒤로">${I.back}</a><h1 style="font-size:17px">${esc(nameOf(p))}</h1>
@@ -500,11 +515,12 @@ function detail(id, q){
   <div class="hero">${heroOf(p)}</div>
   ${p.sample?'':`<div class="photobar"><label class="chip">📷 사진 추가<input type="file" accept="image/*" multiple hidden data-addphoto="${p.id}"></label>
     <a class="chip" href="https://search.naver.com/search.naver?where=image&query=${encodeURIComponent((c.name||nameOf(p))+' 아파트')}" target="_blank" rel="noopener">🔎 단지 사진 보기</a></div>`}
+  ${summary}
   <div class="dtabs">${[['info','기본 정보'],['memo','현장 메모'],['fund','자금 비교']].map(([k,t])=>`<button class="${k===tab?'on':''}" data-tab="${k}">${t}</button>`).join('')}</div>
   <div class="cols">${info}${memo}${fund}</div>
   ${aiCard}
   ${p.transcript?`<details class="raw"><summary>${I.mic.replace('class="ic"','class="ic" style="width:18px;height:18px"')} 녹음 원문</summary>${p.audio?`<audio controls preload="none" src="${esc(p.audio)}" style="width:100%;margin-bottom:8px"></audio>`:''}<p>${esc(p.transcript)}</p></details>`:''}
-  ${p.sample?'':`<div class="foot"><button class="danger" data-del="${p.id}">매물 삭제</button>${a&&p.status!=='analyzing'?`<button class="link" data-act="reai" data-id="${p.id}">AI로 다시 정리 ↻</button>`:''}</div>`}`;
+  ${p.sample?'':`<div class="foot"><button class="danger" data-del="${p.id}">매물 삭제</button>${store.get('apikey','')&&p.status!=='analyzing'?`<button class="link" data-act="reai" data-id="${p.id}">자동 정리(검색) ↻</button>`:''}</div>`}`;
 }
 
 /* ═════════ 화면: 임장 기록 ═════════ */
@@ -542,7 +558,7 @@ function me(){
     <p class="fine">내 매물 ${MINE.length}건은 이 폰에만 저장돼요(서버로 보내지 않음).</p>
     ${MINE.length?'<button class="chip" data-act="backup" style="margin-top:8px">내 매물 백업 파일 받기</button>':''}</section>
   <section class="card" id="aicard"><div class="cardhd">자동 정리 <span class="src">선택 · Claude API</span></div>
-    <p class="small" style="margin:0 0 8px;color:var(--ink2)">키가 없어도 매물 화면의 "Claude에서 정리"로 지금 쓰는 Claude·ChatGPT에서 정리할 수 있어요. API 키를 넣으면 복사·붙여넣기 없이 자동으로 정리해요(유료, 1건 약 300~500원 추정). <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener" style="color:var(--blue);font-weight:700">키 발급 ›</a></p>
+    <p class="small" style="margin:0 0 8px;color:var(--ink2)">녹음 정리는 키 없이 폰 안에서 바로 돼요. API 키를 넣으면 여기에 더해 단지 정보·최근 실거래가를 웹에서 자동으로 찾아와요(유료, 1건 약 300~500원 추정). <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener" style="color:var(--blue);font-weight:700">키 발급 ›</a></p>
     <input id="apikey" class="field" type="password" autocomplete="off" placeholder="sk-ant-..." value="${esc(store.get('apikey',''))}">
     <div class="btnrow"><button class="btn line sm" data-act="aikey-test">연결 확인</button><button class="btn sm" data-act="aikey-save">저장</button></div>
     <p class="fine">키는 이 폰에만 저장되고 Anthropic으로만 전송돼요. 모델: ${ZipAI.MODEL}</p></section>
@@ -652,7 +668,7 @@ function rerenderIf(id){ const {parts} = parse(); if (parts[0]==='p' && parts[1]
 async function runAI(id){
   const p = MINE.find(x=>x.id===id); if (!p || RUNNING.has(id)) return;
   const key = store.get('apikey','');
-  if (!key) { p.status = 'handoff'; saveMine(); rerenderIf(id); return; }
+  if (!key) { p.status = 'local'; saveMine(); rerenderIf(id); return; }   // 키 없으면 폰 안 정리만 (이미 끝남)
   RUNNING.add(id); p.status = 'analyzing'; p.step = '단지를 찾고 있어요'; p.error = null; saveMine(); rerenderIf(id);
   try { const r = await ZipAI.analyze(key, p.transcript || `단지명: ${nameOf(p)} (방문 전, 단지 정보만 찾기)`, s => { p.step = s; saveMine(); rerenderIf(id); }); applyReport(p, r); p.status = 'done'; toast('정리 완료'); }
   catch(e) { p.status = 'error'; p.error = ZipAI.friendlyError(e); }
@@ -714,7 +730,7 @@ document.addEventListener('click', e => {
   else if (act==='redo') { document.getElementById('edit').value = ''; REC.prev = REC.final = ''; const l = document.getElementById('live'); if (l) l.innerHTML = ''; if (SR) startRec(); }
   else if (act==='save') saveRec();
   else if (act==='backup') backup();
-  else if (act==='reai') { if (!store.get('apikey','')) { const p = MINE.find(x=>x.id===id); if (p) { p.ai = null; p.status = 'handoff'; saveMine(); reload(); render(true); } } else runAI(id); }
+  else if (act==='reai') runAI(id);
   else if (act==='handoff') { const p = MINE.find(x=>x.id===id); if (!p) return;
     const prompt = ZipAI.handoffPrompt(p.transcript || `단지명: ${nameOf(p)}${p.sigungu?' ('+p.sigungu+')':''} — 아직 방문 전. 단지 정보와 최근 시세만 찾아 주세요.`), enc = encodeURIComponent(prompt);
     const base = t.dataset.to==='claude' ? 'https://claude.ai/new' : 'https://chatgpt.com/';

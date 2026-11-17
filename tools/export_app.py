@@ -18,8 +18,11 @@ KEEP = ["sido", "sigungu", "dong", "complex_name", "property_type", "sale_price"
         "mgmt_fee", "parking_per_household", "elevator", "mgmt_office", "station_name", "station_walk_min",
         "elementary", "chopuma", "middle_high", "commercial", "defects", "uncertain"]
 
+APP_SAMPLES = {"s1"}   # 앱에는 샘플 1건만 보여준다 (검증용 데이터 5건은 그대로)
 props = []
 for p in data["items"]:
+    if p["_id"] not in APP_SAMPLES:
+        continue
     z = p["_zone"]
     t = transcripts.get(p["_id"], {})
     props.append({
