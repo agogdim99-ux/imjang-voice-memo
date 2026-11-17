@@ -1,0 +1,446 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#FBF8F3">
+<title>집노트</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+:root{
+  --bg:#FBF8F3; --surface:#FFFFFF; --card:#F6F0E8; --line:#E9E0D4; --line2:#F0E9DF;
+  --ink:#3A2618; --ink2:#5E4634; --muted:#8C7A6B;
+  --blue:#1338B3; --blue-ink:#0D2A8A; --blue-soft:#E9EEFB;
+  --ok:#1F7A45; --ok-bg:#E7F4EC; --warn:#9A6200; --warn-bg:#FBF1DC; --bad:#B4232C; --bad-bg:#FBE8E8; --na:#7A6E66; --na-bg:#EFEAE4;
+  --need:#A6620F; --need-bg:#FFF4E2;
+  --radius:16px; --shadow:0 1px 2px rgba(58,38,24,.05),0 6px 24px rgba(58,38,24,.06);
+  --display:"Gowun Batang",serif; --sans:"Pretendard",-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:#EFE8DE;color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.5}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+a{color:inherit;text-decoration:none}
+.phone{position:relative;max-width:430px;min-height:100dvh;margin:0 auto;background:var(--bg);display:flex;flex-direction:column}
+@media (min-width:600px){.phone{margin:24px auto;min-height:calc(100dvh - 48px);border-radius:36px;box-shadow:0 20px 60px rgba(58,38,24,.18);overflow:hidden}}
+main{flex:1;overflow-y:auto;padding:12px 20px 110px}
+.disp{font-family:var(--display);font-weight:700;letter-spacing:-.02em;color:var(--ink)}
+.row{display:flex;align-items:center;gap:8px}
+.between{justify-content:space-between}
+.ic{width:22px;height:22px;flex:none}
+.muted{color:var(--muted)} .small{font-size:12.5px}
+
+/* 상단 */
+.top{display:flex;align-items:center;justify-content:space-between;padding:14px 0 6px}
+.brand{font-size:26px}
+.iconbtn{position:relative;width:40px;height:40px;display:grid;place-items:center;border-radius:12px}
+.iconbtn:active{background:var(--card)}
+.badge{position:absolute;top:4px;right:4px;min-width:17px;height:17px;padding:0 4px;border-radius:9px;background:var(--blue);color:#fff;font-size:10.5px;font-weight:700;display:grid;place-items:center}
+.hero{font-size:30px;line-height:1.3;margin:18px 0 22px}
+
+.btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:56px;border-radius:12px;background:var(--blue);color:#fff;font-weight:700;font-size:17px;box-shadow:0 6px 16px rgba(19,56,179,.25)}
+.btn:active{background:var(--blue-ink);transform:translateY(1px)}
+.btn.ghost{background:var(--surface);color:var(--blue);box-shadow:none;border:1.5px solid var(--blue)}
+
+h2.sec{font-size:17px;font-weight:700;margin:30px 0 8px;color:var(--ink)}
+.list{border-top:1px solid var(--line)}
+.li{display:flex;align-items:center;gap:10px;padding:14px 6px;border-bottom:1px solid var(--line);width:100%;text-align:left}
+.li:active{background:var(--card)}
+.li .name{flex:1;font-size:16px;font-weight:500;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.li .meta{color:var(--ink2);font-size:14px;font-variant-numeric:tabular-nums}
+.chev{width:18px;height:18px;color:var(--ink2);flex:none}
+.zdot{font-size:11px;font-weight:700;padding:2px 7px;border-radius:99px;flex:none}
+.zA,.zC{background:var(--bad-bg);color:var(--bad)} .zB{background:var(--ok-bg);color:var(--ok)} .zq{background:var(--na-bg);color:var(--na)}
+
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface)}
+.seg button{height:42px;font-weight:500;color:var(--ink2);border-left:1px solid var(--line)}
+.seg button:first-child{border-left:0}
+.seg button.on{background:var(--blue);color:#fff;font-weight:700}
+.grouphd{display:flex;align-items:center;gap:8px;padding:14px 6px 10px;color:var(--ink2);font-weight:500;width:100%}
+.grouphd .arrow{color:var(--muted)}
+.grouphd .tog{margin-left:auto;transition:transform .2s}
+.grouphd[aria-expanded=false] .tog{transform:rotate(-90deg)}
+.indent .li{padding-left:16px}
+.empty{padding:28px 10px;text-align:center;color:var(--muted);font-size:14px}
+
+/* 하단 탭 */
+nav.tabs{position:absolute;left:0;right:0;bottom:0;display:grid;grid-template-columns:repeat(3,1fr);background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+@media (max-width:599px){nav.tabs{position:fixed;max-width:430px;margin:0 auto}}
+nav.tabs a{display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0 12px;font-size:12.5px;color:var(--ink2);border-top:3px solid transparent}
+nav.tabs a.on{color:var(--blue);font-weight:700;border-top-color:var(--blue)}
+
+/* 지역별 */
+.pagehd{font-size:28px;margin:18px 0 14px}
+.crumb{display:flex;align-items:center;gap:6px;margin:0 -20px;padding:12px 20px;background:var(--card);font-weight:500}
+.crumb select{appearance:none;border:0;background:transparent;font:inherit;font-weight:600;color:var(--ink);padding:2px 18px 2px 2px;background-image:linear-gradient(45deg,transparent 50%,var(--ink2) 50%),linear-gradient(135deg,var(--ink2) 50%,transparent 50%);background-position:right 6px center,right 1px center;background-size:5px 5px;background-repeat:no-repeat}
+.subtabs{display:flex;gap:4px;overflow-x:auto;border-bottom:1px solid var(--line);margin-top:10px;scrollbar-width:none}
+.subtabs button{padding:12px 14px;white-space:nowrap;color:var(--ink2);border-bottom:3px solid transparent;margin-bottom:-1px}
+.subtabs button.on{color:var(--ink);font-weight:700;border-bottom-color:var(--ink)}
+.chips{display:flex;gap:8px;margin:12px 0 6px;overflow-x:auto;scrollbar-width:none}
+.chip{height:36px;padding:0 16px;border-radius:99px;border:1px solid var(--line);background:var(--surface);color:var(--ink2);white-space:nowrap}
+.chip.on{background:var(--blue);border-color:var(--blue);color:#fff;font-weight:700}
+.note{display:flex;gap:6px;align-items:flex-start;margin-top:12px;color:var(--muted);font-size:12.5px}
+.fab{position:absolute;right:20px;bottom:92px;width:64px;height:64px;border-radius:50%;background:var(--blue);color:#fff;display:grid;place-items:center;box-shadow:0 10px 24px rgba(19,56,179,.35)}
+@media (max-width:599px){.fab{position:fixed;right:max(20px,calc(50vw - 195px))}}
+
+/* 상세 */
+.dethd{display:flex;align-items:center;gap:6px;margin:0 -20px;padding:10px 12px;position:sticky;top:-12px;background:var(--bg);z-index:5}
+.dethd .t{flex:1;text-align:center;font-weight:700;font-size:16.5px;margin-right:40px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.photo{position:relative;margin:0 -20px;height:170px;background:linear-gradient(180deg,#DCE5F5 0%,#EEF1F7 55%,#E7E0D3 100%);display:grid;place-items:end center;overflow:hidden}
+.photo svg{width:100%;height:150px}
+.photo .lbl{position:absolute;right:12px;bottom:10px;font-size:11.5px;color:#fff;background:rgba(58,38,24,.55);padding:3px 8px;border-radius:6px}
+.dtitle{font-size:26px;margin:18px 0 4px;line-height:1.3}
+.loc{display:flex;align-items:center;gap:6px;color:var(--ink2);font-size:14.5px}
+.card{background:var(--card);border-radius:var(--radius);padding:14px 16px;margin-top:14px}
+.cardhd{display:flex;align-items:center;gap:10px;font-weight:700;font-size:16.5px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.cardhd .more{margin-left:auto;font-size:13px;font-weight:500;color:var(--blue)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);padding-top:10px}
+.stat{padding:0 8px;border-left:1px solid var(--line)} .stat:first-child{border-left:0;padding-left:0}
+.stat .k{font-size:12px;color:var(--ink2)} .stat .v{font-size:clamp(16px,5vw,20px);font-weight:800;letter-spacing:-.03em;font-variant-numeric:tabular-nums;white-space:nowrap}
+.stat .v.need{font-size:13px;font-weight:700;color:var(--need)}
+.kv{display:grid;grid-template-columns:96px 1fr;gap:7px 8px;padding-top:12px;font-size:14px}
+.kv dt{color:var(--ink2)} .kv dd{margin:0;font-weight:500}
+.needtxt{color:var(--need);font-weight:600}
+.bul{margin:10px 0 0;padding-left:18px} .bul li{margin:4px 0}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.tag{font-size:12.5px;padding:4px 10px;border-radius:99px;background:var(--need-bg);color:var(--need);font-weight:600}
+.sublbl{font-size:12.5px;font-weight:700;color:var(--ink2);margin-top:12px}
+.scen{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}
+.scen:last-of-type{border-bottom:0}
+.scen .nm{font-size:13px;color:var(--ink2)} .scen .need{font-size:26px;font-weight:800;letter-spacing:-.02em}
+.scen .na{font-size:15px;font-weight:700;color:var(--na)}
+.pill{font-size:13px;font-weight:700;padding:6px 11px;border-radius:99px;white-space:nowrap}
+.pill.ok{background:var(--ok-bg);color:var(--ok)} .pill.warn{background:var(--warn-bg);color:var(--warn)} .pill.bad{background:var(--bad-bg);color:var(--bad)} .pill.na{background:var(--na-bg);color:var(--na)}
+.cond{display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding:10px 12px;background:var(--surface);border-radius:10px;font-size:13.5px}
+.cond b{color:var(--ink)}
+.fine{font-size:12px;color:var(--muted);margin-top:8px;line-height:1.55}
+details.raw{margin-top:14px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:4px 16px}
+details.raw summary{padding:12px 0;font-weight:600;cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px}
+details.raw summary::after{content:"";margin-left:auto;width:8px;height:8px;border-right:2px solid var(--ink2);border-bottom:2px solid var(--ink2);transform:rotate(45deg);transition:transform .2s}
+details.raw[open] summary::after{transform:rotate(-135deg)}
+details.raw p{font-size:14px;color:var(--ink2);margin:0 0 12px}
+audio{width:100%;margin-bottom:10px;height:36px}
+.cta{position:absolute;left:0;right:0;bottom:0;padding:12px 20px calc(14px + env(safe-area-inset-bottom));background:linear-gradient(180deg,rgba(251,248,243,0),var(--bg) 30%)}
+@media (max-width:599px){.cta{position:fixed;max-width:430px;margin:0 auto}}
+
+/* 내 기록 */
+.optgrid{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.tblwrap{overflow-x:auto;margin:10px -20px 0;padding:0 20px}
+table.cmp{border-collapse:collapse;font-size:13px;min-width:560px;background:var(--surface);border-radius:12px;overflow:hidden}
+table.cmp th,table.cmp td{padding:9px 10px;border-bottom:1px solid var(--line2);text-align:left;white-space:nowrap}
+table.cmp th{background:var(--card);font-weight:700;position:sticky;top:0}
+table.cmp td:first-child,table.cmp th:first-child{position:sticky;left:0;background:var(--card);color:var(--ink2);font-weight:600}
+table.cmp td.need{color:var(--need);font-weight:600}
+
+/* 바텀시트 */
+.scrim{position:fixed;inset:0;background:rgba(40,26,16,.42);display:none;z-index:40}
+.sheet{position:fixed;left:0;right:0;bottom:0;max-width:430px;margin:0 auto;background:var(--bg);border-radius:22px 22px 0 0;padding:10px 20px calc(22px + env(safe-area-inset-bottom));max-height:86dvh;overflow-y:auto;transform:translateY(105%);transition:transform .28s ease;z-index:50}
+.sheet.open{transform:none} .scrim.open{display:block}
+.grab{width:40px;height:4px;border-radius:2px;background:var(--line);margin:0 auto 12px}
+.sheet h3{font-size:21px;margin:4px 0 6px}
+.steps{display:flex;gap:6px;margin:12px 0 16px;font-size:12.5px;color:var(--ink2)}
+.steps span{flex:1;background:var(--card);border-radius:10px;padding:8px;text-align:center}
+.steps b{display:block;color:var(--blue);font-size:12px}
+.sample{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}
+.play{width:40px;height:40px;border-radius:50%;background:var(--blue-soft);color:var(--blue);display:grid;place-items:center;flex:none}
+.sample .s{flex:1;min-width:0} .sample .s b{display:block;font-size:15px} .sample .s small{color:var(--muted)}
+.go{font-size:13px;font-weight:700;color:var(--blue);padding:8px 4px;white-space:nowrap}
+.recbox{margin-top:18px;padding:14px;border:1px dashed var(--line);border-radius:14px;text-align:center}
+.recdot{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--bad);margin-right:6px;animation:blink 1s infinite}
+@keyframes blink{50%{opacity:.25}}
+.toast{position:fixed;left:50%;bottom:110px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:10px;font-size:13.5px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:60;max-width:90vw;text-align:center}
+.toast.on{opacity:1}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+</style>
+</head>
+<body>
+<div class="phone">
+  <main id="view"></main>
+  <nav class="tabs" id="tabs">
+    <a href="#/" data-t="home"><svg class="ic" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3 3 10v10a1 1 0 0 0 1 1h5v-6h6v6h5a1 1 0 0 0 1-1V10z"/></svg>홈</a>
+    <a href="#/region" data-t="region"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>지역별 매물</a>
+    <a href="#/records" data-t="records"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>내 기록</a>
+  </nav>
+</div>
+<div class="scrim" id="scrim"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true"></div>
+<div class="toast" id="toast"></div>
+
+<script src="data.js"></script>
+<script>
+/* ───────── 데이터·설정 ───────── */
+const D = window.ZIPNOTE_DATA || {properties: []};
+const P = D.properties;
+const byId = Object.fromEntries(P.map(p => [p.id, p]));
+const store = {
+  get(k, d){ try { const v = localStorage.getItem('zipnote.'+k); return v ? JSON.parse(v) : d; } catch(e){ return d; } },
+  set(k, v){ try { localStorage.setItem('zipnote.'+k, JSON.stringify(v)); } catch(e){} }
+};
+let S = store.get('settings', {seed: 2, buyer: '무주택', income: 0});
+const recent = () => store.get('recent', P.map(p => p.id));
+
+/* ───────── 자금 계산 (imjang/finance.py 와 같은 규칙) ───────── */
+const SEED = {1:['1억 미만',0,10000],2:['1억~3억',10000,30000],3:['3억~5억',30000,50000],4:['5억~7억',50000,70000],5:['7억~10억',70000,100000],6:['10억 이상',100000,null]};
+const BUYER = {'무주택':'무주택','생애최초':'생애최초','다주택':'2주택 이상'};
+const INCOME = {0:['미입력',null],1:['3천만원 미만',2500],2:['3천~5천만원',3000],3:['5천~7천만원',5000],4:['7천만원~1억',7000],5:['1억 이상',10000]};
+const LTV = {'true|무주택':.4,'false|무주택':.7,'true|생애최초':.7,'false|생애최초':.8};
+const cap = p => p <= 150000 ? 60000 : p <= 250000 ? 40000 : 20000;
+function dsrMax(inc){ const r=.045/12, n=360, m=inc*.4/12; return Math.floor(m*(1-Math.pow(1+r,-n))/r); }
+function won(v){ if(v==null) return '확인 필요'; v=Math.round(v); const s=v<0?'-':''; v=Math.abs(v); const e=Math.floor(v/10000), m=v%10000;
+  return s+(e&&m?`${e}억 ${m.toLocaleString()}만원`:e?`${e}억원`:`${m.toLocaleString()}만원`); }
+function short(v){ if(v==null) return null; return v>=10000 ? (Math.round(v/1000)/10).toString()+'억' : v.toLocaleString()+'만'; }
+function loanEst(price, regulated, buyer, inc){
+  if(buyer==='다주택') return {amount:0, basis:'2주택 이상: 수도권 주택구입 목적 주담대 불가'};
+  const ltv=LTV[`${!!regulated}|${buyer}`], parts=[[Math.floor(price*ltv),`LTV ${ltv*100}%`],[cap(price),'절대 한도']];
+  const income=INCOME[inc][1]; if(income) parts.push([dsrMax(income),'DSR 40%']);
+  const [amt]=parts.reduce((a,b)=>b[0]<a[0]?b:a);
+  return {amount:amt, basis: parts.map(p=>`${p[1]} ${won(p[0])}`).join(' · ') + ` → ${won(amt)}` + (income?'':' (소득 미입력: DSR 미반영)')};
+}
+function judge(need, seed){
+  const [name,low,high]=SEED[seed], short_=need-low;
+  if(short_<=0) return {verdict:'가능', level:'ok'};
+  const lv = short_<=10000 ? 'warn' : 'bad';
+  return {verdict:(lv==='warn'?'조금 부족 ':'많이 부족 ')+won(short_), level:lv,
+          note:(high==null||need<=high)?`시드가 구간 상단에 가까우면 가능`:''};
+}
+function finance(p){
+  const z=p.zone, price=p.sale_price, j=p.jeonse_price, out=[];
+  if(price==null) return {scen:[{name:'판정 불가', na:'매매가 확인 필요', level:'na'}]};
+  const loan=loanEst(price, z.regulated, S.buyer, S.income);
+  if(z.gap_allowed===true){
+    if(j==null) out.push({name:'갭투자', na:'전세가 확인 필요', level:'na'});
+    else { const need=price-j; out.push({name:'갭투자', need, ...judge(need,S.seed), detail:`매매 ${short(price)} − 전세 ${short(j)}`}); }
+  } else if(z.gap_allowed===false) out.push({name:'갭투자', na:'불가 · 토허구역', level:'na', detail:'2년 실거주 의무'});
+  const need=price-loan.amount;
+  out.push({name:'실거주 매수', need, ...judge(need,S.seed), detail:`매매 ${short(price)} − 대출 추정 ${short(loan.amount)}`});
+  const tips=[];
+  if(S.buyer==='다주택') tips.push('다주택자는 수도권 주담대가 막혀 현금·전세 레버리지만 가능');
+  else if(S.buyer==='생애최초') tips.push('생애최초 LTV 우대 — 디딤돌·보금자리론 해당 여부 은행 확인');
+  else if(price<=60000) tips.push('6억 이하 → 보금자리론 대상 가능성, 시중은행 금리와 비교');
+  else tips.push('한도 = LTV·절대 한도·DSR 중 가장 작은 값');
+  if(z.zone==='A'||z.zone==='C') tips.push('토허구역: 허가 후 4개월 내 입주·2년 실거주 → 전세 끼고 매수 불가');
+  if(p.seller_loan_exists && p.seller_loan_amount) tips.push(`매도인 융자 ${won(p.seller_loan_amount)} — 잔금 때 말소 조건 명시`);
+  return {scen:out, basis:loan.basis, tips};
+}
+const best = f => { const order={ok:0,warn:1,bad:2,na:3}; return f.scen.slice().sort((a,b)=>order[a.level]-order[b.level])[0]; };
+
+/* ───────── 표시 도우미 ───────── */
+const esc = s => String(s??'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const SIDO_SHORT = {'서울특별시':'서울','경기도':'경기','인천광역시':'인천'};
+const nameOf = p => `${p.dong || p.sigungu || '이름 없는'} ${p.property_type || '매물'}${p.area_pyeong ? ' '+p.area_pyeong+'평' : ''}`;
+const gu = p => (p.sigungu || '구 확인 필요');
+const spot = p => p.station_name || p.dong || '위치 확인 필요';
+const zcls = z => z==='A'?'zA':z==='B'?'zB':z==='C'?'zC':'zq';
+const zshort = z => ({A:'토허',B:'갭 가능',C:'개별 지정'})[z] || '확인';
+const MISS = [['sale_price','매매가'],['jeonse_price','전세가'],['area_pyeong','평형'],['built_year','연식'],['households','세대수'],['mgmt_fee','관리비'],['parking_per_household','주차'],['elevator','엘리베이터'],['station_walk_min','역 거리'],['floor','층'],['facing','향'],['mgmt_office','관리사무소'],['elementary','초등학교'],['middle_high','중·고등학교'],['commercial','상권'],['seller_loan_exists','융자 여부']];
+const missing = p => MISS.filter(([k])=>p[k]==null).map(([,l])=>l).concat((p.defects||[]).length?[]:['하자 여부']);
+const I = {
+  chev:'<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 6 6 6-6 6"/></svg>',
+  pin:'<svg class="ic" style="width:18px;height:18px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>',
+  mic:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>',
+  bell:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>',
+  back:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m15 5-7 7 7 7"/></svg>',
+  bld:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="3" width="10" height="18"/><path d="M14 9h6v12h-6M7 7h1M10 7h1M7 11h1M10 11h1M7 15h1M10 15h1"/></svg>',
+  memo:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V2.5h6V4M9 10h6M9 14h6"/></svg>',
+  coin:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><ellipse cx="9" cy="7" rx="6" ry="2.5"/><path d="M3 7v4c0 1.4 2.7 2.5 6 2.5s6-1.1 6-2.5V7M3 11v4c0 1.4 2.7 2.5 6 2.5"/><ellipse cx="16" cy="15" rx="5" ry="2"/><path d="M11 15v3c0 1.1 2.2 2 5 2s5-.9 5-2v-3"/></svg>',
+  play:'<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>',
+  pause:'<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg>',
+  info:'<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" style="flex:none;margin-top:2px"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>'
+};
+const li = (p, meta='') => `<a class="li" href="#/p/${p.id}"><span class="name">${esc(nameOf(p))}</span>${meta}${I.chev}</a>`;
+
+/* ───────── 화면: 홈 ───────── */
+function home(){
+  const sidoTab = store.get('homeSido', '서울특별시');
+  const needTotal = P.reduce((n,p)=>n+missing(p).length,0);
+  const groups = {};
+  P.filter(p=>p.sido===sidoTab).forEach(p=>{ const k=gu(p)+'|'+spot(p); (groups[k]=groups[k]||[]).push(p); });
+  const rec = recent().map(id=>byId[id]).filter(Boolean).slice(0,3);
+  return `
+  <div class="top"><span class="disp brand">집노트</span>
+    <a class="iconbtn" href="#/records" aria-label="확인 필요 항목 ${needTotal}개">${I.bell}<span class="badge">${needTotal}</span></a></div>
+  <h1 class="disp hero">오늘,<br>어떤 집을 보셨나요?</h1>
+  <button class="btn" data-act="rec">${I.mic} 녹음 시작</button>
+  <h2 class="sec">최근 본 매물</h2>
+  <div class="list">${rec.map(p=>li(p,`<span class="zdot ${zcls(p.zone.zone)}">${zshort(p.zone.zone)}</span>`)).join('')}</div>
+  <h2 class="sec">내 임장 기록</h2>
+  <div class="seg" role="tablist">${Object.entries(SIDO_SHORT).map(([k,v])=>`<button role="tab" class="${k===sidoTab?'on':''}" data-sido="${k}">${v}</button>`).join('')}</div>
+  ${Object.keys(groups).length ? Object.entries(groups).map(([k,list],i)=>{ const [g,s]=k.split('|'); return `
+    <button class="grouphd" aria-expanded="true" data-grp="${i}">${I.pin}<span>${esc(g)}</span><span class="arrow">→</span><span>${esc(s)}</span>
+      <svg class="tog" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></button>
+    <div class="list indent" id="grp${i}">${list.map(p=>li(p)).join('')}</div>`;}).join('') : `<div class="empty">아직 ${SIDO_SHORT[sidoTab]} 임장 기록이 없어요.<br>녹음으로 첫 매물을 남겨보세요.</div>`}`;
+}
+
+/* ───────── 화면: 지역별 매물 ───────── */
+function region(q){
+  const sidos = [...new Set(P.map(p=>p.sido).filter(Boolean))];
+  const sido = q.sido && sidos.includes(q.sido) ? q.sido : sidos[0];
+  const gus = [...new Set(P.filter(p=>p.sido===sido).map(gu))];
+  const g = q.gu && gus.includes(q.gu) ? q.gu : gus[0];
+  const inGu = P.filter(p=>p.sido===sido && gu(p)===g);
+  const spots = [...new Set(inGu.map(spot))];
+  const sp = q.spot && spots.includes(q.spot) ? q.spot : spots[0];
+  const f = q.f || 'all';
+  let list = inGu.filter(p=>spot(p)===sp);
+  if(f==='gap') list = list.filter(p=>p.zone.gap_allowed===true);
+  if(f==='ok') list = list.filter(p=>{ const b=best(finance(p)); return b.level==='ok'||b.level==='warn'; });
+  const sel = (name, opts, cur) => `<select aria-label="${name}" data-q="${name}">${opts.map(o=>`<option value="${esc(o)}" ${o===cur?'selected':''}>${esc(name==='sido'?SIDO_SHORT[o]||o:o)}</option>`).join('')}</select>`;
+  return `
+  <h1 class="disp pagehd">지역별 매물</h1>
+  <div class="crumb">${I.pin}${sel('sido',sidos,sido)}<span class="muted">›</span>${sel('gu',gus,g)}</div>
+  <div class="subtabs">${spots.map(s=>`<button class="${s===sp?'on':''}" data-spot="${esc(s)}">${esc(s)}</button>`).join('')}</div>
+  <h2 class="disp" style="font-size:23px;margin:22px 0 4px">${esc(sp)} ${/역$/.test(sp)?'인근':''}</h2>
+  <div class="chips">${[['all','전체'],['gap','갭투자 가능'],['ok','내 시드로 근접']].map(([k,v])=>`<button class="chip ${k===f?'on':''}" data-f="${k}">${v}</button>`).join('')}</div>
+  <div class="list">${list.length ? list.map(p=>li(p,`<span class="meta">${p.households?p.households.toLocaleString()+'세대':'<span class="needtxt">세대수 확인</span>'}</span>`)).join('') : '<div class="empty">조건에 맞는 매물이 없어요.</div>'}</div>
+  <p class="note">${I.info}<span>녹음에서 자동으로 뽑은 값이에요. 금액·세대수는 거래 전 직접 확인하세요.</span></p>
+  <button class="fab" data-act="rec" aria-label="녹음 시작">${I.mic}</button>`;
+}
+
+/* ───────── 화면: 매물 상세 ───────── */
+function detail(id){
+  const p = byId[id]; if(!p) return `<div class="empty">매물을 찾을 수 없어요.</div>`;
+  const r = recent().filter(x=>x!==id); r.unshift(id); store.set('recent', r);
+  const f = finance(p), miss = missing(p);
+  const stat = (k,v) => `<div class="stat"><div class="k">${k}</div><div class="v ${v?'':'need'}">${v||'확인 필요'}</div></div>`;
+  const kv = (k,v) => `<dt>${k}</dt><dd>${v==null||v===''?'<span class="needtxt">확인 필요</span>':esc(v)}</dd>`;
+  const pk = p.parking_per_household, hh = p.households;
+  return `
+  <div class="dethd"><a class="iconbtn" href="javascript:history.length>1?history.back():location.hash='#/'" aria-label="뒤로">${I.back}</a><span class="t">${esc(nameOf(p))}</span></div>
+  <div class="photo" aria-hidden="true">
+    <svg viewBox="0 0 400 150" preserveAspectRatio="xMidYMax slice">
+      <g fill="#C9D3E6">${[30,90,250,320].map((x,i)=>`<rect x="${x}" y="${40+i%2*18}" width="46" height="${110-i%2*18}"/>`).join('')}</g>
+      <g fill="#F4F1EB" stroke="#B8C2D6">${[60,140,200,290].map((x,i)=>`<rect x="${x}" y="${18+i*7}" width="56" height="${132-i*7}"/>`).join('')}</g>
+      <g fill="#B8C2D6">${[60,140,200,290].flatMap((x,i)=>Array.from({length:7},(_,r)=>[0,1,2].map(c=>`<rect x="${x+8+c*16}" y="${30+i*7+r*15}" width="8" height="7"/>`).join(''))).join('')}</g>
+      <path d="M0 150 Q60 118 120 136 T240 130 T400 128 V150Z" fill="#7E9A6A"/><path d="M0 150 Q80 132 170 144 T400 140 V150Z" fill="#5F7F50"/>
+    </svg><span class="lbl">사진 없음 · 다음 단계에서 연결</span></div>
+  <h1 class="disp dtitle">${esc(nameOf(p))}</h1>
+  <div class="loc">${I.pin}<span>${esc([SIDO_SHORT[p.sido]||p.sido, p.sigungu].filter(Boolean).join(' '))}${p.station_name?' · '+esc(p.station_name):''}</span>
+    <span class="zdot ${zcls(p.zone.zone)}" style="margin-left:4px">${esc(p.zone.label)}</span></div>
+
+  <section class="card"><div class="cardhd">${I.bld}기본 정보</div>
+    <div class="stats">${stat('매매',short(p.sale_price))}${stat('전세',short(p.jeonse_price))}${stat('면적',p.area_pyeong?p.area_pyeong+'평':null)}${stat('역',p.station_walk_min!=null?'도보 '+p.station_walk_min+'분':null)}</div>
+    <dl class="kv">${kv('연식',p.built_year?`${p.built_year}년 (${2026-p.built_year}년차)`:null)}${kv('세대수',hh?`${hh.toLocaleString()}세대 · ${hh>=1000?'대단지':hh>=300?'중단지':'소단지'}`:null)}
+      ${kv('주차',pk!=null?`${pk>=1?'1대 이상':'1대 미만'} (세대당 ${pk}대)`:null)}${kv('관리비',p.mgmt_fee!=null?`${p.mgmt_fee}만원`:null)}
+      ${kv('엘리베이터',p.elevator==null?null:p.elevator?'있음':'없음')}${kv('층 · 향',[p.floor,p.facing].filter(Boolean).join(' · ')||null)}
+      ${kv('초품아',p.chopuma==null?null:p.chopuma?'예':'아니요')}${kv('매도인 융자',p.seller_loan_exists==null?null:p.seller_loan_exists?(p.seller_loan_amount?won(p.seller_loan_amount):'있음'):'없음')}</dl></section>
+
+  <section class="card"><div class="cardhd">${I.memo}현장 메모</div>
+    ${(p.defects||[]).length?`<div class="sublbl">하자 · 수리</div><ul class="bul">${p.defects.map(d=>`<li>${esc(d)}</li>`).join('')}</ul>`:''}
+    ${[p.commercial,p.middle_high,p.mgmt_office].filter(Boolean).length?`<div class="sublbl">입지 · 관리</div><ul class="bul">${[p.commercial,p.middle_high,p.mgmt_office].filter(Boolean).map(d=>`<li>${esc(d)}</li>`).join('')}</ul>`:''}
+    ${(p.uncertain||[]).length?`<div class="sublbl">❓ 말하면서 헷갈린 부분</div><ul class="bul">${p.uncertain.map(d=>`<li>${esc(d)}</li>`).join('')}</ul>`:''}
+    <div class="sublbl">다시 물어볼 것 ${miss.length}개</div><div class="tags">${miss.map(m=>`<span class="tag">${m}</span>`).join('')||'<span class="muted small">빠진 항목 없음</span>'}</div></section>
+
+  <section class="card"><div class="cardhd">${I.coin}자금 비교</div>
+    ${f.scen.map(s=>`<div class="scen"><div><div class="nm">${s.name}${s.need!=null?' · 필요 자금':''}</div>
+      ${s.need!=null?`<div class="need">${short(s.need)}</div>`:`<div class="na">${s.na}</div>`}${s.detail?`<div class="small muted">${esc(s.detail)}</div>`:''}</div>
+      ${s.need!=null?`<span class="pill ${s.level}">${s.verdict}</span>`:''}</div>${s.note?`<div class="small muted" style="margin-top:-6px;padding-bottom:8px">↳ ${s.note}</div>`:''}`).join('')}
+    <button class="cond" data-act="settings"><span>내 조건 <b>시드 ${SEED[S.seed][0]}</b> · ${BUYER[S.buyer]}</span><span style="color:var(--blue);font-weight:700">변경</span></button>
+    ${f.tips?`<ul class="bul small">${f.tips.map(t=>`<li>${esc(t)}</li>`).join('')}</ul>`:''}
+    <p class="fine">${f.basis?'대출 추정: '+esc(f.basis)+'<br>':''}${esc(p.zone.reason)}<br>참고용 추정 · 세금 미반영 · 대출은 은행 상담 필수 · ${esc(p.zone.caution)}</p></section>
+
+  <details class="raw"><summary>${I.mic} 녹음 원문 듣기</summary>
+    <audio controls preload="none" src="${esc(p.audio)}"></audio><p>${esc(p.transcript)}</p></details>
+  <div style="height:70px"></div>
+  <div class="cta"><button class="btn" data-act="rec">${I.mic} 이 매물에 녹음 추가</button></div>`;
+}
+
+/* ───────── 화면: 내 기록 (내 조건 + 비교표) ───────── */
+function records(){
+  const rows = [['위치',p=>[SIDO_SHORT[p.sido],p.sigungu].filter(Boolean).join(' ')||null],['구분',p=>p.zone.label],['매매',p=>short(p.sale_price)],['전세',p=>short(p.jeonse_price)],
+    ['평형',p=>p.area_pyeong?p.area_pyeong+'평':null],['연식',p=>p.built_year],['세대수',p=>p.households?.toLocaleString()],['관리비',p=>p.mgmt_fee!=null?p.mgmt_fee+'만':null],
+    ['주차',p=>p.parking_per_household==null?null:p.parking_per_household>=1?'1대 이상':'1대 미만'],['역',p=>p.station_walk_min!=null?p.station_walk_min+'분':null],
+    ['판정',p=>{const b=best(finance(p)); return b.need!=null?`${b.name} ${b.verdict}`:b.na;}],['확인 필요',p=>missing(p).length+'개']];
+  const chip = (grp, k, label, on) => `<button class="chip ${on?'on':''}" data-set="${grp}" data-v="${k}">${label}</button>`;
+  return `
+  <h1 class="disp pagehd">내 기록</h1>
+  <section class="card" style="margin-top:4px"><div class="cardhd">내 조건</div>
+    <div class="sublbl">시드(투자 가능 금액)</div><div class="optgrid">${Object.entries(SEED).map(([k,v])=>chip('seed',k,v[0],+k===S.seed)).join('')}</div>
+    <div class="sublbl">주택 보유</div><div class="optgrid">${Object.keys(BUYER).map(k=>chip('buyer',k,k,k===S.buyer)).join('')}</div>
+    <div class="sublbl">연소득 (대출 DSR 추정용)</div><div class="optgrid">${Object.entries(INCOME).map(([k,v])=>chip('income',k,v[0],+k===S.income)).join('')}</div>
+    <p class="fine">실제 금액이 아닌 구간만 이 기기에 저장돼요.</p></section>
+  <h2 class="sec">매물 한눈에 비교</h2>
+  <div class="tblwrap"><table class="cmp"><thead><tr><th>항목</th>${P.map(p=>`<th><a href="#/p/${p.id}" style="color:var(--blue)">${esc(nameOf(p))}</a></th>`).join('')}</tr></thead>
+    <tbody>${rows.map(([k,fn])=>`<tr><td>${k}</td>${P.map(p=>{const v=fn(p); return v==null?'<td class="need">확인 필요</td>':`<td>${esc(v)}</td>`;}).join('')}</tr>`).join('')}</tbody></table></div>
+  <p class="note">${I.info}<span>받아쓰기: ${esc(D.source)} · 추출: ${esc(D.method)}</span></p>`;
+}
+
+/* ───────── 바텀시트 ───────── */
+const sheet = document.getElementById('sheet'), scrim = document.getElementById('scrim');
+function openSheet(html){ sheet.innerHTML = '<div class="grab"></div>'+html; sheet.classList.add('open'); scrim.classList.add('open'); }
+function closeSheet(){ sheet.classList.remove('open'); scrim.classList.remove('open'); stopAudio(); stopRec(); }
+scrim.onclick = closeSheet;
+document.addEventListener('keydown', e => { if(e.key==='Escape') closeSheet(); });
+
+function recSheet(){
+  openSheet(`<h3 class="disp">녹음으로 매물 남기기</h3>
+  <p class="muted small" style="margin:0">현장에서 말로 남기면 집에 와서 정리할 필요가 없어요.</p>
+  <div class="steps"><span><b>1</b>녹음</span><span><b>2</b>받아쓰기<br>(Whisper)</span><span><b>3</b>항목표 ·<br>자금 판정</span></div>
+  <div class="sublbl">샘플 녹음으로 체험하기</div>
+  ${P.map(p=>`<div class="sample"><button class="play" data-play="${p.id}" aria-label="재생">${I.play}</button>
+    <div class="s"><b>${esc(nameOf(p))}</b><small>AI 음성 · ${esc(p.title)}</small></div><a class="go" href="#/p/${p.id}">정리 결과 ›</a></div>`).join('')}
+  <div class="recbox" id="recbox"><button class="btn ghost" data-act="mic">${I.mic} 직접 녹음해보기</button>
+    <p class="fine">PoC에서는 녹음 파일을 저장해 Colab 받아쓰기 노트북에 넣는 방식이에요.</p></div>`);
+}
+function settingsSheet(){
+  openSheet(`<h3 class="disp">내 조건</h3>${records().split('<h2 class="sec">')[0].replace(/<h1[\s\S]*?<\/h1>/,'').replace('style="margin-top:4px"','style="margin-top:0;background:transparent;padding:0"')}
+  <button class="btn" data-act="close" style="margin-top:14px">적용</button>`);
+}
+
+let audioEl = null, audioBtn = null;
+function stopAudio(){ if(audioEl){ audioEl.pause(); audioEl=null; } if(audioBtn){ audioBtn.innerHTML=I.play; audioBtn=null; } }
+function togglePlay(btn){
+  const id = btn.dataset.play; const same = audioBtn===btn; stopAudio(); if(same) return;
+  audioEl = new Audio(byId[id].audio); audioBtn = btn; btn.innerHTML = I.pause;
+  audioEl.onended = stopAudio; audioEl.play().catch(()=>{ toast('음성 파일을 열 수 없어요'); stopAudio(); });
+}
+let rec = null, chunks = [];
+function stopRec(){ if(rec && rec.state==='recording') rec.stop(); }
+async function toggleRec(btn){
+  if(rec && rec.state==='recording'){ rec.stop(); return; }
+  try{
+    const stream = await navigator.mediaDevices.getUserMedia({audio:true});
+    rec = new MediaRecorder(stream); chunks = [];
+    rec.ondataavailable = e => chunks.push(e.data);
+    rec.onstop = () => { stream.getTracks().forEach(t=>t.stop());
+      const url = URL.createObjectURL(new Blob(chunks,{type:rec.mimeType}));
+      document.getElementById('recbox').innerHTML = `<audio controls src="${url}"></audio>
+        <a class="btn ghost" href="${url}" download="imjang_${new Date().toISOString().slice(0,10)}.webm">녹음 파일 저장</a>
+        <p class="fine">저장한 파일을 Colab 노트북(01)에 올리면 받아쓰기 → 정리가 이어져요.</p>`; };
+    rec.start(); btn.innerHTML = `<span class="recdot"></span>녹음 중 · 눌러서 끝내기`;
+  }catch(e){ toast('마이크를 쓸 수 없어요 (권한 또는 브라우저 제한)'); }
+}
+let tt; function toast(m){ const t=document.getElementById('toast'); t.textContent=m; t.classList.add('on'); clearTimeout(tt); tt=setTimeout(()=>t.classList.remove('on'),2200); }
+
+/* ───────── 라우터 · 이벤트 ───────── */
+function parse(){ const [path,qs] = (location.hash.slice(1)||'/').split('?'); return {parts:path.split('/').filter(Boolean), q:Object.fromEntries(new URLSearchParams(qs||''))}; }
+function setQ(patch){ const {parts,q} = parse(); const n={...q,...patch}; Object.keys(n).forEach(k=>n[k]==null&&delete n[k]); location.hash = '#/'+parts.join('/')+'?'+new URLSearchParams(n); }
+function render(){
+  const {parts,q} = parse(), v = document.getElementById('view');
+  const tab = parts[0]==='region'?'region':parts[0]==='records'?'records':parts[0]==='p'?'':'home';
+  v.innerHTML = parts[0]==='region'?region(q):parts[0]==='records'?records():parts[0]==='p'?detail(parts[1]):home();
+  document.querySelectorAll('#tabs a').forEach(a=>a.classList.toggle('on', a.dataset.t===tab));
+  document.getElementById('tabs').style.display = parts[0]==='p' ? 'none' : '';
+  if(!q.keep) v.scrollTop = 0;
+}
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-act],[data-sido],[data-grp],[data-spot],[data-f],[data-set],[data-play]'); if(!t) return;
+  if(t.dataset.act==='rec') recSheet();
+  else if(t.dataset.act==='settings') settingsSheet();
+  else if(t.dataset.act==='close') closeSheet();
+  else if(t.dataset.act==='mic') toggleRec(t);
+  else if(t.dataset.sido){ store.set('homeSido', t.dataset.sido); render(); }
+  else if(t.dataset.grp){ const open = t.getAttribute('aria-expanded')==='true'; t.setAttribute('aria-expanded', !open); document.getElementById('grp'+t.dataset.grp).hidden = open; }
+  else if(t.dataset.spot) setQ({spot:t.dataset.spot});
+  else if(t.dataset.f) setQ({f:t.dataset.f, keep:1});
+  else if(t.dataset.play) togglePlay(t);
+  else if(t.dataset.set){ const k=t.dataset.set; S[k] = k==='buyer' ? t.dataset.v : +t.dataset.v; store.set('settings', S);
+    if(sheet.classList.contains('open')) settingsSheet(); render(); toast('조건을 바꿨어요 · 판정이 다시 계산됐어요'); }
+});
+document.addEventListener('change', e => { const s=e.target.closest('select[data-q]'); if(!s) return;
+  setQ(s.dataset.q==='sido' ? {sido:s.value, gu:null, spot:null} : {gu:s.value, spot:null}); });
+window.addEventListener('hashchange', () => { closeSheet(); render(); });
+render();
+</script>
+</body>
+</html>
