@@ -9,6 +9,7 @@ window.ZIPNOTE_DATA = {
    "sido": "서울특별시",
    "sigungu": "영등포구",
    "dong": "당산동",
+   "complex_name": null,
    "property_type": "아파트",
    "sale_price": 72000,
    "jeonse_price": 45000,
@@ -45,7 +46,7 @@ window.ZIPNOTE_DATA = {
    },
    "transcript": "오늘 첫 번째 매물. 서울 영등포구 당산동 아파트, 24평형. 매매는 7억 2천 부르고 전세는 4억 5천 정도 나온대. 2008년식이고 단지는 650세대. 당산역까지 걸어서 8분. 주차는 세대당 1.2대구 엘리베이터 있어. 관리비는 평균 18만원. 베란다 쪽에 누수 흔적이 좀 있어서 확인 필요하고. 남향이라 채광 괜찮고 초등학교가 단지 바로 옆이라 초품아야. 융자는 없대.",
    "audio": "../data/audio/clean/s1.mp3",
-   "seconds": 1.67
+   "seconds": 1.68
   },
   {
    "id": "s2",
@@ -53,6 +54,7 @@ window.ZIPNOTE_DATA = {
    "sido": "인천광역시",
    "sigungu": "부평구",
    "dong": "부평동",
+   "complex_name": null,
    "property_type": "아파트",
    "sale_price": 53000,
    "jeonse_price": 38000,
@@ -97,6 +99,7 @@ window.ZIPNOTE_DATA = {
    "sido": "경기도",
    "sigungu": "부천시",
    "dong": "중동",
+   "complex_name": null,
    "property_type": "빌라",
    "sale_price": 28000,
    "jeonse_price": 23000,
@@ -142,6 +145,7 @@ window.ZIPNOTE_DATA = {
    "sido": "인천광역시",
    "sigungu": "연수구",
    "dong": "송도동",
+   "complex_name": null,
    "property_type": "아파트",
    "sale_price": null,
    "jeonse_price": 40000,
@@ -190,6 +194,7 @@ window.ZIPNOTE_DATA = {
    "sido": "경기도",
    "sigungu": "성남시 분당구",
    "dong": "정자동",
+   "complex_name": null,
    "property_type": null,
    "sale_price": 99000,
    "jeonse_price": 36000,

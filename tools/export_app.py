@@ -13,7 +13,7 @@ src = ROOT / (sys.argv[1] if len(sys.argv) > 1 else "outputs/extracted_rules_tur
 data = json.loads(src.read_text(encoding="utf-8"))
 transcripts = {i["id"]: i for i in json.loads((ROOT / data["settings"]["source"]).read_text(encoding="utf-8"))["items"]}
 
-KEEP = ["sido", "sigungu", "dong", "property_type", "sale_price", "jeonse_price", "wolse_deposit", "wolse_monthly",
+KEEP = ["sido", "sigungu", "dong", "complex_name", "property_type", "sale_price", "jeonse_price", "wolse_deposit", "wolse_monthly",
         "seller_loan_exists", "seller_loan_amount", "area_pyeong", "built_year", "floor", "facing", "households",
         "mgmt_fee", "parking_per_household", "elevator", "mgmt_office", "station_name", "station_walk_min",
         "elementary", "chopuma", "middle_high", "commercial", "defects", "uncertain"]

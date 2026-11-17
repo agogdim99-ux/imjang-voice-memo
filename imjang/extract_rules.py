@@ -45,6 +45,58 @@ def _clauses(text: str) -> list[str]:
     return [c.strip() for c in re.split(r"[.?!,]\s*|\n", text) if c.strip()]
 
 
+# 단지명: "문래자이아파트", "당산 센트럴 아이파크" 처럼 유형어(아파트 등)나 브랜드 앞의 1~3단어
+BRANDS = ["자이", "래미안", "힐스테이트", "아이파크", "푸르지오", "e편한세상", "이편한세상", "롯데캐슬", "더샵", "센트레빌",
+          "위브", "아크로", "하늘채", "꿈에그린", "스카이뷰", "리첸시아", "스위첸", "데시앙", "해링턴", "포레나", "휴먼시아",
+          "베르디움", "어울림", "캐슬", "주공", "트리마제", "디에이치", "써밋", "블레스티지", "헬리오시티"]
+NAME_STOP = {"오늘", "첫", "두", "세", "네", "다섯", "번째", "번째는", "마지막", "본", "거", "거는", "건", "게", "매물", "그", "뭐지",
+             "이번", "여기", "저기", "이", "저", "하나", "집", "보러", "간", "온", "곳", "일단", "음", "어", "그리고", "다음", "본거"}
+LOCATION_WORDS = {"서울", "인천", "경기"}
+
+
+def _is_stop(tok: str) -> bool:
+    from .regions import NEIGHBORHOODS
+    if any(tok == w for ws in NEIGHBORHOODS.values() for w in ws if not w.endswith("동")):
+        return False  # "송도 더샵", "문래 자이"처럼 동네 이름은 단지명 앞부분으로 쓴다
+    if tok in NAME_STOP or tok in LOCATION_WORDS or re.fullmatch(r"\d+(평형?|층|세대)?", tok):
+        return True
+    if re.search(r"(특별시|광역시|도|시|군|구|동|번째는?|째|에서|이고|인데|는|은)$", tok) and not any(b in tok for b in BRANDS):
+        return True
+    from .regions import GYEONGGI_SI
+    return any(tok == si[:-1] for si in GYEONGGI_SI)
+
+
+def _name_before(tokens: list[str]) -> str | None:
+    picked = []
+    for tok in reversed(tokens[-3:]):
+        if _is_stop(tok):
+            break
+        picked.append(tok)
+    name = " ".join(reversed(picked)).strip()
+    return name if len(name) >= 2 else None
+
+
+def extract_complex_name(text: str) -> str | None:
+    for c in _clauses(text):
+        m = re.search(r"(아파트|빌라|오피스텔)", c)
+        if m:
+            name = _name_before(c[: m.start()].split())
+            if name:
+                return name
+    for c in _clauses(text):
+        toks = c.split()
+        for i in range(len(toks) - 1, -1, -1):
+            if any(b in toks[i] for b in BRANDS):
+                name = _name_before(toks[: i + 1])
+                if name:
+                    # 브랜드 뒤 수식어 1개까지 ("래미안 에스티움")
+                    nxt = toks[i + 1] if i + 1 < len(toks) else ""
+                    if nxt and not _is_stop(nxt) and not re.search(r"\d|(는데|봤|했|고|어|요|다|데|야|서)$", nxt):
+                        name += " " + nxt
+                    return re.sub(r"(이고|인데|는|은|이야|야)$", "", name)
+    return None
+
+
 def extract(text: str) -> dict:
     d = empty()
     t = text
@@ -60,6 +112,7 @@ def extract(text: str) -> dict:
 
     m = re.search(r"아파트|빌라|오피스텔|다세대|주택", t)
     d["property_type"] = m.group(0) if m else None
+    d["complex_name"] = extract_complex_name(t)
 
     # 가격: 키워드 뒤 첫 금액. 단, 같은 키워드로 다시 말하고 그 사이에 "아니다/정정"이 있으면 마지막 값(정정 반영)
     for key, kw in (("sale_price", "매매"), ("jeonse_price", "전세")):

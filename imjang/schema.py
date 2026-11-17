@@ -5,6 +5,7 @@ FIELDS = [
     ("sido", "시·도", "지역", "string"),
     ("sigungu", "시·군·구", "지역", "string"),
     ("dong", "동", "지역", "string"),
+    ("complex_name", "단지명", "물건", "string"),
     ("property_type", "유형", "물건", "string"),
     ("sale_price", "매매가", "가격", "integer"),
     ("jeonse_price", "전세가", "가격", "integer"),

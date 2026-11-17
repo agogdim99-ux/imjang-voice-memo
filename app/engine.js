@@ -16,6 +16,41 @@
   const SIDO_ALIASES = [["서울특별시",["서울"]],["인천광역시",["인천"]],["경기도",["경기"]]];
   const CAUTION = "지번 단위 지정 구역(공공주택지구·재개발 후보지 등)은 판정하지 못함 — 거래 전 토지이음·서울부동산정보광장에서 직접 조회";
 
+  /* 동네 이름 → 구 (regions.NEIGHBORHOODS 와 동일) */
+  const NEIGHBORHOODS = [
+    [["서울특별시",null,"영등포구"],["문래","당산","여의도","신길","대림","양평동"]],
+    [["서울특별시",null,"양천구"],["목동","신정","신월"]],
+    [["서울특별시",null,"노원구"],["상계","중계","하계","공릉","월계"]],
+    [["서울특별시",null,"송파구"],["잠실","문정","가락","방이","오금","거여","마천","풍납"]],
+    [["서울특별시",null,"서초구"],["반포","잠원","방배","서초동","양재"]],
+    [["서울특별시",null,"강남구"],["대치","압구정","개포","도곡","역삼","청담","삼성동","일원","수서"]],
+    [["서울특별시",null,"마포구"],["아현","공덕","상암","합정","망원","연남","성산동","도화동"]],
+    [["서울특별시",null,"성동구"],["성수","왕십리","행당","옥수","금호동"]],
+    [["서울특별시",null,"용산구"],["이촌","한남","이태원","효창"]],
+    [["서울특별시",null,"동작구"],["흑석","사당","상도","노량진","대방"]],
+    [["서울특별시",null,"관악구"],["봉천","신림"]],
+    [["서울특별시",null,"성북구"],["길음","정릉","장위","석관","돈암"]],
+    [["서울특별시",null,"강북구"],["미아","수유","번동"]],
+    [["서울특별시",null,"도봉구"],["창동","쌍문","방학"]],
+    [["서울특별시",null,"은평구"],["불광","응암","녹번","진관"]],
+    [["서울특별시",null,"서대문구"],["홍제","북가좌","남가좌","홍은"]],
+    [["서울특별시",null,"강동구"],["고덕","명일","둔촌","천호","암사","길동"]],
+    [["서울특별시",null,"중랑구"],["신내","면목","묵동","상봉"]],
+    [["서울특별시",null,"동대문구"],["이문","휘경","전농","답십리","청량리","장안동"]],
+    [["서울특별시",null,"광진구"],["구의","자양","광장동"]],
+    [["서울특별시",null,"강서구"],["화곡","등촌","가양","마곡","발산","염창"]],
+    [["서울특별시",null,"구로구"],["개봉","오류동","고척","신도림"]],
+    [["서울특별시",null,"금천구"],["독산","가산"]],
+    [["경기도","성남시","분당구"],["분당","판교","정자동","서현","수내","야탑"]],
+    [["경기도","용인시","수지구"],["수지","죽전","풍덕천"]],
+    [["경기도","용인시","기흥구"],["기흥","보정동","구갈"]],
+    [["경기도","고양시",null],["일산"]],
+    [["인천광역시",null,"연수구"],["송도"]],
+    [["인천광역시",null,"서해구"],["청라"]],
+    [["인천광역시",null,"검단구"],["검단"]],
+  ];
+  const NB_INDEX = NEIGHBORHOODS.flatMap(([k, ws]) => ws.map(w => [w, k])).sort((a, b) => b[0].length - a[0].length);
+
   function stripSuffix(n) {
     for (const s of ["특별시","광역시","도","시","군","구"]) if (n.endsWith(s) && n.length > s.length) return n.slice(0, -s.length);
     return n;
@@ -48,6 +83,9 @@
         if (["중구","동구","서구"].includes(g) && found === null) continue;
         if (hay.includes(g)) { found = s; gu = g; break; }
       }
+    }
+    if (gu === null && city === null) {
+      for (const [w, [s, c, g]] of NB_INDEX) if (hay.includes(w) && (found === null || found === s)) { found = s; city = c; gu = g; break; }
     }
     return { sido: found, city, gu, dong };
   }
@@ -84,8 +122,46 @@
   function after(t, kw, w = 14) { const i = t.indexOf(kw); return i < 0 ? null : t.slice(i + kw.length, i + kw.length + w); }
   const clausesOf = t => t.split(/[.?!,]\s*|\n/).map(c => c.trim()).filter(Boolean);
 
+  /* 단지명 (extract_rules.extract_complex_name) */
+  const BRANDS = ["자이","래미안","힐스테이트","아이파크","푸르지오","e편한세상","이편한세상","롯데캐슬","더샵","센트레빌","위브","아크로","하늘채","꿈에그린","스카이뷰","리첸시아","스위첸","데시앙","해링턴","포레나","휴먼시아","베르디움","어울림","캐슬","주공","트리마제","디에이치","써밋","블레스티지","헬리오시티"];
+  const NAME_STOP = new Set(["오늘","첫","두","세","네","다섯","번째","번째는","마지막","본","거","거는","건","게","매물","그","뭐지","이번","여기","저기","이","저","하나","집","보러","간","온","곳","일단","음","어","그리고","다음","본거"]);
+  const LOCATION_WORDS = new Set(["서울","인천","경기"]);
+  function isStop(tok) {
+    if (NB_INDEX.some(([w]) => w === tok && !w.endsWith("동"))) return false;   // "송도 더샵", "문래 자이"
+    if (NAME_STOP.has(tok) || LOCATION_WORDS.has(tok) || /^\d+(평형?|층|세대)?$/.test(tok)) return true;
+    if (/(특별시|광역시|도|시|군|구|동|번째는?|째|에서|이고|인데|는|은)$/.test(tok) && !BRANDS.some(b => tok.includes(b))) return true;
+    return GYEONGGI_SI.some(si => tok === si.slice(0, -1));
+  }
+  function nameBefore(tokens) {
+    const picked = [];
+    for (const tok of tokens.slice(-3).reverse()) { if (isStop(tok)) break; picked.push(tok); }
+    const name = picked.reverse().join(" ").trim();
+    return name.length >= 2 ? name : null;
+  }
+  function extractComplexName(text) {
+    const cls = clausesOf(text);
+    for (const c of cls) {
+      const m = /(아파트|빌라|오피스텔)/.exec(c);
+      if (m) { const n = nameBefore(c.slice(0, m.index).split(/\s+/).filter(Boolean)); if (n) return n; }
+    }
+    for (const c of cls) {
+      const toks = c.split(/\s+/).filter(Boolean);
+      for (let i = toks.length - 1; i >= 0; i--) {
+        if (BRANDS.some(b => toks[i].includes(b))) {
+          let n = nameBefore(toks.slice(0, i + 1));
+          if (n) {
+            const nxt = toks[i + 1] || "";
+            if (nxt && !isStop(nxt) && !/\d|(는데|봤|했|고|어|요|다|데|야|서)$/.test(nxt)) n += " " + nxt;
+            return n.replace(/(이고|인데|는|은|이야|야)$/, "");
+          }
+        }
+      }
+    }
+    return null;
+  }
+
   function empty() {
-    return { sido:null, sigungu:null, dong:null, property_type:null, sale_price:null, jeonse_price:null, wolse_deposit:null, wolse_monthly:null,
+    return { sido:null, sigungu:null, dong:null, complex_name:null, property_type:null, sale_price:null, jeonse_price:null, wolse_deposit:null, wolse_monthly:null,
       seller_loan_exists:null, seller_loan_amount:null, area_pyeong:null, built_year:null, floor:null, facing:null, households:null,
       mgmt_fee:null, parking_per_household:null, elevator:null, mgmt_office:null, station_name:null, station_walk_min:null,
       elementary:null, chopuma:null, middle_high:null, commercial:null, defects:[], uncertain:[] };
@@ -98,6 +174,7 @@
     const reg = normalizeRegion(null, null, dong, t);
     d.sido = reg.sido; d.sigungu = [reg.city, reg.gu].filter(Boolean).join(" ") || null; d.dong = dong;
     m = /아파트|빌라|오피스텔|다세대|주택/.exec(t); d.property_type = m ? m[0] : null;
+    d.complex_name = extractComplexName(t);
 
     for (const [key, kw] of [["sale_price", "매매"], ["jeonse_price", "전세"]]) {
       const vals = []; let i = t.indexOf(kw);
@@ -146,6 +223,6 @@
     return p;
   }
 
-  const api = { normalizeRegion, classify, extract, analyze, parseMoney, empty };
+  const api = { normalizeRegion, classify, extract, analyze, parseMoney, empty, extractComplexName };
   if (typeof module !== "undefined" && module.exports) module.exports = api; else root.ZipEngine = api;
 })(typeof window !== "undefined" ? window : globalThis);
