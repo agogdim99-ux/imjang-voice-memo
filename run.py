@@ -13,7 +13,7 @@ import sys
 import time
 from pathlib import Path
 
-from imjang import extract_llm, extract_rules
+from imjang import extract_llm, extract_open, extract_rules
 from imjang.finance import BUYER_TYPES, INCOME_BRACKETS, SEED_BRACKETS, evaluate_property
 from imjang.regions import classify, normalize_region
 from imjang.report import to_html, to_markdown
@@ -42,8 +42,8 @@ def load_items(path: Path) -> list[dict]:
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--transcripts", default="data/scripts.json", help="받아쓰기 결과 JSON (기본: 대본)")
-    ap.add_argument("--method", choices=["rules", "llm", "auto"], default="auto",
-                    help="rules=규칙 기반, llm=Claude, auto=키 또는 캐시가 있으면 llm 아니면 rules")
+    ap.add_argument("--method", choices=["rules", "qwen", "llm", "auto"], default="auto",
+                    help="rules=규칙 기반, qwen=오픈소스 LLM(Colab 결과), llm=Claude, auto=Claude 키·캐시가 있으면 llm 아니면 rules")
     ap.add_argument("--seed", type=int, choices=list(SEED_BRACKETS), help="시드 구간 번호 1~6")
     ap.add_argument("--buyer", choices=list(BUYER_TYPES), help="무주택 / 생애최초 / 다주택")
     ap.add_argument("--income", type=int, choices=list(INCOME_BRACKETS), default=None, help="연소득 구간 0~5 (0=미입력)")
@@ -76,11 +76,17 @@ def main():
                 print(f"[{it['id']}] Claude 추출 실패 → 규칙 기반 사용: {ex}")
             if p is None and a.method == "llm":
                 print(f"[{it['id']}] API 키도 캐시도 없어 규칙 기반으로 대체합니다.")
+        if a.method == "qwen":
+            p = extract_open.extract(Path(a.transcripts).stem, it["id"])
+            if p is None:
+                print(f"[{it['id']}] Qwen 결과가 없어 규칙 기반으로 대체합니다.")
+            else:
+                method_used.add(f"{extract_open.model_name()} (오픈소스 LLM)")
+        elif p is not None:
+            method_used.add(f"Claude ({extract_llm.MODEL})")
         if p is None:
             p = extract_rules.extract(text)
             method_used.add("규칙 기반")
-        else:
-            method_used.add(f"Claude ({extract_llm.MODEL})")
 
         reg = normalize_region(p.get("sido"), p.get("sigungu"), p.get("dong"), text)
         p["sido"] = reg["sido"] or p.get("sido")
@@ -89,7 +95,7 @@ def main():
         p["_finance"] = evaluate_property(p, zone, a.seed, a.buyer, a.income)
         p["_id"] = it["id"]
         p["_title"] = titles.get(it["id"], it["id"]).split(" — ")[0]
-        p["_seconds"] = round(time.perf_counter() - t0 + it.get("stt_seconds", 0), 2)
+        p["_seconds"] = round(time.perf_counter() - t0 + it.get("stt_seconds", 0) + (p.get("_llm_seconds") or 0), 2)
         p["_stt_seconds"] = it.get("stt_seconds")
         props.append(p)
 
@@ -97,7 +103,7 @@ def main():
                 "seed": a.seed, "buyer": a.buyer, "income": a.income}
     out = ROOT / a.out
     out.mkdir(parents=True, exist_ok=True)
-    tag = "llm" if any("Claude" in m for m in method_used) else "rules"
+    tag = "qwen" if a.method == "qwen" else "llm" if any("Claude" in m for m in method_used) else "rules"
     stem = Path(a.transcripts).stem
     (out / f"extracted_{tag}_{stem}.json").write_text(
         json.dumps({"settings": settings, "items": props}, ensure_ascii=False, indent=2, default=str), encoding="utf-8")
