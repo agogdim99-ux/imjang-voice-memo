@@ -181,6 +181,7 @@ details.srcs{margin-top:10px;font-size:12.5px} details.srcs summary{cursor:point
 details.srcs a{display:block;color:var(--blue);padding:4px 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .spinner{width:36px;height:36px;margin:0 auto;border-radius:50%;border:4px solid var(--blue-soft);border-top-color:var(--blue);animation:spin 1s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
+.steps2{margin:10px 0 12px;padding-left:20px;font-size:13.5px;color:var(--ink2)} .steps2 li{margin:4px 0}
 </style>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
@@ -447,13 +448,20 @@ function detailMine(p){
     <section class="card" style="text-align:center;padding:28px 16px"><div class="spinner"></div>
       <div style="font-weight:700;margin-top:14px">${esc(p.step||'정리 중')}</div>
       <p class="small muted" style="margin:6px 0 0">단지 정보와 최근 실거래가를 검색하고 녹음을 정리하고 있어요. 보통 30초~1분 걸려요. 다른 화면으로 가도 계속 진행돼요.</p></section>` + raw;
-  if (p.status === 'nokey' || p.status === 'error') return head + `
-    <section class="card"><div class="cardhd">${p.status==='nokey'?'AI 설정이 필요해요':'정리하지 못했어요'}</div>
-      <p class="small" style="margin:10px 0">${p.status==='nokey'?'단지 검색과 녹음 정리는 Claude API 키가 있어야 해요. 키를 넣으면 이 녹음을 바로 정리해요.':esc(p.error)}</p>
-      <div class="btnrow">${p.status==='nokey'?'<a class="btn ghost sm" href="#/records?ai=1">키 넣으러 가기</a>':'<span></span>'}<button class="btn sm" data-act="reai" data-id="${p.id}">다시 시도</button></div></section>` + raw;
-  if (!a) return head + `<section class="card"><div class="cardhd">아직 AI로 정리하지 않은 녹음</div>
-      <p class="small" style="margin:10px 0">예전 방식(규칙)으로 저장된 매물이에요. AI로 정리하면 단지 정보·시세·임장 요약이 채워져요.</p>
-      <button class="btn sm" data-act="reai" data-id="${p.id}">AI로 정리하기</button></section>` + raw;
+  const handoff = `
+    <section class="card"><div class="cardhd">✨ 내 Claude·ChatGPT로 정리하기</div>
+      <ol class="steps2"><li>아래 버튼을 누르면 <b>질문이 복사</b>되고 앱이 열려요 (질문이 안 채워져 있으면 붙여넣기)</li>
+        <li>답이 나오면 <b>답 전체를 복사</b>해요</li><li>여기에 붙여넣고 <b>화면에 적용</b></li></ol>
+      <div class="btnrow" style="grid-template-columns:1fr 1fr"><button class="btn sm" data-act="handoff" data-to="claude" data-id="${p.id}">Claude에서 정리</button>
+        <button class="btn ghost sm" data-act="handoff" data-to="chatgpt" data-id="${p.id}">ChatGPT에서 정리</button></div>
+      <textarea class="edit" id="paste" style="min-height:110px;margin-top:12px" placeholder="Claude·ChatGPT의 답을 여기에 붙여넣기"></textarea>
+      <button class="btn sm" data-act="apply-paste" data-id="${p.id}" style="margin-top:8px">화면에 적용</button>
+      <p class="fine">웹 검색이 켜져 있어야 단지 정보·시세를 찾아요 (Claude: 웹 검색 켜기 / ChatGPT: 검색). 추가 비용 없이 지금 쓰는 구독으로 돼요.
+        API 키가 있으면 이 과정 없이 자동으로 정리할 수도 있어요 — <a href="#/records?ai=1" style="color:var(--blue)">AI 설정</a></p></section>`;
+  if (p.status === 'error') return head + `
+    <section class="card"><div class="cardhd">자동 정리하지 못했어요</div><p class="small" style="margin:10px 0">${esc(p.error)}</p>
+      <button class="btn ghost sm" data-act="reai" data-id="${p.id}">자동 정리 다시 시도</button></section>` + handoff + raw;
+  if (!a) return head + handoff + raw;
 
   const st = (k, val) => `<div class="kv2"><span>${k}</span><b class="${val==null?'needtxt':''}">${val==null?'못 찾음':esc(val)}</b></div>`;
   const list = (icon, title, arr) => arr && arr.length ? `<div class="sublbl">${icon} ${title}</div><ul class="bul">${arr.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>` : '';
@@ -511,8 +519,8 @@ function records(){
   <div class="tblwrap" ${P.length?'':'hidden'}><table class="cmp"><thead><tr><th>항목</th>${P.map(p=>`<th><a href="#/p/${p.id}" style="color:var(--blue)">${esc(nameOf(p))}</a></th>`).join('')}</tr></thead>
     <tbody>${rows.map(([k,fn])=>`<tr><td>${k}</td>${P.map(p=>{const v=fn(p); return v==null?'<td class="need">확인 필요</td>':`<td>${esc(v)}</td>`;}).join('')}</tr>`).join('')}</tbody></table></div>
   <p class="note">${I.info}<span>샘플: Whisper 받아쓰기 + 규칙 기반 정리 · 내 녹음: 폰 음성인식 + Claude(웹 검색) 정리</span></p>
-  <section class="card" id="aicard"><div class="cardhd">AI 설정 (Claude)</div>
-    <p class="small" style="margin:10px 0 6px">녹음 정리·단지 검색에 Claude API 키가 필요해요. <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener" style="color:var(--blue);font-weight:700">키 발급 ›</a></p>
+  <section class="card" id="aicard"><div class="cardhd">자동 정리 (선택 · Claude API)</div>
+    <p class="small" style="margin:10px 0 6px">키가 없어도 매물 화면의 "Claude에서 정리" 버튼으로 지금 쓰는 Claude·ChatGPT에서 정리할 수 있어요. API 키를 넣으면 복사·붙여넣기 없이 자동으로 정리해요(유료). <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener" style="color:var(--blue);font-weight:700">키 발급 ›</a></p>
     <input id="apikey" type="password" autocomplete="off" placeholder="sk-ant-..." value="${esc(store.get('apikey',''))}"
       style="width:100%;height:46px;border:1.5px solid var(--line);border-radius:12px;padding:0 12px;font:inherit;background:var(--surface)">
     <div class="btnrow"><button class="btn ghost sm" data-act="aikey-test">연결 확인</button><button class="btn sm" data-act="aikey-save">저장</button></div>
@@ -621,7 +629,7 @@ function rerenderIf(id){ const {parts} = parse(); if (parts[0]==='p' && parts[1]
 async function runAI(id){
   const p = MINE.find(x=>x.id===id); if (!p || RUNNING.has(id)) return;
   const key = store.get('apikey','');
-  if (!key) { p.status = 'nokey'; saveMine(); reload(); rerenderIf(id); return; }
+  if (!key) { p.status = 'handoff'; saveMine(); reload(); rerenderIf(id); return; }   // 키 없으면 Claude·ChatGPT 넘겨주기
   RUNNING.add(id); p.status = 'analyzing'; p.step = '단지를 찾고 있어요'; p.error = null; saveMine(); reload(); rerenderIf(id);
   try {
     const r = await ZipAI.analyze(key, p.transcript, step => { p.step = step; saveMine(); rerenderIf(id); });
@@ -691,7 +699,22 @@ document.addEventListener('click', e => {
   else if(t.dataset.act==='redo'){ document.getElementById('edit').value=''; REC.prev = REC.final = ''; const l=document.getElementById('live'); if(l) l.innerHTML=''; if(SR) startRec(); }
   else if(t.dataset.act==='save') saveRec();
   else if(t.dataset.act==='backup') backup();
-  else if(t.dataset.act==='reai') runAI(t.dataset.id);
+  else if(t.dataset.act==='reai'){ if(!store.get('apikey','')){ const p=MINE.find(x=>x.id===t.dataset.id); if(p){ p.ai=null; p.status='handoff'; saveMine(); reload(); render(); } } else runAI(t.dataset.id); }
+  else if(t.dataset.act==='handoff'){
+    const p = MINE.find(x=>x.id===t.dataset.id); if(!p) return;
+    const prompt = ZipAI.handoffPrompt(p.transcript), enc = encodeURIComponent(prompt);
+    const base = t.dataset.to==='claude' ? 'https://claude.ai/new' : 'https://chatgpt.com/';
+    const url = enc.length < 12000 ? `${base}?q=${enc}` : base;   // 너무 길면 빈 대화를 열고 붙여넣기
+    const copy = navigator.clipboard ? navigator.clipboard.writeText(prompt) : Promise.reject();
+    copy.then(()=>toast('질문을 복사했어요 · 열리는 앱에 붙여넣기 하세요'), ()=>toast('복사가 안 되면 녹음 원문을 직접 복사해 주세요'));
+    window.open(url, '_blank', 'noopener');
+  }
+  else if(t.dataset.act==='apply-paste'){
+    const p = MINE.find(x=>x.id===t.dataset.id); const txt = (document.getElementById('paste').value||'').trim();
+    if(!p || !txt){ toast('답을 먼저 붙여넣어 주세요'); return; }
+    try { const r = ZipAI.parseHandoff(txt); applyReport(p, r); p.status='done'; p.error=null; saveMine(); reload(); render(); toast('정리 완료'); }
+    catch(e){ toast(e.message); }
+  }
   else if(t.dataset.act==='aikey-save'){ const v=document.getElementById('apikey').value.trim(); store.set('apikey', v); toast(v?'키를 저장했어요':'키를 지웠어요');
     MINE.filter(p=>p.status==='nokey').forEach(p=>runAI(p.id)); }
   else if(t.dataset.act==='aikey-test'){ const v=document.getElementById('apikey').value.trim(); if(!v){ toast('키를 먼저 넣어 주세요'); return; }

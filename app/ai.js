@@ -140,5 +140,59 @@
     return true;
   }
 
-  root.ZipAI = { analyze, testKey, friendlyError, MODEL };
+  /* ── 키 없이: Claude·ChatGPT 앱에 넘겨주고 답을 붙여넣기 ── */
+  const TEMPLATE = {
+    complex: { name: '공식 단지명', heard_as: '녹음에서 들린 표현', address: '주소', sido: '서울특별시|인천광역시|경기도', sigungu: '구/시', dong: '동',
+      households: 0, buildings: 0, built_year: 0, floors_max: 0, parking_per_household: 0.0, nearest_station: '역 이름', station_walk_min: 0,
+      builder: '시공사', heating: '난방', confidence: '높음|보통|낮음|못 찾음' },
+    market: { area_pyeong: 0, sale_recent: 0, sale_date: '거래 시점', jeonse_recent: 0, jeonse_date: '거래 시점', note: '시세 한 줄 설명' },
+    sources: [{ title: '출처 제목', url: 'https://...' }],
+    visit: { summary: '2~3문장 요약', said_area_pyeong: 0, said_sale: 0, said_jeonse: 0,
+      pros: ['좋았던 점'], cons: ['아쉬운 점'], defects: ['하자'], management: ['관리 상태'], location: ['입지'], to_check: ['다시 확인할 것'] },
+  };
+  function handoffPrompt(transcript) {
+    return `${SYSTEM.replace('5. 마지막에 save_report 도구를 정확히 한 번 호출한다.', '5. 마지막에 아래 형식의 JSON을 코드블록 하나로 출력한다.').replace('web_search로', '웹 검색으로').replace('web_search로', '웹 검색으로')}
+- 숫자 칸은 숫자만(따옴표 없이), 모르면 null. 금액은 만원 단위 (15억 → 150000).
+- JSON 앞에 짧게 설명해도 되지만, JSON 코드블록은 반드시 하나만.
+
+JSON 형식:
+\`\`\`json
+${JSON.stringify(TEMPLATE)}
+\`\`\`
+
+임장 녹음 받아쓰기:
+"""
+${transcript}
+"""`;
+  }
+  // 붙여넣은 답에서 JSON을 꺼내 보고서 모양으로 맞춘다
+  function parseHandoff(text) {
+    const block = (text.match(/```(?:json)?\s*([\s\S]*?)```/) || [])[1] || text;
+    const i = block.indexOf('{'), j = block.lastIndexOf('}');
+    if (i < 0 || j <= i) throw new Error('답에서 JSON을 찾지 못했어요. Claude 답 전체를 복사해 붙여넣어 주세요.');
+    let r;
+    try { r = JSON.parse(block.slice(i, j + 1)); }
+    catch (e) { throw new Error('JSON 형식이 깨져 있어요. 코드블록 부분을 다시 복사해 주세요.'); }
+    const num = v => (v === '' || v === null || v === undefined || isNaN(Number(String(v).replace(/,/g, '')))) ? null : Number(String(v).replace(/,/g, ''));
+    const str = v => (v === '' || v == null) ? null : String(v);
+    const arr = v => Array.isArray(v) ? v.map(String).filter(Boolean) : (v ? [String(v)] : []);
+    const c = r.complex || {}, m = r.market || {}, v = r.visit || {};
+    const out = {
+      complex: { name: str(c.name), heard_as: str(c.heard_as), address: str(c.address), sido: str(c.sido), sigungu: str(c.sigungu), dong: str(c.dong),
+        households: num(c.households), buildings: num(c.buildings), built_year: num(c.built_year), floors_max: num(c.floors_max),
+        parking_per_household: num(c.parking_per_household), nearest_station: str(c.nearest_station), station_walk_min: num(c.station_walk_min),
+        builder: str(c.builder), heating: str(c.heating), confidence: str(c.confidence) || '보통' },
+      market: { area_pyeong: num(m.area_pyeong), sale_recent: num(m.sale_recent), sale_date: str(m.sale_date), jeonse_recent: num(m.jeonse_recent), jeonse_date: str(m.jeonse_date), note: str(m.note) },
+      sources: Array.isArray(r.sources) ? r.sources.filter(s => s && s.url).map(s => ({ title: String(s.title || s.url), url: String(s.url) })) : [],
+      visit: { summary: str(v.summary) || '', said_area_pyeong: num(v.said_area_pyeong), said_sale: num(v.said_sale), said_jeonse: num(v.said_jeonse),
+        pros: arr(v.pros), cons: arr(v.cons), defects: arr(v.defects), management: arr(v.management), location: arr(v.location), to_check: arr(v.to_check) },
+      _via: 'handoff', _at: Date.now(),
+    };
+    // 템플릿의 0을 그대로 둔 값은 '모름'으로 본다
+    for (const sec of ['complex', 'market', 'visit']) for (const k in out[sec]) if (out[sec][k] === 0) out[sec][k] = null;
+    if (!out.complex.name && !out.visit.summary) throw new Error('단지명과 요약이 비어 있어요. 답을 다시 확인해 주세요.');
+    return out;
+  }
+
+  root.ZipAI = { analyze, testKey, friendlyError, MODEL, handoffPrompt, parseHandoff };
 })(window);
