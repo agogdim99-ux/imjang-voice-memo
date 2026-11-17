@@ -117,6 +117,42 @@ nav.tabs .on{color:var(--blue);font-weight:800}
 .gallery{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;height:240px}
 .gallery .ph{position:relative;flex:0 0 100%;scroll-snap-align:center} .gallery img{width:100%;height:240px;object-fit:cover;display:block}
 @media (min-width:1024px){ .gallery,.gallery img{height:300px} .gallery .ph{flex-basis:60%} .gallery .ph:only-child{flex-basis:100%} }
+.mainph{display:block;width:100%;padding:0} .mainph img{width:100%;height:260px;object-fit:cover;display:block}
+@media (min-width:1024px){ .mainph img{height:340px} }
+.thumbs{display:flex;gap:8px;overflow-x:auto;margin-top:10px;padding-bottom:2px;scrollbar-width:none}
+.th{flex:none;width:68px;height:68px;border-radius:12px;overflow:hidden;border:2px solid transparent;background:var(--soft);padding:0;cursor:pointer}
+.th img{width:100%;height:100%;object-fit:cover;display:block} .th.on{border-color:var(--blue)}
+.th.add{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border:1.5px dashed var(--blue-line);color:var(--blue);font-size:12px;font-weight:800}
+.viewer{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:70;display:none;align-items:center;justify-content:center}
+.viewer.open{display:flex} .viewer img{max-width:100%;max-height:82dvh;object-fit:contain}
+.vbar{position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:space-between;align-items:center;padding:14px 20px calc(14px + env(safe-area-inset-bottom));color:#fff;font-weight:700}
+.vbar button{color:#fff;font-weight:800;padding:8px 6px}
+.vnav{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:64px;color:#fff;font-size:40px;font-weight:300}
+.vnav.l{left:4px} .vnav.r{right:4px}
+#printpage{display:none}
+@media print {
+  @page{size:A4;margin:11mm}
+  html,body{background:#fff!important}
+  .app,.sheet,.scrim,.toast,nav.tabs,.viewer,.fab{display:none!important}
+  #printpage{display:block;font-size:9.5pt;color:#0F172A;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  #printpage header{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:2.5px solid var(--blue);padding-bottom:6px;margin-bottom:8px}
+  #printpage .pl{font-size:8.5pt;color:var(--blue);font-weight:800} #printpage h1{font-size:17pt;margin:2px 0;font-weight:900}
+  #printpage .pa{font-size:9pt;color:#475467} #printpage .pd{text-align:right;font-size:8.5pt;color:#475467}
+  #printpage .pphotos{display:grid;gap:4px;margin-bottom:8px} .pphotos.n1{grid-template-columns:1fr} .pphotos.n2{grid-template-columns:1fr 1fr} .pphotos.n3,.pphotos.n4{grid-template-columns:repeat(4,1fr)}
+  #printpage .pphotos img{width:100%;height:42mm;object-fit:cover;border-radius:4px} .pphotos.n1 img{height:55mm}
+  #printpage .card{margin:0 0 8px;padding:8px 10px;border:1px solid #E4E8EF;border-radius:8px;break-inside:avoid;box-shadow:none;background:#fff}
+  #printpage .pcols{display:grid;grid-template-columns:1fr 1.25fr 0.9fr;gap:6px;align-items:start}
+  #printpage .pcols .pane{display:block!important}
+  #printpage .ul-sm,#printpage .fine{display:none!important}
+  #printpage .need-box{display:block!important;padding:4px 6px} #printpage .pricegrid{gap:3px 6px}
+  #printpage .cardhd{font-size:10.5pt;margin-bottom:4px} #printpage button,#printpage .edit-btn,#printpage .cond{display:none!important}
+  #printpage table.info th,#printpage table.info td{padding:3px 6px;font-size:8.8pt} #printpage table.info th{width:62px}
+  #printpage .memo .lab{font-size:10pt;margin:8px 0 2px} #printpage ul.olist li{padding:2px 0;font-size:8.8pt;border:0}
+  #printpage .htag{font-size:8.5pt;padding:2px 7px} #printpage ul.todo li{padding:1px 0 1px 18px;font-size:8.8pt} #printpage ul.todo li::before{top:4px;width:9px;height:9px}
+  #printpage .scen{border:0;padding:3px 0} #printpage .scen .v{font-size:13pt} #printpage .scen .d{font-size:7.5pt}
+  #printpage .pillv{font-size:7.8pt;padding:2px 6px} #printpage .pricebox{padding:4px 8px} #printpage .pricebox b{font-size:12pt}
+  #printpage footer{margin-top:6px;font-size:7.5pt;color:#98A2B3;text-align:center}
+}
 .phdel{position:absolute;top:8px;right:8px;width:30px;height:30px;border-radius:50%;background:rgba(15,23,42,.55);color:#fff;font-size:18px}
 .mapbox{height:220px} .mapbox iframe{width:100%;height:100%;border:0;display:block}
 @media (min-width:1024px){ .mapbox{height:300px} }
@@ -446,9 +482,29 @@ const ILLUS = `<svg viewBox="0 0 400 150" preserveAspectRatio="xMidYMax slice"><
   <g fill="#FFFFFF" stroke="#B7C4DC">${[60,140,200,290].map((x,i)=>`<rect x="${x}" y="${18+i*7}" width="56" height="${132-i*7}"/>`).join('')}</g>
   <g fill="#B7C4DC">${[60,140,200,290].flatMap((x,i)=>Array.from({length:7},(_,r)=>[0,1,2].map(c=>`<rect x="${x+8+c*16}" y="${30+i*7+r*15}" width="8" height="7"/>`).join(''))).join('')}</g>
   <path d="M0 150 Q60 120 120 137 T240 131 T400 129 V150Z" fill="#8DB07A"/></svg>`;
+const coverIdx = {};   // 매물별로 지금 크게 보이는 사진 번호
+function thumbsOf(p){
+  const ph = p.photos || [];
+  return `<div class="thumbs">${ph.map((k,i)=>`<button class="th ${i===(coverIdx[p.id]||0)?'on':''}" data-cover="${p.id}" data-i="${i}" aria-label="사진 ${i+1}"><img data-photo="${k}" alt=""></button>`).join('')}
+    <label class="th add" aria-label="카메라로 찍기"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg><span>찍기</span>
+      <input type="file" accept="image/*" capture="environment" hidden data-addphoto="${p.id}"></label>
+    <label class="th add" aria-label="앨범에서 여러 장 선택"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 16 5-5 4 4 3-3 6 6"/></svg><span>앨범</span>
+      <input type="file" accept="image/*" multiple hidden data-addphoto="${p.id}"></label></div>`;
+}
+function viewer(id, i){
+  const p = byId[id], ph = p?.photos || []; if (!ph.length) return;
+  i = (i + ph.length) % ph.length;
+  let el = document.getElementById('viewer');
+  if (!el) { el = Object.assign(document.createElement('div'), {id:'viewer', className:'viewer'}); document.body.appendChild(el); }
+  el.innerHTML = `<img data-photo="${ph[i]}" alt="임장 사진 ${i+1}">
+    <div class="vbar"><button data-vclose>닫기</button><span>${i+1} / ${ph.length}</span><button data-vdel="${id}" data-i="${i}">삭제</button></div>
+    ${ph.length>1?`<button class="vnav l" data-vgo="${id}" data-i="${i-1}" aria-label="이전">‹</button><button class="vnav r" data-vgo="${id}" data-i="${i+1}" aria-label="다음">›</button>`:''}`;
+  el.classList.add('open'); fillPhotos();
+}
 function heroOf(p){
   const ph = p.photos || [];
-  if (ph.length) return `<div class="gallery">${ph.map(k=>`<div class="ph"><img data-photo="${k}" alt="임장 사진"><button class="phdel" data-delphoto="${k}" data-id="${p.id}" aria-label="사진 삭제">×</button></div>`).join('')}</div>`;
+  if (ph.length) { const i = Math.min(coverIdx[p.id] || 0, ph.length - 1);
+    return `<button class="mainph" data-view="${p.id}" data-i="${i}" aria-label="사진 크게 보기"><img data-photo="${ph[i]}" alt="임장 사진 ${i+1}"></button><span class="lbl">사진 ${i+1} / ${ph.length} · 눌러서 크게</span>`; }
   if (p.geo) { const {lat, lon} = p.geo, d = .006; return `<div class="mapbox"><iframe title="단지 위치 지도" loading="lazy" src="https://www.openstreetmap.org/export/embed.html?bbox=${lon-d},${lat-d*.6},${lon+d},${lat+d*.6}&layer=mapnik&marker=${lat},${lon}"></iframe></div><span class="lbl">단지 위치 · © OpenStreetMap</span>`; }
   return `<div class="illus">${ILLUS}</div><span class="lbl">${p.sample ? '샘플 · 사진 없음' : '사진을 추가하거나 정리하면 지도가 떠요'}</span>`;
 }
@@ -535,7 +591,8 @@ function detail(id, q){
     <div class="dact"><button class="btn line" data-act="rec" data-target="${p.sample?'':p.id}">${I.mic.replace('class="ic"','class="ic" style="width:18px;height:18px"')} 녹음 추가</button>
       <button class="btn" data-act="memo" data-id="${p.id}">${I.pen} 메모 작성</button></div></div>
   <div class="hero">${heroOf(p)}</div>
-  ${p.sample?'':`<div class="photobar"><label class="chip">사진 추가<input type="file" accept="image/*" multiple hidden data-addphoto="${p.id}"></label>
+  ${p.sample?'':thumbsOf(p)}
+  ${`<div class="photobar"><button class="chip" data-act="print" data-id="${p.id}">한 페이지로 저장 (PDF)</button>
     <a class="chip" href="https://search.naver.com/search.naver?where=image&query=${encodeURIComponent((c.name||nameOf(p))+' 아파트')}" target="_blank" rel="noopener">단지 사진 보기</a></div>`}
   ${summary}
   <div class="dtabs">${[['info','기본 정보'],['memo','현장 메모'],['fund','자금 비교']].map(([k,t])=>`<button class="${k===tab?'on':''}" data-tab="${k}">${t}</button>`).join('')}</div>
@@ -721,14 +778,49 @@ function render(stay){
   v.innerHTML = pg==='region' ? region(q) : pg==='records' ? records(q) : pg==='me' ? me() : pg==='p' ? detail(parts[1], q) : home();
   const t = pg==='region'||pg==='p' ? 'region' : pg==='records' ? 'records' : pg==='me' ? 'me' : 'home';
   document.querySelectorAll('[data-t]').forEach(a => a.classList.toggle('on', a.dataset.t === t));
+  if (!pg) armExitGuard();
+  if (pg==='p' && q.print) setTimeout(() => printPage(parts[1], q.print === 'preview'), 300);   // 링크로 바로 인쇄용 화면
   if (q.ai) { const c = document.getElementById('aicard'); c && c.scrollIntoView({block:'center'}); }
   else if (stay || keepScroll) scrollTo(0, y); else scrollTo(0, 0);
   keepScroll = false;
   const qi = document.getElementById('q'); if (qi && q.q !== undefined && document.activeElement !== qi && !q.q) qi.focus();
 }
+/* 사진 크게 보기 · 대표 사진 */
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-view],[data-cover],[data-vclose],[data-vgo],[data-vdel]'); if (!t) return;
+  e.stopPropagation();
+  if (t.dataset.view) viewer(t.dataset.view, +t.dataset.i);
+  else if (t.dataset.cover) { coverIdx[t.dataset.cover] = +t.dataset.i; render(true); }
+  else if (t.dataset.vgo) viewer(t.dataset.vgo, +t.dataset.i);
+  else if (t.dataset.vclose !== undefined) document.getElementById('viewer').classList.remove('open');
+  else if (t.dataset.vdel) { const p = MINE.find(x=>x.id===t.dataset.vdel); if (p && confirm('이 사진을 지울까요?')) { const k = p.photos[+t.dataset.i]; p.photos.splice(+t.dataset.i, 1); PhotoDB.del(k); coverIdx[p.id] = 0; saveMine(); document.getElementById('viewer').classList.remove('open'); render(true); toast('사진을 지웠어요'); } }
+}, true);
+
+/* 한 페이지로 저장 (인쇄 → PDF) */
+async function printPage(id, noDialog){
+  const p = byId[id], v = document.getElementById('view'); if (!p) return;
+  let pp = document.getElementById('printpage');
+  if (!pp) { pp = Object.assign(document.createElement('div'), {id:'printpage'}); document.body.appendChild(pp); }
+  const panes = [...v.querySelectorAll('.cols .pane')].map(x => x.outerHTML);
+  const photos = (p.photos || []).slice(0, 4).map(k => `<img data-photo="${k}" alt="">`).join('');
+  const addr = [p.ai?.complex?.address || [p.sido, p.sigungu, p.dong].filter(Boolean).join(' '), p.zone?.label].filter(Boolean).join(' · ');
+  pp.innerHTML = `<header><div><div class="pl">집노트 · 임장 기록</div><h1>${esc(nameOf(p))}</h1><div class="pa">${esc(addr)}</div></div>
+      <div class="pd">${new Date(p.updated || p.created || Date.now()).toLocaleDateString('ko-KR')}<br>시드 ${SEED[S.seed][0]} · ${BUYER[S.buyer]}</div></header>
+    ${photos ? `<div class="pphotos n${Math.min((p.photos||[]).length,4)}">${photos}</div>` : ''}
+    ${v.querySelector('.glance')?.outerHTML || ''}<div class="pcols">${panes.join('')}</div>
+    <footer>모든 수치는 녹음·검색 기반 참고용 추정입니다. 세금 미반영, 대출은 은행 상담 필수. 토허구역은 거래 전 직접 조회하세요.</footer>`;
+  await fillPhotos();
+  await Promise.all([...pp.querySelectorAll('img')].map(im => im.complete ? 0 : new Promise(r => { im.onload = im.onerror = r; })));
+  if (noDialog) return;
+  const old = document.title; document.title = `집노트_${nameOf(p)}`;   // PDF 파일 이름
+  window.print();
+  setTimeout(() => { document.title = old; }, 1000);
+}
+
 document.addEventListener('click', e => {
   const t = e.target.closest('[data-act],[data-f],[data-set],[data-play],[data-del],[data-rename],[data-delphoto],[data-tab]'); if (!t) return;
   const act = t.dataset.act, id = t.dataset.id;
+  if (act==='print') { printPage(id); return; }
   if (t.dataset.tab) { setQ({tab:t.dataset.tab}, true); return; }
   if (t.dataset.delphoto) { const p = MINE.find(x=>x.id===id); if (p && confirm('이 사진을 지울까요?')) { p.photos = (p.photos||[]).filter(k=>k!==t.dataset.delphoto); PhotoDB.del(t.dataset.delphoto); saveMine(); render(true); } return; }
   if (t.dataset.rename) { const p = MINE.find(x=>x.id===t.dataset.rename); if (!p) return; const nv = prompt('매물 이름', nameOf(p)); if (nv != null) { p.custom_name = nv.trim() || null; saveMine(); reload(); render(true); toast('이름을 바꿨어요'); } return; }
@@ -771,7 +863,21 @@ document.addEventListener('change', e => {
   setQ(s.dataset.q==='sido' ? {sido:s.value, gu:null, spot:null} : s.dataset.q==='gu' ? {gu:s.value, spot:null} : {spot:s.value}, true);
 });
 let st_; document.addEventListener('input', e => { if (e.target.id === 'q') { clearTimeout(st_); const v = e.target.value; st_ = setTimeout(() => { setQ({q:v}, true); setTimeout(() => { const qi = document.getElementById('q'); if (qi) { qi.focus(); qi.setSelectionRange(v.length, v.length); } }, 0); }, 300); } });
-window.addEventListener('hashchange', () => { closeSheet(); render(); });
+window.addEventListener('hashchange', () => { closeSheet(); document.getElementById('viewer')?.classList.remove('open'); render(); });
+
+/* 홈에서 뒤로 두 번 누르면 나가기: 홈 아래에 '경고용' 기록을 하나 깔아 둔다 */
+function armExitGuard(){
+  if (parse().parts.length) return;                        // 홈에서만
+  if (history.state && (history.state.guard || history.state.base)) return;
+  history.replaceState({base:1}, ''); history.pushState({guard:1}, '');
+}
+window.addEventListener('popstate', e => {
+  if (parse().parts.length || !(e.state && e.state.base)) return;
+  closeSheet(); document.getElementById('viewer')?.classList.remove('open');
+  toast('한 번 더 누르면 앱이 닫혀요');
+  // 2초 안에 다시 누르면 그대로 나가지고, 지나면 경고를 다시 깐다
+  setTimeout(() => { if (!parse().parts.length && history.state && history.state.base) history.pushState({guard:1}, ''); }, 2000);
+});
 render();
 </script>
 </body>
