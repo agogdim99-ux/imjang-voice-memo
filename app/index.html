@@ -3,798 +3,736 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#FBF8F3">
+<meta name="theme-color" content="#FFFFFF">
 <title>집노트</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
-<style>
-:root{
-  --bg:#FBF8F3; --surface:#FFFFFF; --card:#F6F0E8; --line:#E9E0D4; --line2:#F0E9DF;
-  --ink:#3A2618; --ink2:#5E4634; --muted:#8C7A6B;
-  --blue:#1338B3; --blue-ink:#0D2A8A; --blue-soft:#E9EEFB;
-  --ok:#1F7A45; --ok-bg:#E7F4EC; --warn:#9A6200; --warn-bg:#FBF1DC; --bad:#B4232C; --bad-bg:#FBE8E8; --na:#7A6E66; --na-bg:#EFEAE4;
-  --need:#A6620F; --need-bg:#FFF4E2;
-  --radius:16px; --shadow:0 1px 2px rgba(58,38,24,.05),0 6px 24px rgba(58,38,24,.06);
-  --display:"Gowun Batang",serif; --sans:"Pretendard",-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
-}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;background:#EFE8DE;color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.5}
-button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
-a{color:inherit;text-decoration:none}
-.phone{position:relative;max-width:430px;min-height:100dvh;margin:0 auto;background:var(--bg);display:flex;flex-direction:column}
-@media (min-width:600px){.phone{margin:24px auto;min-height:calc(100dvh - 48px);border-radius:36px;box-shadow:0 20px 60px rgba(58,38,24,.18);overflow:hidden}}
-main{flex:1;overflow-y:auto;padding:12px 20px 110px}
-.disp{font-family:var(--display);font-weight:700;letter-spacing:-.02em;color:var(--ink)}
-.row{display:flex;align-items:center;gap:8px}
-.between{justify-content:space-between}
-.ic{width:22px;height:22px;flex:none}
-.muted{color:var(--muted)} .small{font-size:12.5px}
-
-/* 상단 */
-.top{display:flex;align-items:center;justify-content:space-between;padding:14px 0 6px}
-.brand{font-size:26px}
-.iconbtn{position:relative;width:40px;height:40px;display:grid;place-items:center;border-radius:12px}
-.iconbtn:active{background:var(--card)}
-.badge{position:absolute;top:4px;right:4px;min-width:17px;height:17px;padding:0 4px;border-radius:9px;background:var(--blue);color:#fff;font-size:10.5px;font-weight:700;display:grid;place-items:center}
-.hero{font-size:30px;line-height:1.3;margin:18px 0 22px}
-
-.btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:56px;border-radius:12px;background:var(--blue);color:#fff;font-weight:700;font-size:17px;box-shadow:0 6px 16px rgba(19,56,179,.25)}
-.btn:active{background:var(--blue-ink);transform:translateY(1px)}
-.btn.ghost{background:var(--surface);color:var(--blue);box-shadow:none;border:1.5px solid var(--blue)}
-
-h2.sec{font-size:17px;font-weight:700;margin:30px 0 8px;color:var(--ink)}
-.list{border-top:1px solid var(--line)}
-.li{display:flex;align-items:center;gap:10px;padding:14px 6px;border-bottom:1px solid var(--line);width:100%;text-align:left}
-.li:active{background:var(--card)}
-.li .name{flex:1;font-size:16px;font-weight:500;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.li .meta{color:var(--ink2);font-size:14px;font-variant-numeric:tabular-nums}
-.chev{width:18px;height:18px;color:var(--ink2);flex:none}
-.zdot{font-size:11px;font-weight:700;padding:2px 7px;border-radius:99px;flex:none}
-.zA,.zC{background:var(--bad-bg);color:var(--bad)} .zB{background:var(--ok-bg);color:var(--ok)} .zq{background:var(--na-bg);color:var(--na)}
-
-.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface)}
-.seg button{height:42px;font-weight:500;color:var(--ink2);border-left:1px solid var(--line)}
-.seg button:first-child{border-left:0}
-.seg button.on{background:var(--blue);color:#fff;font-weight:700}
-.grouphd{display:flex;align-items:center;gap:8px;padding:14px 6px 10px;color:var(--ink2);font-weight:500;width:100%}
-.grouphd .arrow{color:var(--muted)}
-.grouphd .tog{margin-left:auto;transition:transform .2s}
-.grouphd[aria-expanded=false] .tog{transform:rotate(-90deg)}
-.indent .li{padding-left:16px}
-.empty{padding:28px 10px;text-align:center;color:var(--muted);font-size:14px}
-
-/* 하단 탭 */
-nav.tabs{position:absolute;left:0;right:0;bottom:0;display:grid;grid-template-columns:repeat(3,1fr);background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
-@media (max-width:599px){nav.tabs{position:fixed;max-width:430px;margin:0 auto}}
-nav.tabs a{display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0 12px;font-size:12.5px;color:var(--ink2);border-top:3px solid transparent}
-nav.tabs a.on{color:var(--blue);font-weight:700;border-top-color:var(--blue)}
-
-/* 지역별 */
-.pagehd{font-size:28px;margin:18px 0 14px}
-.crumb{display:flex;align-items:center;gap:6px;margin:0 -20px;padding:12px 20px;background:var(--card);font-weight:500}
-.crumb select{appearance:none;border:0;background:transparent;font:inherit;font-weight:600;color:var(--ink);padding:2px 18px 2px 2px;background-image:linear-gradient(45deg,transparent 50%,var(--ink2) 50%),linear-gradient(135deg,var(--ink2) 50%,transparent 50%);background-position:right 6px center,right 1px center;background-size:5px 5px;background-repeat:no-repeat}
-.subtabs{display:flex;gap:4px;overflow-x:auto;border-bottom:1px solid var(--line);margin-top:10px;scrollbar-width:none}
-.subtabs button{padding:12px 14px;white-space:nowrap;color:var(--ink2);border-bottom:3px solid transparent;margin-bottom:-1px}
-.subtabs button.on{color:var(--ink);font-weight:700;border-bottom-color:var(--ink)}
-.chips{display:flex;gap:8px;margin:12px 0 6px;overflow-x:auto;scrollbar-width:none}
-.chip{height:36px;padding:0 16px;border-radius:99px;border:1px solid var(--line);background:var(--surface);color:var(--ink2);white-space:nowrap}
-.chip.on{background:var(--blue);border-color:var(--blue);color:#fff;font-weight:700}
-.note{display:flex;gap:6px;align-items:flex-start;margin-top:12px;color:var(--muted);font-size:12.5px}
-.fab{position:absolute;right:20px;bottom:92px;width:64px;height:64px;border-radius:50%;background:var(--blue);color:#fff;display:grid;place-items:center;box-shadow:0 10px 24px rgba(19,56,179,.35)}
-@media (max-width:599px){.fab{position:fixed;right:max(20px,calc(50vw - 195px))}}
-
-/* 상세 */
-.dethd{display:flex;align-items:center;gap:6px;margin:0 -20px;padding:10px 12px;position:sticky;top:-12px;background:var(--bg);z-index:5}
-.dethd .t{flex:1;text-align:center;font-weight:700;font-size:16.5px;margin-right:40px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.photo{position:relative;margin:0 -20px;height:170px;background:linear-gradient(180deg,#DCE5F5 0%,#EEF1F7 55%,#E7E0D3 100%);display:grid;place-items:end center;overflow:hidden}
-.photo svg{width:100%;height:150px}
-.photo .lbl{position:absolute;right:12px;bottom:10px;font-size:11.5px;color:#fff;background:rgba(58,38,24,.55);padding:3px 8px;border-radius:6px}
-.dtitle{font-size:26px;margin:18px 0 4px;line-height:1.3}
-.loc{display:flex;align-items:center;gap:6px;color:var(--ink2);font-size:14.5px}
-.card{background:var(--card);border-radius:var(--radius);padding:14px 16px;margin-top:14px}
-.cardhd{display:flex;align-items:center;gap:10px;font-weight:700;font-size:16.5px;padding-bottom:10px;border-bottom:1px solid var(--line)}
-.cardhd .more{margin-left:auto;font-size:13px;font-weight:500;color:var(--blue)}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);padding-top:10px}
-.stat{padding:0 8px;border-left:1px solid var(--line)} .stat:first-child{border-left:0;padding-left:0}
-.stat .k{font-size:12px;color:var(--ink2)} .stat .v{font-size:clamp(16px,5vw,20px);font-weight:800;letter-spacing:-.03em;font-variant-numeric:tabular-nums;white-space:nowrap}
-.stat .v.need{font-size:13px;font-weight:700;color:var(--need)}
-.kv{display:grid;grid-template-columns:96px 1fr;gap:7px 8px;padding-top:12px;font-size:14px}
-.kv dt{color:var(--ink2)} .kv dd{margin:0;font-weight:500}
-.needtxt{color:var(--need);font-weight:600}
-.bul{margin:10px 0 0;padding-left:18px} .bul li{margin:4px 0}
-.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
-.tag{font-size:12.5px;padding:4px 10px;border-radius:99px;background:var(--need-bg);color:var(--need);font-weight:600}
-.sublbl{font-size:12.5px;font-weight:700;color:var(--ink2);margin-top:12px}
-.scen{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}
-.scen:last-of-type{border-bottom:0}
-.scen .nm{font-size:13px;color:var(--ink2)} .scen .need{font-size:26px;font-weight:800;letter-spacing:-.02em}
-.scen .na{font-size:15px;font-weight:700;color:var(--na)}
-.pill{font-size:13px;font-weight:700;padding:6px 11px;border-radius:99px;white-space:nowrap}
-.pill.ok{background:var(--ok-bg);color:var(--ok)} .pill.warn{background:var(--warn-bg);color:var(--warn)} .pill.bad{background:var(--bad-bg);color:var(--bad)} .pill.na{background:var(--na-bg);color:var(--na)}
-.cond{display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding:10px 12px;background:var(--surface);border-radius:10px;font-size:13.5px}
-.cond b{color:var(--ink)}
-.fine{font-size:12px;color:var(--muted);margin-top:8px;line-height:1.55}
-details.raw{margin-top:14px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:4px 16px}
-details.raw summary{padding:12px 0;font-weight:600;cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px}
-details.raw summary::after{content:"";margin-left:auto;width:8px;height:8px;border-right:2px solid var(--ink2);border-bottom:2px solid var(--ink2);transform:rotate(45deg);transition:transform .2s}
-details.raw[open] summary::after{transform:rotate(-135deg)}
-details.raw p{font-size:14px;color:var(--ink2);margin:0 0 12px}
-audio{width:100%;margin-bottom:10px;height:36px}
-.cta{position:absolute;left:0;right:0;bottom:0;padding:12px 20px calc(14px + env(safe-area-inset-bottom));background:linear-gradient(180deg,rgba(251,248,243,0),var(--bg) 30%)}
-@media (max-width:599px){.cta{position:fixed;max-width:430px;margin:0 auto}}
-
-/* 내 기록 */
-.optgrid{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
-.tblwrap{overflow-x:auto;margin:10px -20px 0;padding:0 20px}
-table.cmp{border-collapse:collapse;font-size:13px;min-width:560px;background:var(--surface);border-radius:12px;overflow:hidden}
-table.cmp th,table.cmp td{padding:9px 10px;border-bottom:1px solid var(--line2);text-align:left;white-space:nowrap}
-table.cmp th{background:var(--card);font-weight:700;position:sticky;top:0}
-table.cmp td:first-child,table.cmp th:first-child{position:sticky;left:0;background:var(--card);color:var(--ink2);font-weight:600}
-table.cmp td.need{color:var(--need);font-weight:600}
-
-/* 바텀시트 */
-.scrim{position:fixed;inset:0;background:rgba(40,26,16,.42);display:none;z-index:40}
-.sheet{position:fixed;left:0;right:0;bottom:0;max-width:430px;margin:0 auto;background:var(--bg);border-radius:22px 22px 0 0;padding:10px 20px calc(22px + env(safe-area-inset-bottom));max-height:86dvh;overflow-y:auto;transform:translateY(105%);transition:transform .28s ease;z-index:50}
-.sheet.open{transform:none} .scrim.open{display:block}
-.grab{width:40px;height:4px;border-radius:2px;background:var(--line);margin:0 auto 12px}
-.sheet h3{font-size:21px;margin:4px 0 6px}
-.steps{display:flex;gap:6px;margin:12px 0 16px;font-size:12.5px;color:var(--ink2)}
-.steps span{flex:1;background:var(--card);border-radius:10px;padding:8px;text-align:center}
-.steps b{display:block;color:var(--blue);font-size:12px}
-.sample{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}
-.play{width:40px;height:40px;border-radius:50%;background:var(--blue-soft);color:var(--blue);display:grid;place-items:center;flex:none}
-.sample .s{flex:1;min-width:0} .sample .s b{display:block;font-size:15px} .sample .s small{color:var(--muted)}
-.go{font-size:13px;font-weight:700;color:var(--blue);padding:8px 4px;white-space:nowrap}
-.recbox{margin-top:18px;padding:14px;border:1px dashed var(--line);border-radius:14px;text-align:center}
-.recdot{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--bad);margin-right:6px;animation:blink 1s infinite}
-@keyframes blink{50%{opacity:.25}}
-.toast{position:fixed;left:50%;bottom:110px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:10px;font-size:13.5px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:60;max-width:90vw;text-align:center}
-.toast.on{opacity:1}
-:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
-
-/* 녹음 */
-.recmain{display:flex;flex-direction:column;align-items:center;gap:10px;margin:8px 0 6px}
-.bigmic{width:96px;height:96px;border-radius:50%;background:var(--blue);color:#fff;display:grid;place-items:center;box-shadow:0 10px 28px rgba(19,56,179,.35);transition:transform .15s}
-.bigmic .ic{width:38px;height:38px}
-.bigmic.on{background:var(--bad);box-shadow:0 0 0 10px rgba(180,35,44,.15),0 10px 28px rgba(180,35,44,.35);animation:pulse 1.4s infinite}
-@keyframes pulse{50%{box-shadow:0 0 0 18px rgba(180,35,44,.06),0 10px 28px rgba(180,35,44,.35)}}
-.rectime{font-variant-numeric:tabular-nums;font-weight:700;color:var(--ink2)}
-.live{min-height:120px;max-height:34dvh;overflow-y:auto;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;font-size:15.5px;line-height:1.6}
-.live .interim{color:var(--muted)}
-.live:empty::before{content:attr(data-ph);color:var(--muted)}
-textarea.edit{width:100%;min-height:160px;border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;font:inherit;font-size:15.5px;line-height:1.6;background:var(--surface);color:var(--ink);resize:vertical}
-textarea.edit:focus{outline:none;border-color:var(--blue)}
-.hint{background:var(--blue-soft);color:var(--blue-ink);border-radius:12px;padding:10px 12px;font-size:13px;margin:10px 0}
-.btnrow{display:grid;grid-template-columns:1fr 2fr;gap:8px;margin-top:12px}
-.btn.sm{height:50px;font-size:16px}
-.mini{font-size:12px;font-weight:700;padding:2px 7px;border-radius:6px;background:var(--blue-soft);color:var(--blue)}
-.danger{color:var(--bad);font-weight:600;font-size:14px;padding:10px 0}
-details.samples summary{list-style:none;cursor:pointer;font-weight:700;font-size:13px;color:var(--ink2);padding:14px 0 4px}
-.tip{font-size:12.5px;color:var(--ink2);margin:4px 0 0;padding-left:18px}
-.tip li{margin:3px 0}
-.kvgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px 12px;padding-top:12px}
-.kv2{display:flex;flex-direction:column;font-size:13.5px} .kv2 span{font-size:12px;color:var(--ink2)} .kv2 b{font-weight:600}
-.pricebox{margin-top:14px;padding:12px;background:var(--surface);border-radius:12px}
-.pr{flex:1;display:flex;flex-direction:column} .pr span{font-size:12px;color:var(--ink2)} .pr b{font-size:22px;font-weight:800;letter-spacing:-.02em} .pr small{color:var(--muted);font-size:11.5px}
-details.srcs{margin-top:10px;font-size:12.5px} details.srcs summary{cursor:pointer;color:var(--ink2);font-weight:600}
-details.srcs a{display:block;color:var(--blue);padding:4px 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.spinner{width:36px;height:36px;margin:0 auto;border-radius:50%;border:4px solid var(--blue-soft);border-top-color:var(--blue);animation:spin 1s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.gallery{display:flex;gap:6px;overflow-x:auto;scroll-snap-type:x mandatory;height:230px;background:#ddd5c9}
-.gallery .ph{position:relative;flex:0 0 100%;scroll-snap-align:center} .gallery img{width:100%;height:230px;object-fit:cover;display:block}
-.gallery .ph:only-child{flex-basis:100%}
-.phdel{position:absolute;top:8px;right:8px;width:30px;height:30px;border-radius:50%;background:rgba(40,26,16,.55);color:#fff;font-size:18px;line-height:1}
-.mapbox{position:relative;height:200px} .mapbox iframe{width:100%;height:100%;border:0;display:block}
-.mapbox .lbl{position:absolute;right:10px;bottom:8px;font-size:11px;background:rgba(255,255,255,.85);padding:2px 6px;border-radius:6px;color:var(--ink2)}
-.photobar{display:flex;gap:8px;margin:12px 0 0;overflow-x:auto} .photobar .chip{display:inline-flex;align-items:center;height:34px;font-size:13.5px;cursor:pointer}
-.steps2{margin:10px 0 12px;padding-left:20px;font-size:13.5px;color:var(--ink2)} .steps2 li{margin:4px 0}
-</style>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icon-512.png">
+<style>
+:root{
+  --bg:#F3F5F9; --surface:#FFFFFF; --soft:#F6F8FB; --line:#E4E8EF; --line2:#EEF1F5;
+  --ink:#0F172A; --ink2:#475467; --muted:#98A2B3;
+  --blue:#1747D6; --blue-ink:#1239AE; --blue-soft:#EAF0FF; --blue-line:#C9D7FF;
+  --ok:#0F8A4F; --ok-bg:#E6F6EE; --warn:#B26B00; --warn-bg:#FFF4DC; --bad:#C2262E; --bad-bg:#FDECEC; --na:#667085; --na-bg:#F0F2F5;
+  --need:#B25E09; --need-bg:#FFF3E3;
+  --r:16px; --shadow:0 1px 2px rgba(16,24,40,.04),0 4px 14px rgba(16,24,40,.05);
+  --sans:"Pretendard",-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.5;letter-spacing:-.01em}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+a{color:inherit;text-decoration:none}
+input,textarea,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.ic{width:22px;height:22px;flex:none}
+.muted{color:var(--muted)} .small{font-size:13px} .row{display:flex;align-items:center;gap:8px}
+
+/* 레이아웃: 폰 = 한 줄, PC = 왼쪽 메뉴 + 본문 */
+.app{min-height:100dvh}
+.side{display:none}
+.main{max-width:520px;margin:0 auto;background:var(--surface);min-height:100dvh;position:relative}
+main{padding:8px 20px 110px}
+@media (min-width:1024px){
+  .app{display:grid;grid-template-columns:232px 1fr}
+  .side{display:flex;flex-direction:column;gap:4px;position:sticky;top:0;height:100dvh;padding:28px 16px;background:var(--surface);border-right:1px solid var(--line)}
+  .side .logo{font-size:26px;margin:0 10px 22px}
+  .side a,.side button{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:12px;color:var(--ink2);font-weight:600;text-align:left}
+  .side a.on{background:var(--blue-soft);color:var(--blue)}
+  .side a:hover,.side button:hover{background:var(--soft)}
+  .main{max-width:1180px;margin:0;background:var(--bg)}
+  main{padding:28px 36px 60px}
+  nav.tabs{display:none!important}
+}
+.logo{font-weight:900;color:var(--blue);letter-spacing:-.04em}
+
+/* 공통 */
+.top{display:flex;align-items:center;justify-content:space-between;padding:14px 0 4px}
+.top .logo{font-size:28px}
+.iconbtn{position:relative;width:40px;height:40px;display:grid;place-items:center;border-radius:12px;color:var(--ink)}
+.iconbtn:active{background:var(--soft)}
+.badge{position:absolute;top:5px;right:4px;min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:var(--blue);color:#fff;font-size:10px;font-weight:800;display:grid;place-items:center}
+.lead{font-size:18px;font-weight:600;color:var(--ink2);line-height:1.45;margin:6px 0 18px}
+.btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:56px;border-radius:14px;background:var(--blue);color:#fff;font-weight:800;font-size:17px}
+.btn:active{background:var(--blue-ink)}
+.btn.xl{height:68px;font-size:21px;justify-content:space-between;padding:0 22px}
+.btn.xl .ic{width:28px;height:28px}
+.btn.sm{height:46px;font-size:15px;border-radius:12px}
+.btn.line{background:var(--surface);color:var(--ink);border:1.5px solid var(--line);font-weight:700}
+.btn.line.blue{color:var(--blue);border-color:var(--blue-line)}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.duo .btn{height:50px;font-size:14.5px;font-weight:700;justify-content:center}
+
+.panel{background:var(--soft);border-radius:var(--r);padding:16px;margin-top:16px}
+.panelhd{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.panelhd h2{font-size:18px;margin:0;font-weight:800}
+.more{font-size:13px;color:var(--ink2);display:flex;align-items:center;gap:2px}
+.pcard{display:flex;align-items:center;gap:10px;padding:15px 16px;background:var(--surface);border-radius:14px;box-shadow:var(--shadow);margin-top:8px;width:100%;text-align:left}
+.pcard:active{background:var(--soft)}
+.pcard .t{flex:1;min-width:0}
+.pcard b{display:block;font-size:17px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pcard span.s{font-size:14px;color:var(--ink2)}
+.chev{width:18px;height:18px;color:var(--ink2);flex:none}
+.st{font-size:12.5px;font-weight:800;line-height:1.2;padding:5px 10px;border-radius:8px;background:var(--blue-soft);color:var(--blue);white-space:nowrap;flex:none;align-self:center}
+@media (min-width:1024px){ .phd.det{display:none} }
+.st.plan{background:#fff;border:1.5px solid var(--blue-line)}
+.st.smp{background:var(--na-bg);color:var(--na)}
+.zt{font-size:12px;font-weight:800;padding:3px 8px;border-radius:7px;white-space:nowrap}
+.zA,.zC{background:var(--bad-bg);color:var(--bad)} .zB{background:var(--ok-bg);color:var(--ok)} .zq{background:var(--na-bg);color:var(--na)}
+.empty{padding:22px 10px;text-align:center;color:var(--muted);font-size:14px}
+.note{display:flex;gap:8px;align-items:flex-start;background:var(--soft);border-radius:12px;padding:12px 14px;color:var(--ink2);font-size:13px;margin-top:12px}
+
+/* 하단 탭 */
+nav.tabs{position:fixed;left:0;right:0;bottom:0;max-width:520px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr);background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom);z-index:20}
+nav.tabs a,nav.tabs button{display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 0 10px;font-size:12px;color:var(--ink2);font-weight:600}
+nav.tabs .on{color:var(--blue);font-weight:800}
+
+/* 페이지 머리 */
+.phd{display:grid;grid-template-columns:40px 1fr 40px;align-items:center;margin:4px -6px 10px}
+.phd h1{font-size:19px;margin:0;text-align:center;font-weight:800}
+@media (min-width:1024px){ .phd{grid-template-columns:0 1fr 40px;margin-bottom:18px} .phd h1{text-align:left;font-size:26px} .phd .back{visibility:hidden} }
+.pills{display:flex;align-items:center;gap:6px;overflow-x:auto;scrollbar-width:none;padding:2px 0}
+.pill{position:relative;display:inline-flex;align-items:center;height:42px;padding:0 18px;border-radius:999px;border:1.5px solid var(--line);background:var(--surface);font-weight:700;white-space:nowrap}
+.pill.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.pill select{position:absolute;inset:0;opacity:0;cursor:pointer}
+.sep{color:var(--ink2);font-weight:700}
+.ftabs{display:flex;gap:8px;margin-top:14px;overflow-x:auto;scrollbar-width:none}
+.ftab{height:40px;padding:0 16px;border-radius:10px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink2);font-weight:700;white-space:nowrap}
+.ftab.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.fab{position:fixed;right:max(18px,calc(50vw - 242px));bottom:84px;width:62px;height:62px;border-radius:50%;background:var(--blue);color:#fff;display:grid;place-items:center;box-shadow:0 10px 24px rgba(23,71,214,.35);z-index:15}
+@media (min-width:1024px){.fab{display:none}}
+
+/* 상세 */
+.crumb{font-size:12.5px;color:var(--ink2);display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.dtop{display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-top:6px}
+.dtop .ttl{flex:1;min-width:220px}
+.dtop h1{font-size:26px;margin:0;font-weight:900;letter-spacing:-.03em;line-height:1.25}
+.dtop .sub{font-size:15px;color:var(--ink2);margin-top:4px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.dact{display:flex;gap:8px}
+.dact .btn{width:auto;height:46px;padding:0 16px;font-size:14.5px}
+@media (max-width:1023px){ .dact{width:100%} .dact .btn{flex:1} }
+.hero{margin:14px -20px 0;position:relative;background:#E8EDF5;overflow:hidden}
+@media (min-width:1024px){ .hero{margin:16px 0 0;border-radius:var(--r)} }
+.hero .lbl{position:absolute;right:10px;bottom:8px;font-size:11.5px;background:rgba(15,23,42,.55);color:#fff;padding:3px 8px;border-radius:6px}
+.gallery{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;height:240px}
+.gallery .ph{position:relative;flex:0 0 100%;scroll-snap-align:center} .gallery img{width:100%;height:240px;object-fit:cover;display:block}
+@media (min-width:1024px){ .gallery,.gallery img{height:300px} .gallery .ph{flex-basis:60%} .gallery .ph:only-child{flex-basis:100%} }
+.phdel{position:absolute;top:8px;right:8px;width:30px;height:30px;border-radius:50%;background:rgba(15,23,42,.55);color:#fff;font-size:18px}
+.mapbox{height:220px} .mapbox iframe{width:100%;height:100%;border:0;display:block}
+@media (min-width:1024px){ .mapbox{height:300px} }
+.illus{height:180px} .illus svg{width:100%;height:100%}
+.photobar{display:flex;gap:8px;margin-top:10px;overflow-x:auto}
+.chip{display:inline-flex;align-items:center;gap:4px;height:36px;padding:0 14px;border-radius:999px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink2);font-weight:700;font-size:13.5px;white-space:nowrap;cursor:pointer}
+.chip.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.dtabs{display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1.5px solid var(--line);margin-top:18px;position:sticky;top:0;background:var(--surface);z-index:5}
+@media (min-width:1024px){ .dtabs{background:var(--bg)} }
+.dtabs button{padding:13px 0;font-weight:700;color:var(--ink2);border-bottom:3px solid transparent;margin-bottom:-1.5px;font-size:15.5px}
+.dtabs button.on{color:var(--blue);border-bottom-color:var(--blue)}
+.cols{display:block}
+.pane{display:none} .pane.on{display:block}
+@media (min-width:1024px){ .cols{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;align-items:start;margin-top:14px} .pane{display:block} }
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;margin-top:14px}
+@media (min-width:1024px){ .cols .card{margin-top:0} }
+.cardhd{display:flex;align-items:center;justify-content:space-between;gap:8px;font-weight:800;font-size:16px;margin-bottom:10px}
+.cardhd .src{font-size:12px;font-weight:600;color:var(--muted)}
+.edit-btn{display:inline-flex;align-items:center;gap:4px;font-size:12.5px;font-weight:700;color:var(--ink2);border:1.5px solid var(--line);border-radius:8px;padding:4px 8px}
+table.info{width:100%;border-collapse:collapse;font-size:14px}
+table.info th{width:84px;text-align:left;font-weight:600;color:var(--ink2);background:var(--soft);padding:10px;border-bottom:1px solid var(--line2);vertical-align:top}
+table.info td{padding:10px;border-bottom:1px solid var(--line2);font-weight:600}
+table.info tr:last-child th,table.info tr:last-child td{border-bottom:0}
+.needtxt{color:var(--need);font-weight:700}
+.memo ul{margin:6px 0 0;padding-left:18px} .memo li{margin:5px 0;font-size:14.5px}
+.memo .lab{font-size:12.5px;font-weight:800;color:var(--ink2);margin-top:12px}
+.memo .sum{font-size:15px;line-height:1.65;margin:0}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.tag{font-size:12.5px;padding:4px 10px;border-radius:999px;background:var(--need-bg);color:var(--need);font-weight:700}
+.pricegrid{display:grid;grid-template-columns:auto 1fr;gap:8px 12px;align-items:center}
+.pricegrid span{font-size:14px;color:var(--ink2);font-weight:600}
+.pricebox{background:var(--blue-soft);border-radius:10px;padding:10px 12px;text-align:right}
+.pricebox b{font-size:22px;font-weight:900;color:var(--blue)} .pricebox small{display:block;font-size:11px;color:var(--ink2)}
+.need-box{margin-top:12px;background:var(--soft);border-radius:12px;padding:12px}
+.scen{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--line2)}
+.scen:last-child{border-bottom:0}
+.scen .nm{font-size:12.5px;color:var(--ink2);font-weight:700} .scen .v{font-size:24px;font-weight:900;color:var(--blue);letter-spacing:-.03em}
+.scen .na{font-size:14.5px;font-weight:800;color:var(--na)} .scen .d{font-size:12px;color:var(--muted)}
+.pillv{font-size:12.5px;font-weight:800;padding:6px 10px;border-radius:999px;white-space:nowrap}
+.pillv.ok{background:var(--ok-bg);color:var(--ok)} .pillv.warn{background:var(--warn-bg);color:var(--warn)} .pillv.bad{background:var(--bad-bg);color:var(--bad)}
+.cond{display:flex;align-items:center;justify-content:space-between;width:100%;margin-top:10px;padding:10px 12px;border:1.5px solid var(--line);border-radius:10px;font-size:13.5px}
+.fine{font-size:12px;color:var(--muted);margin:10px 0 0;line-height:1.55}
+.ul-sm{margin:8px 0 0;padding-left:18px;font-size:13px;color:var(--ink2)}
+details.raw{margin-top:14px;border:1px solid var(--line);border-radius:var(--r);padding:2px 16px;background:var(--surface)}
+details.raw summary{padding:13px 0;font-weight:700;cursor:pointer;list-style:none;display:flex;gap:8px;align-items:center}
+details.raw p{font-size:14px;color:var(--ink2);margin:0 0 12px;white-space:pre-wrap}
+details.srcs{margin-top:10px;font-size:12.5px} details.srcs summary{cursor:pointer;color:var(--ink2);font-weight:700}
+details.srcs a{display:block;color:var(--blue);padding:3px 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.foot{display:flex;justify-content:space-between;align-items:center;margin-top:12px}
+.danger{color:var(--bad);font-weight:700;font-size:14px;padding:8px 0}
+.link{color:var(--blue);font-weight:700;font-size:14px;padding:8px 0}
+.spinner{width:34px;height:34px;margin:0 auto;border-radius:50%;border:4px solid var(--blue-soft);border-top-color:var(--blue);animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+textarea.edit,input.field{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;font-size:15.5px;line-height:1.6;background:var(--surface)}
+textarea.edit{min-height:150px;resize:vertical}
+textarea.edit:focus,input.field:focus{outline:none;border-color:var(--blue)}
+.steps2{margin:4px 0 12px;padding-left:20px;font-size:13.5px;color:var(--ink2)} .steps2 li{margin:4px 0}
+
+/* 기록·내 정보 */
+.optgrid{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.lab2{font-size:13px;font-weight:800;color:var(--ink2);margin-top:14px}
+.tblwrap{overflow-x:auto;margin-top:10px;border:1px solid var(--line);border-radius:12px}
+table.cmp{border-collapse:collapse;font-size:13px;min-width:600px;width:100%;background:var(--surface)}
+table.cmp th,table.cmp td{padding:9px 10px;border-bottom:1px solid var(--line2);text-align:left;white-space:nowrap}
+table.cmp th{background:var(--soft);font-weight:800}
+table.cmp td:first-child,table.cmp th:first-child{position:sticky;left:0;background:var(--soft);color:var(--ink2);font-weight:700}
+table.cmp td.need{color:var(--need);font-weight:700}
+.search{display:flex;align-items:center;gap:8px;height:46px;border:1.5px solid var(--line);border-radius:12px;padding:0 12px;background:var(--surface)}
+.search input{flex:1;border:0;outline:0;background:transparent;font-size:15px}
+
+/* 바텀시트 */
+.scrim{position:fixed;inset:0;background:rgba(15,23,42,.45);display:none;z-index:40}
+.sheet{position:fixed;left:0;right:0;bottom:0;max-width:520px;margin:0 auto;background:var(--surface);border-radius:22px 22px 0 0;padding:10px 20px calc(22px + env(safe-area-inset-bottom));max-height:88dvh;overflow-y:auto;transform:translateY(105%);transition:transform .28s ease;z-index:50}
+@media (min-width:1024px){ .sheet{bottom:auto;top:50%;border-radius:20px;transform:translateY(-40%) scale(.98);opacity:0;pointer-events:none;transition:.2s} .sheet.open{transform:translateY(-50%);opacity:1;pointer-events:auto} }
+.sheet.open{transform:none} .scrim.open{display:block}
+.grab{width:40px;height:4px;border-radius:2px;background:var(--line);margin:0 auto 14px}
+.sheet h3{font-size:21px;margin:2px 0 6px;font-weight:900}
+.recmain{display:flex;flex-direction:column;align-items:center;gap:10px;margin:12px 0 8px}
+.bigmic{width:96px;height:96px;border-radius:50%;background:var(--blue);color:#fff;display:grid;place-items:center;box-shadow:0 10px 28px rgba(23,71,214,.35)}
+.bigmic .ic{width:38px;height:38px}
+.bigmic.on{background:var(--bad);box-shadow:0 0 0 10px rgba(194,38,46,.14);animation:pulse 1.4s infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 18px rgba(194,38,46,.05)}}
+.rectime{font-variant-numeric:tabular-nums;font-weight:700;color:var(--ink2);font-size:14px;text-align:center}
+.recdot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--bad);margin-right:6px;animation:blink 1s infinite}
+@keyframes blink{50%{opacity:.25}}
+.live{min-height:110px;max-height:32dvh;overflow-y:auto;background:var(--soft);border-radius:14px;padding:12px 14px;font-size:15.5px;line-height:1.6}
+.live .interim{color:var(--muted)} .live:empty::before{content:attr(data-ph);color:var(--muted)}
+.hint{background:var(--blue-soft);color:var(--blue-ink);border-radius:12px;padding:10px 12px;font-size:13px;margin:10px 0}
+.btnrow{display:grid;grid-template-columns:1fr 2fr;gap:8px;margin-top:12px}
+details.tips summary{list-style:none;cursor:pointer;font-weight:800;font-size:13px;color:var(--ink2);padding:14px 0 4px}
+.tip{font-size:13px;color:var(--ink2);margin:4px 0 0;padding-left:18px} .tip li{margin:3px 0}
+.sample{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line2)}
+.play{width:38px;height:38px;border-radius:50%;background:var(--blue-soft);color:var(--blue);display:grid;place-items:center;flex:none}
+.sample .s{flex:1;min-width:0} .sample b{display:block;font-size:14.5px} .sample small{color:var(--muted)}
+.toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:10px;font-size:13.5px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:60;max-width:90vw;text-align:center}
+.toast.on{opacity:1}
+</style>
 </head>
 <body>
-<div class="phone">
-  <main id="view"></main>
+<div class="app">
+  <aside class="side" id="side">
+    <span class="logo">집노트</span>
+    <a href="#/" data-t="home"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11 12 4l9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>홈</a>
+    <a href="#/region" data-t="region"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>매물 관리</a>
+    <button data-act="rec"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>녹음하기</button>
+    <a href="#/records" data-t="records"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3h12v18l-6-4-6 4z"/></svg>임장 기록</a>
+    <a href="#/me" data-t="me"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>내 정보</a>
+  </aside>
+  <div class="main"><main id="view"></main></div>
   <nav class="tabs" id="tabs">
     <a href="#/" data-t="home"><svg class="ic" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3 3 10v10a1 1 0 0 0 1 1h5v-6h6v6h5a1 1 0 0 0 1-1V10z"/></svg>홈</a>
-    <a href="#/region" data-t="region"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>지역별 매물</a>
-    <a href="#/records" data-t="records"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>내 기록</a>
+    <a href="#/region" data-t="region"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>매물</a>
+    <button data-act="rec"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>녹음</button>
+    <a href="#/records" data-t="records"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3h12v18l-6-4-6 4z"/></svg>기록</a>
+    <a href="#/me" data-t="me"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>내 정보</a>
   </nav>
 </div>
 <div class="scrim" id="scrim"></div>
 <div class="sheet" id="sheet" role="dialog" aria-modal="true"></div>
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast" role="status"></div>
 
 <script src="data.js"></script>
 <script src="engine.js"></script>
 <script src="ai.js"></script>
 <script>
-/* ───────── 데이터·설정 ───────── */
+'use strict';
+/* ═════════ 저장소 · 데이터 ═════════ */
 const D = window.ZIPNOTE_DATA || {properties: []};
 const store = {
   get(k, d){ try { const v = localStorage.getItem('zipnote.'+k); return v ? JSON.parse(v) : d; } catch(e){ return d; } },
   set(k, v){ try { localStorage.setItem('zipnote.'+k, JSON.stringify(v)); return true; } catch(e){ toast('저장 공간이 부족해요'); return false; } }
 };
-let S = store.get('settings', {seed: 2, buyer: '무주택', income: 0, samples: true});
+let S = store.get('settings', {seed:2, buyer:'무주택', income:0, samples:true});
 if (S.samples === undefined) S.samples = true;
-const SAMPLES = D.properties.map(p => ({...p, sample: true}));
+const SAMPLES = D.properties.map(p => ({...p, sample:true, visit:'done'}));
 let MINE = store.get('mine', []);
-// 예전 버전에서 저장한 매물: 단지명·동네 인식을 새 규칙으로 한 번 다시 채운다
-(function upgradeOld(){
-  let changed = false;
-  for (const p of MINE) {
-    if (p.complex_name === undefined && p.transcript) {
-      const a = ZipEngine.analyze(p.transcript);
-      p.complex_name = a.complex_name;
-      if (!p.sido && a.sido) { p.sido = a.sido; p.sigungu = a.sigungu; p.zone = a.zone; }
-      changed = true;
-    }
-  }
-  if (changed) store.set('mine', MINE);
-})();
+for (const p of MINE) {
+  if (!p.visit) p.visit = p.transcript ? 'done' : 'planned';
+  if (p.status === 'analyzing') { p.status = 'error'; p.error = '정리가 중간에 멈췄어요. 다시 시도해 주세요.'; }
+  if (p.complex_name === undefined && p.transcript) { const a = ZipEngine.analyze(p.transcript); p.complex_name = a.complex_name; if (!p.sido && a.sido) { p.sido=a.sido; p.sigungu=a.sigungu; p.zone=a.zone; } }
+}
 let P = [], byId = {};
-function reload(){
-  P =MINE.slice().sort((a,b)=>b.created-a.created).concat(S.samples ? SAMPLES : []);
-  byId = Object.fromEntries(MINE.concat(SAMPLES).map(p => [p.id, p]));
-}
-reload();
-const recent = () => { const r = store.get('recent', []); const ids = P.map(p=>p.id); return r.filter(id=>ids.includes(id)).concat(ids.filter(id=>!r.includes(id))); };
+function saveMine(){ store.set('mine', MINE); }
+function reload(){ P = MINE.slice().sort((a,b)=>(b.updated||b.created)-(a.updated||a.created)).concat(S.samples ? SAMPLES : []); byId = Object.fromEntries(MINE.concat(SAMPLES).map(p=>[p.id,p])); }
+saveMine(); reload();
+const recent = () => { const r = store.get('recent', []), ids = P.map(p=>p.id); return r.filter(id=>ids.includes(id)).concat(ids.filter(id=>!r.includes(id))); };
 
-/* 받아쓴 글 → 내 매물 저장 */
-function saveNew(text){
-  const a = ZipEngine.analyze(text);
-  const p = {...a, id:'u'+Date.now(), sample:false, created:Date.now(), transcript:text, title:'내 임장'};
-  MINE.push(p); store.set('mine', MINE); reload(); return p;
-}
+function newProp(extra){ const p = {id:'u'+Date.now(), sample:false, created:Date.now(), transcript:'', photos:[], ...extra}; MINE.push(p); saveMine(); reload(); return p; }
+function saveNew(text){ const a = ZipEngine.analyze(text); return newProp({...a, transcript:text, visit:'done'}); }
 function mergeInto(id, text){
-  const p = MINE.find(x=>x.id===id); if(!p) return saveNew(text);
+  const p = MINE.find(x=>x.id===id); if (!p) return saveNew(text);
   const a = ZipEngine.analyze(text);
-  for (const [k,v] of Object.entries(a)) {
-    if (k==='zone') continue;
-    if (Array.isArray(v)) p[k] = [...new Set((p[k]||[]).concat(v))];
-    else if (v != null) p[k] = v;          // 새 녹음에서 말한 값이 우선 (정정 반영)
-  }
-  p.transcript = (p.transcript||'') + '\n\n[추가 녹음] ' + text;
-  const r = ZipEngine.normalizeRegion(p.sido, p.sigungu, p.dong, p.transcript);
-  p.zone = ZipEngine.classify(r, p.transcript); p.updated = Date.now();
-  store.set('mine', MINE); reload(); return p;
+  for (const [k,v] of Object.entries(a)) { if (k==='zone') continue; if (Array.isArray(v)) p[k] = [...new Set((p[k]||[]).concat(v))]; else if (v != null && (p[k] == null || !p.ai)) p[k] = v; }
+  p.transcript = p.transcript ? p.transcript + '\n\n[추가 녹음] ' + text : text;
+  p.visit = 'done'; p.updated = Date.now();
+  if (!p.ai) { const r = ZipEngine.normalizeRegion(p.sido, p.sigungu, p.dong, p.transcript + ' ' + (p.custom_name||'')); p.zone = ZipEngine.classify(r, p.transcript); }
+  saveMine(); reload(); return p;
 }
-function removeMine(id){ (MINE.find(p=>p.id===id)?.photos||[]).forEach(k=>PhotoDB.del(k)); MINE = MINE.filter(p=>p.id!==id); store.set('mine', MINE); reload(); }
+function removeMine(id){ (MINE.find(p=>p.id===id)?.photos||[]).forEach(k=>PhotoDB.del(k)); MINE = MINE.filter(p=>p.id!==id); saveMine(); reload(); }
 
-/* ───────── 자금 계산 (imjang/finance.py 와 같은 규칙) ───────── */
+/* ═════════ 자금 계산 (imjang/finance.py 와 같은 규칙) ═════════ */
 const SEED = {1:['1억 미만',0,10000],2:['1억~3억',10000,30000],3:['3억~5억',30000,50000],4:['5억~7억',50000,70000],5:['7억~10억',70000,100000],6:['10억 이상',100000,null]};
 const BUYER = {'무주택':'무주택','생애최초':'생애최초','다주택':'2주택 이상'};
 const INCOME = {0:['미입력',null],1:['3천만원 미만',2500],2:['3천~5천만원',3000],3:['5천~7천만원',5000],4:['7천만원~1억',7000],5:['1억 이상',10000]};
 const LTV = {'true|무주택':.4,'false|무주택':.7,'true|생애최초':.7,'false|생애최초':.8};
 const cap = p => p <= 150000 ? 60000 : p <= 250000 ? 40000 : 20000;
-function dsrMax(inc){ const r=.045/12, n=360, m=inc*.4/12; return Math.floor(m*(1-Math.pow(1+r,-n))/r); }
-function won(v){ if(v==null) return '확인 필요'; v=Math.round(v); const s=v<0?'-':''; v=Math.abs(v); const e=Math.floor(v/10000), m=v%10000;
-  return s+(e&&m?`${e}억 ${m.toLocaleString()}만원`:e?`${e}억원`:`${m.toLocaleString()}만원`); }
-function short(v){ if(v==null) return null; return v>=10000 ? (Math.round(v/1000)/10).toString()+'억' : v.toLocaleString()+'만'; }
+const dsrMax = inc => { const r=.045/12, n=360, m=inc*.4/12; return Math.floor(m*(1-Math.pow(1+r,-n))/r); };
+function won(v){ if(v==null) return '확인 필요'; v=Math.round(v); const s=v<0?'-':''; v=Math.abs(v); const e=Math.floor(v/10000), m=v%10000; return s+(e&&m?`${e}억 ${m.toLocaleString()}만원`:e?`${e}억원`:`${m.toLocaleString()}만원`); }
+const short = v => v==null ? null : v>=10000 ? (Math.round(v/1000)/10)+'억' : v.toLocaleString()+'만';
 function loanEst(price, regulated, buyer, inc){
-  if(buyer==='다주택') return {amount:0, basis:'2주택 이상: 수도권 주택구입 목적 주담대 불가'};
-  const ltv=LTV[`${!!regulated}|${buyer}`], parts=[[Math.floor(price*ltv),`LTV ${ltv*100}%`],[cap(price),'절대 한도']];
-  const income=INCOME[inc][1]; if(income) parts.push([dsrMax(income),'DSR 40%']);
-  const [amt]=parts.reduce((a,b)=>b[0]<a[0]?b:a);
-  return {amount:amt, basis: parts.map(p=>`${p[1]} ${won(p[0])}`).join(' · ') + ` → ${won(amt)}` + (income?'':' (소득 미입력: DSR 미반영)')};
+  if (buyer==='다주택') return {amount:0, basis:'2주택 이상: 수도권 주택구입 목적 주담대 불가'};
+  const ltv = LTV[`${!!regulated}|${buyer}`], parts = [[Math.floor(price*ltv),`LTV ${ltv*100}%`],[cap(price),'절대 한도']];
+  const income = INCOME[inc][1]; if (income) parts.push([dsrMax(income),'DSR 40%']);
+  const [amt] = parts.reduce((a,b)=>b[0]<a[0]?b:a);
+  return {amount:amt, basis: parts.map(p=>`${p[1]} ${won(p[0])}`).join(' · ')+` → ${won(amt)}`+(income?'':' (소득 미입력: DSR 미반영)')};
 }
 function judge(need, seed){
-  const [name,low,high]=SEED[seed], short_=need-low;
-  if(short_<=0) return {verdict:'가능', level:'ok'};
-  const lv = short_<=10000 ? 'warn' : 'bad';
-  return {verdict:(lv==='warn'?'조금 부족 ':'많이 부족 ')+won(short_), level:lv,
-          note:(high==null||need<=high)?`시드가 구간 상단에 가까우면 가능`:''};
+  const [,low,high] = SEED[seed], sh = need-low;
+  if (sh <= 0) return {verdict:'가능', level:'ok'};
+  const lv = sh <= 10000 ? 'warn' : 'bad';
+  return {verdict:(lv==='warn'?'조금 부족 ':'많이 부족 ')+won(sh), level:lv, note:(high==null||need<=high)?'시드가 구간 상단에 가까우면 가능':''};
 }
 function finance(p){
-  const z=p.zone, price=p.sale_price, j=p.jeonse_price, out=[];
-  if(price==null) return {scen:[{name:'판정 불가', na:'매매가 확인 필요', level:'na'}]};
-  const loan=loanEst(price, z.regulated, S.buyer, S.income);
-  if(z.gap_allowed===true){
-    if(j==null) out.push({name:'갭투자', na:'전세가 확인 필요', level:'na'});
-    else { const need=price-j; out.push({name:'갭투자', need, ...judge(need,S.seed), detail:`매매 ${short(price)} − 전세 ${short(j)}`}); }
-  } else if(z.gap_allowed===false) out.push({name:'갭투자', na:'불가 · 토허구역', level:'na', detail:'2년 실거주 의무'});
-  const need=price-loan.amount;
+  const z = p.zone || {zone:'?'}, price = p.sale_price, j = p.jeonse_price, out = [];
+  if (price == null) return {scen:[{name:'판정 보류', na:'매매가가 필요해요', level:'na'}], tips:['녹음에서 가격을 말하거나, Claude 정리로 최근 실거래가를 찾으면 판정돼요']};
+  const loan = loanEst(price, z.regulated, S.buyer, S.income);
+  if (z.gap_allowed === true) { if (j == null) out.push({name:'갭투자', na:'전세가 확인 필요', level:'na'}); else { const need = price-j; out.push({name:'갭투자', need, ...judge(need,S.seed), detail:`매매 ${short(price)} − 전세 ${short(j)}`}); } }
+  else if (z.gap_allowed === false) out.push({name:'갭투자', na:'불가 · 토허구역', level:'na', detail:'2년 실거주 의무'});
+  const need = price - loan.amount;
   out.push({name:'실거주 매수', need, ...judge(need,S.seed), detail:`매매 ${short(price)} − 대출 추정 ${short(loan.amount)}`});
-  const tips=[];
-  if(S.buyer==='다주택') tips.push('다주택자는 수도권 주담대가 막혀 현금·전세 레버리지만 가능');
-  else if(S.buyer==='생애최초') tips.push('생애최초 LTV 우대 — 디딤돌·보금자리론 해당 여부 은행 확인');
-  else if(price<=60000) tips.push('6억 이하 → 보금자리론 대상 가능성, 시중은행 금리와 비교');
-  else tips.push('한도 = LTV·절대 한도·DSR 중 가장 작은 값');
-  if(z.zone==='A'||z.zone==='C') tips.push('토허구역: 허가 후 4개월 내 입주·2년 실거주 → 전세 끼고 매수 불가');
-  if(p.seller_loan_exists && p.seller_loan_amount) tips.push(`매도인 융자 ${won(p.seller_loan_amount)} — 잔금 때 말소 조건 명시`);
+  const tips = [];
+  if (S.buyer==='다주택') tips.push('다주택자는 수도권 주담대가 막혀 현금·전세 레버리지만 가능');
+  else if (S.buyer==='생애최초') tips.push('생애최초 LTV 우대 — 디딤돌·보금자리론 해당 여부 은행 확인');
+  else if (price <= 60000) tips.push('6억 이하 → 보금자리론 대상 가능성, 시중은행 금리와 비교');
+  else tips.push('대출 한도 = LTV·절대 한도·DSR 중 가장 작은 값');
+  if (z.zone==='A'||z.zone==='C') tips.push('토허구역: 허가 후 4개월 내 입주·2년 실거주 → 전세 끼고 매수 불가');
+  if (p.seller_loan_exists && p.seller_loan_amount) tips.push(`매도인 융자 ${won(p.seller_loan_amount)} — 잔금 때 말소 조건 명시`);
   return {scen:out, basis:loan.basis, tips};
 }
-const best = f => { const order={ok:0,warn:1,bad:2,na:3}; return f.scen.slice().sort((a,b)=>order[a.level]-order[b.level])[0]; };
+const best = f => f.scen.slice().sort((a,b)=>({ok:0,warn:1,bad:2,na:3}[a.level]-{ok:0,warn:1,bad:2,na:3}[b.level]))[0];
 
-/* ───────── 표시 도우미 ───────── */
+/* ═════════ 표시 도우미 ═════════ */
 const esc = s => String(s??'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const SIDO_SHORT = {'서울특별시':'서울','경기도':'경기','인천광역시':'인천'};
-const nameOf = p => p.custom_name || p.complex_name
-  || `${p.dong || (p.sigungu||'').split(' ').pop() || '이름 없는'} ${p.property_type || '매물'}${p.area_pyeong ? ' '+p.area_pyeong+'평' : ''}`;
-const gu = p => (p.sigungu || '구 확인 필요');
-const spot = p => p.station_name || p.dong || '위치 확인 필요';
+const nameOf = p => p.custom_name || p.complex_name || `${p.dong || (p.sigungu||'').split(' ').pop() || '이름 없는'} ${p.property_type || '매물'}${p.area_pyeong ? ' '+p.area_pyeong+'평' : ''}`;
+const gu = p => p.sigungu || '지역 미확인';
+const spot = p => p.station_name || p.dong || '기타';
 const zcls = z => z==='A'?'zA':z==='B'?'zB':z==='C'?'zC':'zq';
-const zshort = z => ({A:'토허',B:'갭 가능',C:'개별 지정'})[z] || '확인';
-const MISS = [['sale_price','매매가'],['jeonse_price','전세가'],['area_pyeong','평형'],['built_year','연식'],['households','세대수'],['mgmt_fee','관리비'],['parking_per_household','주차'],['elevator','엘리베이터'],['station_walk_min','역 거리'],['floor','층'],['facing','향'],['mgmt_office','관리사무소'],['elementary','초등학교'],['middle_high','중·고등학교'],['commercial','상권'],['seller_loan_exists','융자 여부']];
-const missing = p => MISS.filter(([k])=>p[k]==null).map(([,l])=>l).concat((p.defects||[]).length?[]:['하자 여부']);
+const subOf = p => p.households ? `${p.households.toLocaleString()}세대` : [SIDO_SHORT[p.sido], p.sigungu].filter(Boolean).join(' ') || (p.visit==='planned' ? '방문 전' : '정보 확인 필요');
+const stChip = p => p.visit==='planned' ? '<span class="st plan">방문 예정</span>' : `<span class="st${p.sample?' smp':''}">${p.sample?'샘플':'임장 완료'}</span>`;
+const MISS = [['sale_price','매매가'],['jeonse_price','전세가'],['area_pyeong','평형'],['built_year','연식'],['households','세대수'],['parking_per_household','주차'],['station_walk_min','역 거리']];
+const missing = p => MISS.filter(([k])=>p[k]==null).map(([,l])=>l);
 const I = {
-  chev:'<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 6 6 6-6 6"/></svg>',
+  chev:'<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m9 6 6 6-6 6"/></svg>',
   pin:'<svg class="ic" style="width:18px;height:18px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>',
   mic:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>',
-  bell:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>',
   back:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m15 5-7 7 7 7"/></svg>',
-  bld:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="3" width="10" height="18"/><path d="M14 9h6v12h-6M7 7h1M10 7h1M7 11h1M10 11h1M7 15h1M10 15h1"/></svg>',
-  memo:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V2.5h6V4M9 10h6M9 14h6"/></svg>',
-  coin:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><ellipse cx="9" cy="7" rx="6" ry="2.5"/><path d="M3 7v4c0 1.4 2.7 2.5 6 2.5s6-1.1 6-2.5V7M3 11v4c0 1.4 2.7 2.5 6 2.5"/><ellipse cx="16" cy="15" rx="5" ry="2"/><path d="M11 15v3c0 1.1 2.2 2 5 2s5-.9 5-2v-3"/></svg>',
+  search:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>',
+  bell:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>',
+  bookmark:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3h12v18l-6-4-6 4z"/></svg>',
+  pen:'<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>',
+  plus:'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>',
+  info:'<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="flex:none;margin-top:2px"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>',
   play:'<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>',
   pause:'<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg>',
-  info:'<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" style="flex:none;margin-top:2px"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>'
 };
-const li = (p, meta='') => `<a class="li" href="#/p/${p.id}"><span class="name">${esc(nameOf(p))}</span>${p.sample?'<span class="mini" style="background:var(--na-bg);color:var(--na)">샘플</span>':'<span class="mini">내 녹음</span>'}${meta}${I.chev}</a>`;
+const pcard = p => `<a class="pcard" href="#/p/${p.id}"><div class="t"><b>${esc(nameOf(p))}</b><span class="s">${esc(subOf(p))}</span></div>${stChip(p)}${I.chev}</a>`;
 
-/* ───────── 화면: 홈 ───────── */
+/* ═════════ 화면: 홈 ═════════ */
 function home(){
-  const sidoTab = store.get('homeSido', '서울특별시');
-  const needTotal = P.reduce((n,p)=>n+missing(p).length,0);
-  const groups = {};
-  P.filter(p=>p.sido===sidoTab).forEach(p=>{ const k=gu(p)+'|'+spot(p); (groups[k]=groups[k]||[]).push(p); });
-  const rec = recent().map(id=>byId[id]).filter(Boolean).slice(0,3);
+  const rec = recent().map(id=>byId[id]).filter(Boolean).slice(0,2);
+  const saved = P.filter(p=>!rec.includes(p)).slice(0,3);
+  const planned = P.filter(p=>p.visit==='planned').length;
   return `
-  <div class="top"><span class="disp brand">집노트</span>
-    <a class="iconbtn" href="#/records" aria-label="확인 필요 항목 ${needTotal}개">${I.bell}<span class="badge">${needTotal}</span></a></div>
-  <h1 class="disp hero">오늘,<br>어떤 집을 보셨나요?</h1>
-  <button class="btn" data-act="rec">${I.mic} 녹음 시작</button>
-  <h2 class="sec">최근 본 매물</h2>
-  <div class="list">${rec.length ? rec.map(p=>li(p,`<span class="zdot ${zcls(p.zone.zone)}">${zshort(p.zone.zone)}</span>`)).join('') : '<div class="empty">아직 기록이 없어요. 녹음 시작을 눌러 첫 매물을 남겨보세요.</div>'}</div>
-  <h2 class="sec">내 임장 기록</h2>
-  <div class="seg" role="tablist">${Object.entries(SIDO_SHORT).map(([k,v])=>`<button role="tab" class="${k===sidoTab?'on':''}" data-sido="${k}">${v}</button>`).join('')}</div>
-  ${Object.keys(groups).length ? Object.entries(groups).map(([k,list],i)=>{ const [g,s]=k.split('|'); return `
-    <button class="grouphd" aria-expanded="true" data-grp="${i}">${I.pin}<span>${esc(g)}</span><span class="arrow">→</span><span>${esc(s)}</span>
-      <svg class="tog" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></button>
-    <div class="list indent" id="grp${i}">${list.map(p=>li(p)).join('')}</div>`;}).join('') : `<div class="empty">아직 ${SIDO_SHORT[sidoTab]} 임장 기록이 없어요.<br>녹음으로 첫 매물을 남겨보세요.</div>`}`;
+  <div class="top"><span class="logo">집노트</span>
+    <div class="row" style="gap:0"><a class="iconbtn" href="#/records?q=" aria-label="검색">${I.search}</a>
+      <a class="iconbtn" href="#/records?f=planned" aria-label="방문 예정 ${planned}곳">${I.bell}${planned?`<span class="badge">${planned}</span>`:''}</a></div></div>
+  <p class="lead">내가 직접 보고 기록하는<br>임장 노트</p>
+  <button class="btn xl" data-act="rec"><span class="row" style="gap:12px">${I.mic}녹음 시작</span>${I.chev.replace('class="chev"','class="ic" style="color:#fff"')}</button>
+  <div class="duo"><a class="btn line" href="#/region">${I.pin.replace('class="ic"','class="ic" style="color:var(--blue)"')} 지역별 매물 보기</a>
+    <button class="btn line" data-act="plan">${I.plus} 방문 예정 추가</button></div>
+  <section class="panel"><div class="panelhd"><h2>최근 본 매물</h2><a class="more" href="#/records">더보기 ›</a></div>
+    ${rec.length ? rec.map(pcard).join('') : '<div class="empty">아직 기록이 없어요. 녹음 시작을 눌러 첫 매물을 남겨보세요.</div>'}</section>
+  <section class="panel"><div class="panelhd"><h2>저장한 임장 기록</h2><a class="more" href="#/records">더보기 ›</a></div>
+    ${saved.length ? saved.map(pcard).join('') : '<div class="empty">저장한 기록이 여기에 모여요.</div>'}</section>`;
 }
 
-/* ───────── 화면: 지역별 매물 ───────── */
+/* ═════════ 화면: 지역별 매물 ═════════ */
 function region(q){
+  const head = `<div class="phd"><a class="iconbtn back" href="#/" aria-label="홈으로">${I.back}</a><h1>지역별 매물</h1><a class="iconbtn" href="#/records" aria-label="임장 기록">${I.bookmark}</a></div>`;
   const sidos = [...new Set(P.map(p=>p.sido).filter(Boolean))];
-  if(!sidos.length) return `<h1 class="disp pagehd">지역별 매물</h1><div class="empty">지역이 확인된 매물이 아직 없어요.<br>녹음할 때 "서울 영등포구 당산동"처럼 지역을 말해 주세요.</div><button class="fab" data-act="rec" aria-label="녹음 시작">${I.mic}</button>`;
-  const sido = q.sido && sidos.includes(q.sido) ? q.sido : sidos[0];
+  if (!sidos.length) return head + `<div class="empty">지역이 확인된 매물이 아직 없어요.</div>`;
+  const sido = sidos.includes(q.sido) ? q.sido : sidos[0];
   const gus = [...new Set(P.filter(p=>p.sido===sido).map(gu))];
-  const g = q.gu && gus.includes(q.gu) ? q.gu : gus[0];
+  const g = gus.includes(q.gu) ? q.gu : gus[0];
   const inGu = P.filter(p=>p.sido===sido && gu(p)===g);
-  const spots = [...new Set(inGu.map(spot))];
-  const sp = q.spot && spots.includes(q.spot) ? q.spot : spots[0];
+  const spots = ['전체', ...new Set(inGu.map(spot))];
+  const sp = spots.includes(q.spot) ? q.spot : (spots.length > 2 ? '전체' : spots[1]);
+  const base = sp==='전체' ? inGu : inGu.filter(p=>spot(p)===sp);
   const f = q.f || 'all';
-  let list = inGu.filter(p=>spot(p)===sp);
-  if(f==='gap') list = list.filter(p=>p.zone.gap_allowed===true);
-  if(f==='ok') list = list.filter(p=>{ const b=best(finance(p)); return b.level==='ok'||b.level==='warn'; });
-  const sel = (name, opts, cur) => `<select aria-label="${name}" data-q="${name}">${opts.map(o=>`<option value="${esc(o)}" ${o===cur?'selected':''}>${esc(name==='sido'?SIDO_SHORT[o]||o:o)}</option>`).join('')}</select>`;
-  return `
-  <h1 class="disp pagehd">지역별 매물</h1>
-  <div class="crumb">${I.pin}${sel('sido',sidos,sido)}<span class="muted">›</span>${sel('gu',gus,g)}</div>
-  <div class="subtabs">${spots.map(s=>`<button class="${s===sp?'on':''}" data-spot="${esc(s)}">${esc(s)}</button>`).join('')}</div>
-  <h2 class="disp" style="font-size:23px;margin:22px 0 4px">${esc(sp)} ${/역$/.test(sp)?'인근':''}</h2>
-  <div class="chips">${[['all','전체'],['gap','갭투자 가능'],['ok','내 시드로 근접']].map(([k,v])=>`<button class="chip ${k===f?'on':''}" data-f="${k}">${v}</button>`).join('')}</div>
-  <div class="list">${list.length ? list.map(p=>li(p,`<span class="meta">${p.households?p.households.toLocaleString()+'세대':'<span class="needtxt">세대수 확인</span>'}</span>`)).join('') : '<div class="empty">조건에 맞는 매물이 없어요.</div>'}</div>
-  <p class="note">${I.info}<span>녹음에서 자동으로 뽑은 값이에요. 금액·세대수는 거래 전 직접 확인하세요.</span></p>
+  const list = f==='done' ? base.filter(p=>p.visit!=='planned') : f==='planned' ? base.filter(p=>p.visit==='planned') : base;
+  const sel = (name, opts, cur, label) => `<span class="pill ${name==='spot'?'on':''}">${esc(label)} ▾<select aria-label="${name}" data-q="${name}">${opts.map(o=>`<option value="${esc(o)}" ${o===cur?'selected':''}>${esc(name==='sido'?SIDO_SHORT[o]||o:o)}</option>`).join('')}</select></span>`;
+  const cnt = k => k==='done' ? base.filter(p=>p.visit!=='planned').length : k==='planned' ? base.filter(p=>p.visit==='planned').length : base.length;
+  return head + `
+  <div class="pills">${sel('sido',sidos,sido,SIDO_SHORT[sido]||sido)}<span class="sep">›</span>${sel('gu',gus,g,g)}<span class="sep">›</span>${sel('spot',spots,sp,sp)}</div>
+  <div class="ftabs">${[['all','전체'],['done','임장 완료'],['planned','방문 예정']].map(([k,v])=>`<button class="ftab ${k===f?'on':''}" data-f="${k}">${v} (${cnt(k)})</button>`).join('')}</div>
+  <div class="note">${I.info}<span>직접 임장한 매물과 방문 예정으로 저장한 매물만 표시돼요.</span></div>
+  ${list.length ? list.map(pcard).join('') : '<div class="empty">이 조건의 매물이 없어요.</div>'}
   <button class="fab" data-act="rec" aria-label="녹음 시작">${I.mic}</button>`;
 }
 
-/* ───────── 화면: 매물 상세 ───────── */
-function detail(id){
-  const p = byId[id]; if(!p) return `<div class="empty">매물을 찾을 수 없어요.</div>`;
-  const r = recent().filter(x=>x!==id); r.unshift(id); store.set('recent', r);
-  if (!p.sample) return detailMine(p);
-  const f = finance(p), miss = missing(p);
-  const stat = (k,v) => `<div class="stat"><div class="k">${k}</div><div class="v ${v?'':'need'}">${v||'확인 필요'}</div></div>`;
-  const kv = (k,v) => `<dt>${k}</dt><dd>${v==null||v===''?'<span class="needtxt">확인 필요</span>':esc(v)}</dd>`;
-  const pk = p.parking_per_household, hh = p.households;
-  return `
-  <div class="dethd"><a class="iconbtn" href="javascript:history.length>1?history.back():location.hash='#/'" aria-label="뒤로">${I.back}</a><span class="t">${esc(nameOf(p))}</span></div>
-  <div class="photo" aria-hidden="true">
-    <svg viewBox="0 0 400 150" preserveAspectRatio="xMidYMax slice">
-      <g fill="#C9D3E6">${[30,90,250,320].map((x,i)=>`<rect x="${x}" y="${40+i%2*18}" width="46" height="${110-i%2*18}"/>`).join('')}</g>
-      <g fill="#F4F1EB" stroke="#B8C2D6">${[60,140,200,290].map((x,i)=>`<rect x="${x}" y="${18+i*7}" width="56" height="${132-i*7}"/>`).join('')}</g>
-      <g fill="#B8C2D6">${[60,140,200,290].flatMap((x,i)=>Array.from({length:7},(_,r)=>[0,1,2].map(c=>`<rect x="${x+8+c*16}" y="${30+i*7+r*15}" width="8" height="7"/>`).join(''))).join('')}</g>
-      <path d="M0 150 Q60 118 120 136 T240 130 T400 128 V150Z" fill="#7E9A6A"/><path d="M0 150 Q80 132 170 144 T400 140 V150Z" fill="#5F7F50"/>
-    </svg><span class="lbl">사진 없음 · 다음 단계에서 연결</span></div>
-  <div class="row" style="align-items:flex-start"><h1 class="disp dtitle" style="flex:1">${esc(nameOf(p))}</h1>
-    ${p.sample?'':`<button class="iconbtn" style="margin-top:16px" data-rename="${p.id}" aria-label="이름 고치기"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/></svg></button>`}</div>
-  ${p.complex_name||p.custom_name?`<div class="small muted" style="margin:-2px 0 4px">${esc([p.property_type, p.area_pyeong?p.area_pyeong+'평':null].filter(Boolean).join(' · '))}</div>`:''}
-  <div class="loc">${I.pin}<span>${esc([SIDO_SHORT[p.sido]||p.sido, p.sigungu].filter(Boolean).join(' '))}${p.station_name?' · '+esc(p.station_name):''}</span>
-    <span class="zdot ${zcls(p.zone.zone)}" style="margin-left:4px">${esc(p.zone.label)}</span></div>
-
-  <section class="card"><div class="cardhd">${I.bld}기본 정보</div>
-    <div class="stats">${stat('매매',short(p.sale_price))}${stat('전세',short(p.jeonse_price))}${stat('면적',p.area_pyeong?p.area_pyeong+'평':null)}${stat('역',p.station_walk_min!=null?'도보 '+p.station_walk_min+'분':null)}</div>
-    <dl class="kv">${kv('연식',p.built_year?`${p.built_year}년 (${2026-p.built_year}년차)`:null)}${kv('세대수',hh?`${hh.toLocaleString()}세대 · ${hh>=1000?'대단지':hh>=300?'중단지':'소단지'}`:null)}
-      ${kv('주차',pk!=null?`${pk>=1?'1대 이상':'1대 미만'} (세대당 ${pk}대)`:null)}${kv('관리비',p.mgmt_fee!=null?`${p.mgmt_fee}만원`:null)}
-      ${kv('엘리베이터',p.elevator==null?null:p.elevator?'있음':'없음')}${kv('층 · 향',[p.floor,p.facing].filter(Boolean).join(' · ')||null)}
-      ${kv('초품아',p.chopuma==null?null:p.chopuma?'예':'아니요')}${kv('매도인 융자',p.seller_loan_exists==null?null:p.seller_loan_exists?(p.seller_loan_amount?won(p.seller_loan_amount):'있음'):'없음')}</dl></section>
-
-  <section class="card"><div class="cardhd">${I.memo}현장 메모</div>
-    ${(p.defects||[]).length?`<div class="sublbl">하자 · 수리</div><ul class="bul">${p.defects.map(d=>`<li>${esc(d)}</li>`).join('')}</ul>`:''}
-    ${[p.commercial,p.middle_high,p.mgmt_office].filter(Boolean).length?`<div class="sublbl">입지 · 관리</div><ul class="bul">${[p.commercial,p.middle_high,p.mgmt_office].filter(Boolean).map(d=>`<li>${esc(d)}</li>`).join('')}</ul>`:''}
-    ${(p.uncertain||[]).length?`<div class="sublbl">❓ 말하면서 헷갈린 부분</div><ul class="bul">${p.uncertain.map(d=>`<li>${esc(d)}</li>`).join('')}</ul>`:''}
-    <div class="sublbl">다시 물어볼 것 ${miss.length}개</div><div class="tags">${miss.map(m=>`<span class="tag">${m}</span>`).join('')||'<span class="muted small">빠진 항목 없음</span>'}</div></section>
-
-  <section class="card"><div class="cardhd">${I.coin}자금 비교</div>
-    ${f.scen.map(s=>`<div class="scen"><div><div class="nm">${s.name}${s.need!=null?' · 필요 자금':''}</div>
-      ${s.need!=null?`<div class="need">${short(s.need)}</div>`:`<div class="na">${s.na}</div>`}${s.detail?`<div class="small muted">${esc(s.detail)}</div>`:''}</div>
-      ${s.need!=null?`<span class="pill ${s.level}">${s.verdict}</span>`:''}</div>${s.note?`<div class="small muted" style="margin-top:-6px;padding-bottom:8px">↳ ${s.note}</div>`:''}`).join('')}
-    <button class="cond" data-act="settings"><span>내 조건 <b>시드 ${SEED[S.seed][0]}</b> · ${BUYER[S.buyer]}</span><span style="color:var(--blue);font-weight:700">변경</span></button>
-    ${f.tips?`<ul class="bul small">${f.tips.map(t=>`<li>${esc(t)}</li>`).join('')}</ul>`:''}
-    <p class="fine">${f.basis?'대출 추정: '+esc(f.basis)+'<br>':''}${esc(p.zone.reason)}<br>참고용 추정 · 세금 미반영 · 대출은 은행 상담 필수 · ${esc(p.zone.caution)}</p></section>
-
-  <details class="raw"><summary>${I.mic} 녹음 원문 ${p.audio?'듣기':'보기'}</summary>
-    ${p.audio?`<audio controls preload="none" src="${esc(p.audio)}"></audio>`:''}<p style="white-space:pre-wrap">${esc(p.transcript)}</p></details>
-  ${p.sample?'':`<button class="danger" data-del="${p.id}">이 매물 삭제</button>`}
-  <div style="height:70px"></div>
-  <div class="cta"><button class="btn" data-act="rec" data-target="${p.sample?'':p.id}">${I.mic} 이 매물에 녹음 추가</button></div>`;
-}
-
-/* ───────── 사진 (폰 IndexedDB에 저장) ───────── */
+/* ═════════ 사진 · 지도 ═════════ */
 const PhotoDB = {
   db: null,
-  open(){ return this.db || (this.db = new Promise((res, rej) => { const r = indexedDB.open('zipnote', 1);
-    r.onupgradeneeded = () => r.result.createObjectStore('photos'); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); })); },
-  async put(key, blob){ const db = await this.open(); return new Promise((res, rej) => { const tx = db.transaction('photos','readwrite'); tx.objectStore('photos').put(blob, key); tx.oncomplete = res; tx.onerror = () => rej(tx.error); }); },
-  async get(key){ const db = await this.open(); return new Promise((res) => { const q = db.transaction('photos').objectStore('photos').get(key); q.onsuccess = () => res(q.result); q.onerror = () => res(null); }); },
-  async del(key){ const db = await this.open(); return new Promise((res) => { const tx = db.transaction('photos','readwrite'); tx.objectStore('photos').delete(key); tx.oncomplete = res; tx.onerror = res; }); },
+  open(){ return this.db || (this.db = new Promise((res, rej) => { const r = indexedDB.open('zipnote', 1); r.onupgradeneeded = () => r.result.createObjectStore('photos'); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); })); },
+  async put(k, b){ const db = await this.open(); return new Promise((res, rej) => { const tx = db.transaction('photos','readwrite'); tx.objectStore('photos').put(b, k); tx.oncomplete = res; tx.onerror = () => rej(tx.error); }); },
+  async get(k){ const db = await this.open(); return new Promise(res => { const q = db.transaction('photos').objectStore('photos').get(k); q.onsuccess = () => res(q.result); q.onerror = () => res(null); }); },
+  async del(k){ try { const db = await this.open(); db.transaction('photos','readwrite').objectStore('photos').delete(k); } catch(_){} },
 };
-function shrink(file, max = 1280){   // 저장 공간 절약: 긴 변 1280px JPEG
-  return new Promise((res) => { const img = new Image(); img.onload = () => { const s = Math.min(1, max / Math.max(img.width, img.height));
-    const cv = Object.assign(document.createElement('canvas'), {width: Math.round(img.width*s), height: Math.round(img.height*s)});
-    cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height); cv.toBlob(b => { URL.revokeObjectURL(img.src); res(b || file); }, 'image/jpeg', 0.82); };
+function shrink(file, max = 1280){
+  return new Promise(res => { const img = new Image(); img.onload = () => { const s = Math.min(1, max/Math.max(img.width, img.height));
+    const cv = Object.assign(document.createElement('canvas'), {width:Math.round(img.width*s), height:Math.round(img.height*s)});
+    cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height); cv.toBlob(b => { URL.revokeObjectURL(img.src); res(b || file); }, 'image/jpeg', .82); };
     img.onerror = () => res(file); img.src = URL.createObjectURL(file); });
 }
 async function addPhotos(id, files){
   const p = MINE.find(x=>x.id===id); if (!p || !files.length) return;
   p.photos = p.photos || [];
-  for (const f of files) { const key = `${id}:${Date.now()}:${Math.random().toString(36).slice(2,6)}`; await PhotoDB.put(key, await shrink(f)); p.photos.push(key); }
+  for (const f of files) { const k = `${id}:${Date.now()}:${Math.random().toString(36).slice(2,6)}`; await PhotoDB.put(k, await shrink(f)); p.photos.push(k); }
   saveMine(); reload(); render(); toast(`사진 ${files.length}장을 붙였어요`);
 }
 const urlCache = {};
-async function fillPhotos(){
-  for (const el of document.querySelectorAll('img[data-photo]')) {
-    const k = el.dataset.photo; if (!urlCache[k]) { const b = await PhotoDB.get(k); if (!b) continue; urlCache[k] = URL.createObjectURL(b); }
-    el.src = urlCache[k];
-  }
-}
-/* 단지 위치 → 지도 (OpenStreetMap, 키 불필요). 주소는 한 번만 찾아 저장 */
+async function fillPhotos(){ for (const el of document.querySelectorAll('img[data-photo]')) { const k = el.dataset.photo; if (!urlCache[k]) { const b = await PhotoDB.get(k); if (!b) continue; urlCache[k] = URL.createObjectURL(b); } el.src = urlCache[k]; } }
 async function locate(p){
-  if (p.geo !== undefined || !p.ai) return;
-  const c = p.ai.complex || {};
-  const qs = [c.address, [c.sigungu, c.dong, c.name].filter(Boolean).join(' '), [p.sigungu, nameOf(p)].filter(Boolean).join(' ')].filter(Boolean);
+  if (p.sample || p.geo !== undefined) return;
+  const c = p.ai?.complex || {};
+  const qs = [c.address, [c.sigungu, c.dong, c.name].filter(Boolean).join(' '), [p.sigungu, p.dong, nameOf(p)].filter(Boolean).join(' ')].filter(q => q && q.trim().length > 3);
+  if (!qs.length) return;
   p.geo = null;
-  for (const q of qs) {
-    try { const r = await fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=kr&accept-language=ko&q=${encodeURIComponent(q)}`);
-      const j = await r.json(); if (j && j[0]) { p.geo = {lat: +j[0].lat, lon: +j[0].lon}; break; } } catch(_) {}
-  }
+  for (const q of qs) { try { const r = await fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=kr&accept-language=ko&q=${encodeURIComponent(q)}`); const j = await r.json(); if (j && j[0]) { p.geo = {lat:+j[0].lat, lon:+j[0].lon}; break; } } catch(_){} }
   saveMine(); rerenderIf(p.id);
 }
+const ILLUS = `<svg viewBox="0 0 400 150" preserveAspectRatio="xMidYMax slice"><rect width="400" height="150" fill="#E3EAF6"/>
+  <g fill="#C7D3E8">${[30,90,250,320].map((x,i)=>`<rect x="${x}" y="${40+i%2*18}" width="46" height="${110-i%2*18}"/>`).join('')}</g>
+  <g fill="#FFFFFF" stroke="#B7C4DC">${[60,140,200,290].map((x,i)=>`<rect x="${x}" y="${18+i*7}" width="56" height="${132-i*7}"/>`).join('')}</g>
+  <g fill="#B7C4DC">${[60,140,200,290].flatMap((x,i)=>Array.from({length:7},(_,r)=>[0,1,2].map(c=>`<rect x="${x+8+c*16}" y="${30+i*7+r*15}" width="8" height="7"/>`).join(''))).join('')}</g>
+  <path d="M0 150 Q60 120 120 137 T240 131 T400 129 V150Z" fill="#8DB07A"/></svg>`;
 function heroOf(p){
-  const photos = p.photos || [];
-  if (photos.length) return `<div class="gallery">${photos.map(k=>`<div class="ph"><img data-photo="${k}" alt="임장 사진"><button class="phdel" data-delphoto="${k}" data-id="${p.id}" aria-label="사진 삭제">×</button></div>`).join('')}</div>`;
-  if (p.geo) { const {lat, lon} = p.geo, d = 0.006;
-    return `<div class="mapbox"><iframe title="단지 위치 지도" loading="lazy" src="https://www.openstreetmap.org/export/embed.html?bbox=${lon-d},${lat-d*0.6},${lon+d},${lat+d*0.6}&layer=mapnik&marker=${lat},${lon}"></iframe>
-      <span class="lbl">단지 위치 · © OpenStreetMap</span></div>`; }
-  return `<div class="photo" aria-hidden="true" style="height:120px;display:grid;place-items:center"><span class="small muted">${p.ai ? '위치를 찾는 중이거나 찾지 못했어요' : '정리하면 단지 위치 지도가 여기에 떠요'}</span></div>`;
+  const ph = p.photos || [];
+  if (ph.length) return `<div class="gallery">${ph.map(k=>`<div class="ph"><img data-photo="${k}" alt="임장 사진"><button class="phdel" data-delphoto="${k}" data-id="${p.id}" aria-label="사진 삭제">×</button></div>`).join('')}</div>`;
+  if (p.geo) { const {lat, lon} = p.geo, d = .006; return `<div class="mapbox"><iframe title="단지 위치 지도" loading="lazy" src="https://www.openstreetmap.org/export/embed.html?bbox=${lon-d},${lat-d*.6},${lon+d},${lat+d*.6}&layer=mapnik&marker=${lat},${lon}"></iframe></div><span class="lbl">단지 위치 · © OpenStreetMap</span>`; }
+  return `<div class="illus">${ILLUS}</div><span class="lbl">${p.sample ? '샘플 · 사진 없음' : '사진을 추가하거나 정리하면 지도가 떠요'}</span>`;
 }
 
-/* ───────── 화면: 내 매물 상세 (AI 정리) ───────── */
-function detailMine(p){
-  const a = p.ai, c = a?.complex || {}, m = a?.market || {}, v = a?.visit || {};
+/* ═════════ 화면: 매물 상세 ═════════ */
+function detail(id, q){
+  const p = byId[id]; if (!p) return `<div class="empty">매물을 찾을 수 없어요.</div>`;
+  const r = recent().filter(x=>x!==id); r.unshift(id); store.set('recent', r);
   setTimeout(() => { fillPhotos(); locate(p); }, 0);
-  const searchName = (c.name || nameOf(p)) + ' 아파트';
-  const head = `
-  <div class="dethd"><a class="iconbtn" href="javascript:history.length>1?history.back():location.hash='#/'" aria-label="뒤로">${I.back}</a><span class="t">${esc(nameOf(p))}</span></div>
-  <div style="margin:0 -20px">${heroOf(p)}</div>
-  <div class="photobar"><label class="chip">📷 사진 추가<input type="file" accept="image/*" multiple hidden data-addphoto="${p.id}"></label>
-    <a class="chip" href="https://search.naver.com/search.naver?where=image&query=${encodeURIComponent(searchName)}" target="_blank" rel="noopener">🔎 단지 사진 보기</a>
-    ${(p.photos||[]).length && p.geo ? `<a class="chip" href="https://www.openstreetmap.org/?mlat=${p.geo.lat}&mlon=${p.geo.lon}#map=17/${p.geo.lat}/${p.geo.lon}" target="_blank" rel="noopener">🗺 지도</a>` : ''}</div>
-  <div class="row" style="align-items:flex-start;margin-top:8px"><h1 class="disp dtitle" style="flex:1;margin-top:6px">${esc(nameOf(p))}</h1>
-    <button class="iconbtn" style="margin-top:8px" data-rename="${p.id}" aria-label="이름 고치기"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/></svg></button></div>
-  <div class="loc">${I.pin}<span>${esc(c.address || [SIDO_SHORT[p.sido]||p.sido, p.sigungu, p.dong].filter(Boolean).join(' ') || '위치 확인 필요')}</span></div>
-  <div class="row" style="margin-top:8px;flex-wrap:wrap"><span class="zdot ${zcls(p.zone.zone)}">${esc(p.zone.label)}</span>
-    ${a?`<span class="zdot zq">AI 단지 확인: ${esc(c.confidence||'')}</span>`:''}${c.heard_as && c.heard_as!==c.name?`<span class="small muted">"${esc(c.heard_as)}"(으)로 들림</span>`:''}</div>`;
+  const a = p.ai, c = a?.complex || {}, m = a?.market || {}, v = a?.visit || {};
+  const tab = q.tab || 'info';
+  const crumbs = [SIDO_SHORT[p.sido], p.sigungu, p.station_name || p.dong].filter(Boolean);
 
-  const raw = `<details class="raw"><summary>${I.mic} 녹음 원문 보기</summary><p style="white-space:pre-wrap">${esc(p.transcript)}</p></details>
-    <div class="row" style="justify-content:space-between;margin-top:6px"><button class="danger" data-del="${p.id}">이 매물 삭제</button>
-    ${p.status!=='analyzing'?`<button class="go" data-act="reai" data-id="${p.id}">AI로 다시 정리 ↻</button>`:''}</div>
-    <div style="height:70px"></div>
-    <div class="cta"><button class="btn" data-act="rec" data-target="${p.id}">${I.mic} 이 매물에 녹음 추가</button></div>`;
+  /* 기본 정보 */
+  const row = (k, val) => `<tr><th>${k}</th><td>${val==null||val===''?'<span class="needtxt">확인 필요</span>':esc(val)}</td></tr>`;
+  const hh = c.households ?? p.households, by = c.built_year ?? p.built_year, pk = c.parking_per_household ?? p.parking_per_household;
+  const st = c.nearest_station || p.station_name, sw = c.station_walk_min ?? p.station_walk_min;
+  const info = `<section class="card pane ${tab==='info'?'on':''}"><div class="cardhd">기본 정보 ${a?'<span class="src">웹 검색 · AI</span>':''}</div>
+    <table class="info">${row('단지명', c.name || nameOf(p))}${row('세대수', hh?hh.toLocaleString()+'세대'+(hh>=1000?' · 대단지':hh<300?' · 소단지':''):null)}
+      ${row('위치', c.address || [p.sido, p.sigungu, p.dong].filter(Boolean).join(' ') || null)}${row('준공', by?`${by}년 (${2026-by}년차)`:null)}
+      ${row('역', st||sw!=null?[st, sw!=null?'도보 '+sw+'분':null].filter(Boolean).join(' · '):null)}${row('주차', pk!=null?`세대당 ${pk}대 (${pk>=1?'1대 이상':'1대 미만'})`:null)}
+      ${a?row('동·층', [c.buildings?c.buildings+'개 동':null, c.floors_max?'최고 '+c.floors_max+'층':null].filter(Boolean).join(' · ')||null)+row('시공사', c.builder):''}
+      ${!a&&p.mgmt_fee!=null?row('관리비', p.mgmt_fee+'만원'):''}${row('토허', p.zone?.label)}</table>
+    ${a && (a.sources||[]).length ? `<details class="srcs"><summary>출처 ${a.sources.length}개</summary>${a.sources.map(s=>`<a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.title||s.url)}</a>`).join('')}</details>` : ''}</section>`;
 
-  if (p.status === 'analyzing') return head + `
-    <section class="card" style="text-align:center;padding:28px 16px"><div class="spinner"></div>
-      <div style="font-weight:700;margin-top:14px">${esc(p.step||'정리 중')}</div>
-      <p class="small muted" style="margin:6px 0 0">단지 정보와 최근 실거래가를 검색하고 녹음을 정리하고 있어요. 보통 30초~1분 걸려요. 다른 화면으로 가도 계속 진행돼요.</p></section>` + raw;
-  const handoff = `
-    <section class="card"><div class="cardhd">✨ 내 Claude·ChatGPT로 정리하기</div>
-      <ol class="steps2"><li>아래 버튼을 누르면 <b>질문이 복사</b>되고 앱이 열려요 (질문이 안 채워져 있으면 붙여넣기)</li>
-        <li>답이 나오면 <b>답 전체를 복사</b>해요</li><li>여기에 붙여넣고 <b>화면에 적용</b></li></ol>
-      <div class="btnrow" style="grid-template-columns:1fr 1fr"><button class="btn sm" data-act="handoff" data-to="claude" data-id="${p.id}">Claude에서 정리</button>
-        <button class="btn ghost sm" data-act="handoff" data-to="chatgpt" data-id="${p.id}">ChatGPT에서 정리</button></div>
-      <textarea class="edit" id="paste" style="min-height:110px;margin-top:12px" placeholder="Claude·ChatGPT의 답을 여기에 붙여넣기"></textarea>
-      <button class="btn sm" data-act="apply-paste" data-id="${p.id}" style="margin-top:8px">화면에 적용</button>
-      <p class="fine">웹 검색이 켜져 있어야 단지 정보·시세를 찾아요 (Claude: 웹 검색 켜기 / ChatGPT: 검색). 추가 비용 없이 지금 쓰는 구독으로 돼요.
-        API 키가 있으면 이 과정 없이 자동으로 정리할 수도 있어요 — <a href="#/records?ai=1" style="color:var(--blue)">AI 설정</a></p></section>`;
-  if (p.status === 'error') return head + `
-    <section class="card"><div class="cardhd">자동 정리하지 못했어요</div><p class="small" style="margin:10px 0">${esc(p.error)}</p>
-      <button class="btn ghost sm" data-act="reai" data-id="${p.id}">자동 정리 다시 시도</button></section>` + handoff + raw;
-  if (!a) return head + handoff + raw;
+  /* 현장 메모 */
+  const li = arr => arr.map(x=>`<li>${esc(x)}</li>`).join('');
+  const sec = (lab, arr) => arr && arr.length ? `<div class="lab">${lab}</div><ul>${li([...new Set(arr)])}</ul>` : '';
+  let memoBody;
+  if (a) memoBody = `${v.summary?`<p class="sum">${esc(v.summary)}</p>`:''}${sec('👍 좋았던 점', v.pros)}${sec('👎 아쉬운 점', v.cons)}${sec('🔧 하자 · 수리', v.defects)}${sec('🏢 관리 상태', v.management)}${sec('📍 입지', v.location)}
+    ${(v.to_check||[]).length?`<div class="lab">다시 확인할 것</div><div class="tags">${v.to_check.map(x=>`<span class="tag">${esc(x)}</span>`).join('')}</div>`:''}`;
+  else memoBody = `${sec('🔧 하자 · 수리', p.defects)}${sec('📍 입지 · 관리', [p.commercial, p.middle_high, p.mgmt_office, p.elementary].filter(Boolean))}${sec('❓ 헷갈린 부분', p.uncertain)}
+    ${missing(p).length?`<div class="lab">다시 확인할 것</div><div class="tags">${missing(p).map(x=>`<span class="tag">${x}</span>`).join('')}</div>`:''}`;
+  if (p.memo) memoBody = `<div class="lab">✍️ 내 메모</div><p class="sum" style="white-space:pre-wrap">${esc(p.memo)}</p>` + memoBody;
+  if (!memoBody.trim()) memoBody = `<div class="empty" style="padding:10px">${p.visit==='planned'?'방문 후 녹음하거나 메모를 남겨 주세요.':'정리된 메모가 없어요.'}</div>`;
+  const memo = `<section class="card pane memo ${tab==='memo'?'on':''}"><div class="cardhd">현장 메모 ${p.sample?'':`<button class="edit-btn" data-act="memo" data-id="${p.id}">${I.pen} 편집</button>`}</div>${memoBody}</section>`;
 
-  const st = (k, val) => `<div class="kv2"><span>${k}</span><b class="${val==null?'needtxt':''}">${val==null?'못 찾음':esc(val)}</b></div>`;
-  const list = (icon, title, arr) => arr && arr.length ? `<div class="sublbl">${icon} ${title}</div><ul class="bul">${arr.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>` : '';
+  /* 자금 비교 */
   const f = finance(p);
-  const priceNote = p.sale_src==='녹음' ? '녹음에서 들은 가격 기준' : p.sale_src==='실거래' ? `검색한 최근 실거래가 기준${m.sale_date?` (${esc(m.sale_date)})`:''}` : '';
-  return head + `
-  <section class="card"><div class="cardhd">${I.bld}단지 정보 <span class="more" style="color:var(--muted)">웹 검색</span></div>
-    <div class="stats" style="grid-template-columns:repeat(3,1fr)">
-      <div class="stat"><div class="k">세대수</div><div class="v ${c.households?'':'need'}">${c.households?c.households.toLocaleString():'못 찾음'}</div></div>
-      <div class="stat"><div class="k">준공</div><div class="v ${c.built_year?'':'need'}">${c.built_year?c.built_year+'년':'못 찾음'}</div></div>
-      <div class="stat"><div class="k">역</div><div class="v ${c.station_walk_min!=null?'':'need'}" style="font-size:16px">${c.station_walk_min!=null?'도보 '+c.station_walk_min+'분':'못 찾음'}</div></div></div>
-    <div class="kvgrid">${st('가까운 역', c.nearest_station)}${st('동 수 · 최고층', c.buildings||c.floors_max?[c.buildings?c.buildings+'개 동':null,c.floors_max?c.floors_max+'층':null].filter(Boolean).join(' · '):null)}
-      ${st('세대당 주차', c.parking_per_household!=null?c.parking_per_household+'대 ('+(c.parking_per_household>=1?'1대 이상':'1대 미만')+')':null)}${st('시공사', c.builder)}${st('난방', c.heating)}
-      ${st('연차', c.built_year?(2026-c.built_year)+'년차':null)}</div>
-    <div class="pricebox"><div class="sublbl" style="margin-top:0">최근 시세 ${m.area_pyeong?`· ${m.area_pyeong}평`:''}</div>
-      <div class="row" style="gap:10px"><div class="pr"><span>매매</span><b>${short(m.sale_recent)||'못 찾음'}</b><small>${esc(m.sale_date||'')}</small></div>
-        <div class="pr"><span>전세</span><b>${short(m.jeonse_recent)||'못 찾음'}</b><small>${esc(m.jeonse_date||'')}</small></div></div>
-      ${m.note?`<p class="small" style="margin:8px 0 0;color:var(--ink2)">${esc(m.note)}</p>`:''}</div>
-    ${(a.sources||[]).length?`<details class="srcs"><summary>출처 ${a.sources.length}개</summary>${a.sources.map(s=>`<a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.title||s.url)}</a>`).join('')}</details>`:''}
-    <p class="fine">AI가 웹에서 찾은 정보예요. 틀릴 수 있으니 거래 전 국토부 실거래가·등기부로 확인하세요.</p></section>
+  const srcNote = p.sale_src==='녹음' ? '녹음에서 들은 가격' : p.sale_src==='실거래' ? `최근 실거래가${m.sale_date?' ('+esc(m.sale_date)+')':''}` : p.sample ? '녹음에서 들은 가격' : '';
+  const fund = `<section class="card pane ${tab==='fund'?'on':''}"><div class="cardhd">자금 비교 <span class="src">참고용 추정</span></div>
+    <div class="pricegrid"><span>매매가</span><div class="pricebox"><b>${short(p.sale_price)||'—'}</b>${srcNote?`<small>${srcNote}</small>`:''}</div>
+      <span>전세가</span><div class="pricebox"><b>${short(p.jeonse_price)||'—'}</b>${p.jeonse_src?`<small>${p.jeonse_src==='녹음'?'녹음에서 들은 가격':'최근 실거래가'}</small>`:''}</div></div>
+    <div class="need-box">${f.scen.map(s=>`<div class="scen"><div><div class="nm">${s.name}${s.need!=null?' · 필요 자금':''}</div>
+        ${s.need!=null?`<div class="v">약 ${short(s.need)}</div>`:`<div class="na">${s.na}</div>`}${s.detail?`<div class="d">${esc(s.detail)}</div>`:''}</div>
+        ${s.need!=null?`<span class="pillv ${s.level}">${s.verdict}</span>`:''}</div>`).join('')}</div>
+    <button class="cond" data-act="settings"><span>내 조건 <b>시드 ${SEED[S.seed][0]}</b> · ${BUYER[S.buyer]}</span><span style="color:var(--blue);font-weight:800">변경</span></button>
+    ${f.tips?`<ul class="ul-sm">${f.tips.map(t=>`<li>${esc(t)}</li>`).join('')}</ul>`:''}
+    <p class="fine">${f.basis?'대출 추정: '+esc(f.basis)+'<br>':''}${esc(p.zone?.reason||'')}<br>세금 미반영 · 대출은 은행 상담 필수 · ${esc(p.zone?.caution||'')}</p></section>`;
 
-  <section class="card"><div class="cardhd">${I.memo}내 임장 정리</div>
-    <p style="margin:10px 0 0;font-size:15px;line-height:1.65">${esc(v.summary||'')}</p>
-    ${list('👍','좋았던 점',v.pros)}${list('👎','아쉬운 점',v.cons)}${list('🔧','하자 · 수리',v.defects)}${list('🏢','관리 상태',v.management)}${list('📍','입지',v.location)}
-    ${(v.to_check||[]).length?`<div class="sublbl">다시 확인할 것</div><div class="tags">${v.to_check.map(x=>`<span class="tag">${esc(x)}</span>`).join('')}</div>`:''}</section>
+  /* AI 정리 상태 */
+  let aiCard = '';
+  if (!p.sample) {
+    if (p.status === 'analyzing') aiCard = `<section class="card" style="text-align:center;padding:26px 16px"><div class="spinner"></div><div style="font-weight:800;margin-top:12px">${esc(p.step||'정리 중')}</div><p class="small muted" style="margin:6px 0 0">단지 정보·실거래가를 찾고 녹음을 정리하고 있어요 (30초~1분).</p></section>`;
+    else if (!a) aiCard = `${p.status==='error'?`<section class="card"><div class="cardhd">자동 정리하지 못했어요</div><p class="small" style="margin:0 0 10px">${esc(p.error)}</p><button class="btn line sm" data-act="reai" data-id="${p.id}">자동 정리 다시 시도</button></section>`:''}
+      <section class="card"><div class="cardhd">✨ 내 Claude·ChatGPT로 정리하기</div>
+        <ol class="steps2"><li>버튼을 누르면 <b>질문이 복사</b>되고 앱이 열려요 (비어 있으면 붙여넣기)</li><li>답이 나오면 <b>답 전체를 복사</b></li><li>여기에 붙여넣고 <b>화면에 적용</b></li></ol>
+        <div class="duo" style="margin-top:0"><button class="btn sm" data-act="handoff" data-to="claude" data-id="${p.id}">Claude에서 정리</button><button class="btn line sm" data-act="handoff" data-to="chatgpt" data-id="${p.id}">ChatGPT에서 정리</button></div>
+        <textarea class="edit" id="paste" style="min-height:100px;margin-top:12px" placeholder="Claude·ChatGPT의 답을 여기에 붙여넣기"></textarea>
+        <button class="btn sm" data-act="apply-paste" data-id="${p.id}" style="margin-top:8px">화면에 적용</button>
+        <p class="fine">웹 검색이 켜져 있어야 단지 정보·시세를 찾아요. 지금 쓰는 구독으로 추가 비용 없이 돼요. (API 키가 있으면 <a href="#/me?ai=1" style="color:var(--blue)">자동 정리</a>)</p></section>`;
+  }
 
-  <section class="card"><div class="cardhd">${I.coin}살 수 있을까?</div>
-    ${priceNote?`<p class="small muted" style="margin:10px 0 0">${priceNote}${p.jeonse_src?` · 전세는 ${p.jeonse_src==='녹음'?'녹음에서 들은 값':'최근 실거래'}`:''}</p>`:''}
-    ${f.scen.map(s=>`<div class="scen"><div><div class="nm">${s.name}${s.need!=null?' · 필요 자금':''}</div>
-      ${s.need!=null?`<div class="need">${short(s.need)}</div>`:`<div class="na">${s.na}</div>`}${s.detail?`<div class="small muted">${esc(s.detail)}</div>`:''}</div>
-      ${s.need!=null?`<span class="pill ${s.level}">${s.verdict}</span>`:''}</div>${s.note?`<div class="small muted" style="margin-top:-6px;padding-bottom:8px">↳ ${s.note}</div>`:''}`).join('')}
-    <button class="cond" data-act="settings"><span>내 조건 <b>시드 ${SEED[S.seed][0]}</b> · ${BUYER[S.buyer]}</span><span style="color:var(--blue);font-weight:700">변경</span></button>
-    ${f.tips?`<ul class="bul small">${f.tips.map(t=>`<li>${esc(t)}</li>`).join('')}</ul>`:''}
-    <p class="fine">${f.basis?'대출 추정: '+esc(f.basis)+'<br>':''}${esc(p.zone.reason)}<br>참고용 추정 · 세금 미반영 · 대출은 은행 상담 필수 · ${esc(p.zone.caution)}</p></section>` + raw;
-}
-
-/* ───────── 화면: 내 기록 (내 조건 + 비교표) ───────── */
-function records(){
-  const rows = [['위치',p=>[SIDO_SHORT[p.sido],p.sigungu].filter(Boolean).join(' ')||null],['구분',p=>p.zone.label],['매매',p=>short(p.sale_price)],['전세',p=>short(p.jeonse_price)],
-    ['평형',p=>p.area_pyeong?p.area_pyeong+'평':null],['연식',p=>p.built_year],['세대수',p=>p.households?.toLocaleString()],['관리비',p=>p.mgmt_fee!=null?p.mgmt_fee+'만':null],
-    ['주차',p=>p.parking_per_household==null?null:p.parking_per_household>=1?'1대 이상':'1대 미만'],['역',p=>p.station_walk_min!=null?p.station_walk_min+'분':null],
-    ['판정',p=>{const b=best(finance(p)); return b.need!=null?`${b.name} ${b.verdict}`:b.na;}],['확인 필요',p=>missing(p).length+'개']];
-  const chip = (grp, k, label, on) => `<button class="chip ${on?'on':''}" data-set="${grp}" data-v="${k}">${label}</button>`;
   return `
-  <h1 class="disp pagehd">내 기록</h1>
-  <section class="card" style="margin-top:4px"><div class="cardhd">내 조건</div>
-    <div class="sublbl">시드(투자 가능 금액)</div><div class="optgrid">${Object.entries(SEED).map(([k,v])=>chip('seed',k,v[0],+k===S.seed)).join('')}</div>
-    <div class="sublbl">주택 보유</div><div class="optgrid">${Object.keys(BUYER).map(k=>chip('buyer',k,k,k===S.buyer)).join('')}</div>
-    <div class="sublbl">연소득 (대출 DSR 추정용)</div><div class="optgrid">${Object.entries(INCOME).map(([k,v])=>chip('income',k,v[0],+k===S.income)).join('')}</div>
-    <div class="sublbl">샘플 매물(AI 음성 5건)</div><div class="optgrid">${chip('samples',1,'보기',S.samples)}${chip('samples',0,'숨기기',!S.samples)}</div>
-    <p class="fine">실제 금액이 아닌 구간만 이 기기에 저장돼요. 내 녹음 매물 ${MINE.length}건도 이 폰에만 저장돼요(서버로 보내지 않음).</p>
-    ${MINE.length?`<button class="chip" data-act="backup" style="margin-top:8px">내 매물 백업 파일 받기</button>`:''}</section>
-  <h2 class="sec">매물 한눈에 비교</h2>
-  ${P.length?'':'<div class="empty">비교할 매물이 없어요.</div>'}
-  <div class="tblwrap" ${P.length?'':'hidden'}><table class="cmp"><thead><tr><th>항목</th>${P.map(p=>`<th><a href="#/p/${p.id}" style="color:var(--blue)">${esc(nameOf(p))}</a></th>`).join('')}</tr></thead>
-    <tbody>${rows.map(([k,fn])=>`<tr><td>${k}</td>${P.map(p=>{const v=fn(p); return v==null?'<td class="need">확인 필요</td>':`<td>${esc(v)}</td>`;}).join('')}</tr>`).join('')}</tbody></table></div>
-  <p class="note">${I.info}<span>샘플: Whisper 받아쓰기 + 규칙 기반 정리 · 내 녹음: 폰 음성인식 + Claude(웹 검색) 정리</span></p>
-  <section class="card" id="aicard"><div class="cardhd">자동 정리 (선택 · Claude API)</div>
-    <p class="small" style="margin:10px 0 6px">키가 없어도 매물 화면의 "Claude에서 정리" 버튼으로 지금 쓰는 Claude·ChatGPT에서 정리할 수 있어요. API 키를 넣으면 복사·붙여넣기 없이 자동으로 정리해요(유료). <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener" style="color:var(--blue);font-weight:700">키 발급 ›</a></p>
-    <input id="apikey" type="password" autocomplete="off" placeholder="sk-ant-..." value="${esc(store.get('apikey',''))}"
-      style="width:100%;height:46px;border:1.5px solid var(--line);border-radius:12px;padding:0 12px;font:inherit;background:var(--surface)">
-    <div class="btnrow"><button class="btn ghost sm" data-act="aikey-test">연결 확인</button><button class="btn sm" data-act="aikey-save">저장</button></div>
-    <p class="fine">키는 이 폰에만 저장되고 Anthropic으로만 전송돼요. 매물 1건 정리에 약 300~500원(웹 검색 포함, 추정)이 들어요. 모델: ${ZipAI.MODEL}</p></section>`;
+  <div class="phd det"><a class="iconbtn back" href="javascript:history.length>1?history.back():location.hash='#/'" aria-label="뒤로">${I.back}</a><h1 style="font-size:17px">${esc(nameOf(p))}</h1>
+    ${p.sample?'<span></span>':`<button class="iconbtn" data-rename="${p.id}" aria-label="이름 고치기">${I.pen}</button>`}</div>
+  ${crumbs.length?`<div class="crumb">${crumbs.map(esc).join(' <span>›</span> ')}</div>`:''}
+  <div class="dtop"><div class="ttl"><h1>${esc(nameOf(p))}</h1><div class="sub">${hh?hh.toLocaleString()+'세대':''}${stChip(p)}${p.zone?`<span class="zt ${zcls(p.zone.zone)}">${esc(p.zone.label)}</span>`:''}</div></div>
+    <div class="dact"><button class="btn line" data-act="rec" data-target="${p.sample?'':p.id}">${I.mic.replace('class="ic"','class="ic" style="width:18px;height:18px"')} 녹음 추가</button>
+      <button class="btn" data-act="memo" data-id="${p.id}">${I.pen} 메모 작성</button></div></div>
+  <div class="hero">${heroOf(p)}</div>
+  ${p.sample?'':`<div class="photobar"><label class="chip">📷 사진 추가<input type="file" accept="image/*" multiple hidden data-addphoto="${p.id}"></label>
+    <a class="chip" href="https://search.naver.com/search.naver?where=image&query=${encodeURIComponent((c.name||nameOf(p))+' 아파트')}" target="_blank" rel="noopener">🔎 단지 사진 보기</a></div>`}
+  <div class="dtabs">${[['info','기본 정보'],['memo','현장 메모'],['fund','자금 비교']].map(([k,t])=>`<button class="${k===tab?'on':''}" data-tab="${k}">${t}</button>`).join('')}</div>
+  <div class="cols">${info}${memo}${fund}</div>
+  ${aiCard}
+  ${p.transcript?`<details class="raw"><summary>${I.mic.replace('class="ic"','class="ic" style="width:18px;height:18px"')} 녹음 원문</summary>${p.audio?`<audio controls preload="none" src="${esc(p.audio)}" style="width:100%;margin-bottom:8px"></audio>`:''}<p>${esc(p.transcript)}</p></details>`:''}
+  ${p.sample?'':`<div class="foot"><button class="danger" data-del="${p.id}">매물 삭제</button>${a&&p.status!=='analyzing'?`<button class="link" data-act="reai" data-id="${p.id}">AI로 다시 정리 ↻</button>`:''}</div>`}`;
 }
 
-/* ───────── 바텀시트 ───────── */
+/* ═════════ 화면: 임장 기록 ═════════ */
+function records(q){
+  const f = q.f || 'all', term = (q.q || '').trim();
+  let list = P;
+  if (f==='done') list = list.filter(p=>p.visit!=='planned'); if (f==='planned') list = list.filter(p=>p.visit==='planned');
+  if (term) list = list.filter(p => [nameOf(p), p.sigungu, p.dong, p.transcript, p.memo].join(' ').includes(term));
+  const rows = [['구분',p=>p.zone?.label],['매매',p=>short(p.sale_price)],['전세',p=>short(p.jeonse_price)],['평형',p=>p.area_pyeong?p.area_pyeong+'평':null],
+    ['준공',p=>p.built_year],['세대수',p=>p.households?.toLocaleString()],['주차',p=>p.parking_per_household==null?null:p.parking_per_household>=1?'1대 이상':'1대 미만'],
+    ['역',p=>p.station_walk_min!=null?p.station_walk_min+'분':null],['판정',p=>{const b=best(finance(p)); return b.need!=null?`${b.name} ${b.verdict}`:b.na;}]];
+  const cmp = list.filter(p=>p.visit!=='planned');
+  return `
+  <div class="phd"><a class="iconbtn back" href="#/" aria-label="홈으로">${I.back}</a><h1>임장 기록</h1><span></span></div>
+  <label class="search">${I.search}<input id="q" type="search" placeholder="단지명 · 지역 · 메모 검색" value="${esc(term)}" ${q.q!==undefined&&!term?'autofocus':''}></label>
+  <div class="ftabs">${[['all','전체'],['done','임장 완료'],['planned','방문 예정']].map(([k,v])=>`<button class="ftab ${k===f?'on':''}" data-f="${k}">${v}</button>`).join('')}</div>
+  ${list.length ? list.map(pcard).join('') : '<div class="empty">찾는 기록이 없어요.</div>'}
+  ${cmp.length > 1 ? `<h2 style="font-size:18px;font-weight:800;margin:26px 0 0">한눈에 비교</h2>
+  <div class="tblwrap"><table class="cmp"><thead><tr><th>항목</th>${cmp.map(p=>`<th><a href="#/p/${p.id}" style="color:var(--blue)">${esc(nameOf(p))}</a></th>`).join('')}</tr></thead>
+    <tbody>${rows.map(([k,fn])=>`<tr><td>${k}</td>${cmp.map(p=>{const v=fn(p); return v==null?'<td class="need">확인 필요</td>':`<td>${esc(v)}</td>`;}).join('')}</tr>`).join('')}</tbody></table></div>` : ''}`;
+}
+
+/* ═════════ 화면: 내 정보 ═════════ */
+const optChip = (grp, k, label, on) => `<button class="chip ${on?'on':''}" data-set="${grp}" data-v="${k}">${label}</button>`;
+const condHTML = () => `
+    <div class="lab2">시드(투자 가능 금액)</div><div class="optgrid">${Object.entries(SEED).map(([k,v])=>optChip('seed',k,v[0],+k===S.seed)).join('')}</div>
+    <div class="lab2">주택 보유</div><div class="optgrid">${Object.keys(BUYER).map(k=>optChip('buyer',k,k,k===S.buyer)).join('')}</div>
+    <div class="lab2">연소득 (대출 DSR 추정용)</div><div class="optgrid">${Object.entries(INCOME).map(([k,v])=>optChip('income',k,v[0],+k===S.income)).join('')}</div>`;
+function me(){
+  return `
+  <div class="phd"><a class="iconbtn back" href="#/" aria-label="홈으로">${I.back}</a><h1>내 정보</h1><span></span></div>
+  <section class="card"><div class="cardhd">내 조건</div>${condHTML()}<p class="fine">실제 금액이 아닌 구간만 이 폰에 저장돼요.</p></section>
+  <section class="card"><div class="cardhd">보기 설정</div><div class="lab2" style="margin-top:0">샘플 매물(AI 음성 5건)</div>
+    <div class="optgrid">${optChip('samples',1,'보기',S.samples)}${optChip('samples',0,'숨기기',!S.samples)}</div>
+    <p class="fine">내 매물 ${MINE.length}건은 이 폰에만 저장돼요(서버로 보내지 않음).</p>
+    ${MINE.length?'<button class="chip" data-act="backup" style="margin-top:8px">내 매물 백업 파일 받기</button>':''}</section>
+  <section class="card" id="aicard"><div class="cardhd">자동 정리 <span class="src">선택 · Claude API</span></div>
+    <p class="small" style="margin:0 0 8px;color:var(--ink2)">키가 없어도 매물 화면의 "Claude에서 정리"로 지금 쓰는 Claude·ChatGPT에서 정리할 수 있어요. API 키를 넣으면 복사·붙여넣기 없이 자동으로 정리해요(유료, 1건 약 300~500원 추정). <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener" style="color:var(--blue);font-weight:700">키 발급 ›</a></p>
+    <input id="apikey" class="field" type="password" autocomplete="off" placeholder="sk-ant-..." value="${esc(store.get('apikey',''))}">
+    <div class="btnrow"><button class="btn line sm" data-act="aikey-test">연결 확인</button><button class="btn sm" data-act="aikey-save">저장</button></div>
+    <p class="fine">키는 이 폰에만 저장되고 Anthropic으로만 전송돼요. 모델: ${ZipAI.MODEL}</p></section>
+  <p class="fine" style="text-align:center;margin-top:20px">집노트 · 임장 음성메모 PoC · 모든 수치는 참고용 추정입니다</p>`;
+}
+
+/* ═════════ 바텀시트 ═════════ */
 const sheet = document.getElementById('sheet'), scrim = document.getElementById('scrim');
 function openSheet(html){ sheet.innerHTML = '<div class="grab"></div>'+html; sheet.classList.add('open'); scrim.classList.add('open'); }
 function closeSheet(){ sheet.classList.remove('open'); scrim.classList.remove('open'); stopAudio(); abortRec(); }
 scrim.onclick = closeSheet;
-document.addEventListener('keydown', e => { if(e.key==='Escape') closeSheet(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSheet(); });
+function settingsSheet(){ openSheet(`<h3>내 조건</h3>${condHTML()}<button class="btn" data-act="close" style="margin-top:16px">적용</button>`); }
+function planSheet(){
+  openSheet(`<h3>방문 예정 추가</h3><p class="small muted" style="margin:0 0 12px">가볼 단지를 먼저 저장해 두고, 현장에서 녹음을 추가하세요.</p>
+    <input id="pname" class="field" placeholder="단지명 (예: 당산 센트럴 아이파크)">
+    <input id="parea" class="field" style="margin-top:8px" placeholder="지역 (예: 영등포구 당산동) — 선택">
+    <textarea id="pmemo" class="edit" style="min-height:80px;margin-top:8px" placeholder="메모 — 선택 (예: 토요일 2시 중개사 약속)"></textarea>
+    <button class="btn" data-act="plan-save" style="margin-top:12px">저장</button>`);
+  setTimeout(()=>document.getElementById('pname')?.focus(), 250);
+}
+function memoSheet(id){
+  const p = byId[id]; if (!p) return;
+  if (p.sample) { toast('샘플 매물은 수정할 수 없어요'); return; }
+  openSheet(`<h3>메모 작성</h3><p class="small muted" style="margin:0 0 10px">${esc(nameOf(p))}에 직접 메모를 남겨요.</p>
+    <textarea id="memoedit" class="edit" placeholder="예) 남향 동이 특히 좋음, 101동 소음 확인">${esc(p.memo||'')}</textarea>
+    <button class="btn" data-act="memo-save" data-id="${id}" style="margin-top:12px">저장</button>`);
+}
 
+/* 녹음 (폰 음성인식) */
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 const REC = {sr:null, on:false, prev:'', final:'', start:0, timer:null, target:''};
-/* 녹음 중 화면 꺼짐 방지 (Wake Lock) */
 let wakeLock = null;
-async function keepAwake(on){
-  try {
-    if (on && 'wakeLock' in navigator) { wakeLock = await navigator.wakeLock.request('screen'); }
-    else if (!on && wakeLock) { await wakeLock.release(); wakeLock = null; }
-  } catch(_) {}
-}
-document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'visible' && REC.on) { keepAwake(true); try { REC.sr && REC.sr.start(); } catch(_){} }
-});
-function saveDraft(){ store.set('draft', {text: REC.final, target: REC.target, t: Date.now()}); }
-
+async function keepAwake(on){ try { if (on && 'wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen'); else if (!on && wakeLock) { await wakeLock.release(); wakeLock = null; } } catch(_){} }
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && REC.on) { keepAwake(true); try { REC.sr && REC.sr.start(); } catch(_){} } });
+const saveDraft = () => store.set('draft', {text:REC.final, target:REC.target, t:Date.now()});
 function recSheet(target){
   REC.target = target || ''; REC.prev = REC.final = '';
-  const t = target && byId[target];
-  const draft = store.get('draft', null);
-  const useDraft = draft && draft.text && draft.text.trim().length > 3 && Date.now() - draft.t < 2*86400000 && (draft.target||'') === REC.target;
-  setTimeout(() => { if (useDraft) { const ed = document.getElementById('edit'); ed.value = draft.text.trim(); document.getElementById('after').hidden = false; toast('끊겼던 녹음 내용을 불러왔어요'); } }, 50);
-  openSheet(`<h3 class="disp">${t ? '녹음 추가' : '녹음으로 매물 남기기'}</h3>
-  <p class="muted small" style="margin:0">${t ? esc(nameOf(t))+'에 대해 더 본 것을 말해 주세요. 기존 녹음과 합쳐서 다시 정리해요.' : '단지 이름과 본 것을 평소처럼 말하세요. 단지 정보와 시세는 AI가 찾아와요.'}</p>
-  ${SR ? `<div class="recmain"><button class="bigmic" id="bigmic" data-act="mic" aria-label="녹음 시작">${I.mic}</button>
-      <span class="rectime" id="rectime">눌러서 녹음 시작</span></div>
+  const t = target && byId[target], draft = store.get('draft', null);
+  const useDraft = draft && draft.text && draft.text.trim().length > 3 && Date.now()-draft.t < 2*86400000 && (draft.target||'') === REC.target;
+  openSheet(`<h3>${t ? '녹음 추가' : '녹음 시작'}</h3>
+  <p class="small muted" style="margin:0">${t ? esc(nameOf(t))+'에 대해 본 것을 말해 주세요. 기존 녹음과 합쳐 정리해요.' : '처음에 단지 이름을 말하고, 본 것을 평소처럼 말하세요.'}</p>
+  ${SR ? `<div class="recmain"><button class="bigmic" id="bigmic" data-act="mic" aria-label="녹음 시작">${I.mic}</button><span class="rectime" id="rectime">눌러서 녹음 시작</span></div>
     <div class="live" id="live" data-ph="말하면 여기에 바로 글자로 나와요."></div>`
-  : `<div class="hint">이 브라우저는 실시간 받아쓰기를 지원하지 않아요. 아래 칸을 누르고 <b>키보드의 🎤 음성 입력</b>으로 말하거나 직접 적어 주세요. (Chrome·Safari 최신 버전은 지원)</div>`}
-  <div id="after" ${SR ? 'hidden' : ''}>
-    <div class="sublbl">받아쓴 글 — 틀린 곳은 고칠 수 있어요</div>
-    <textarea class="edit" id="edit" placeholder="예) 서울 영등포구 당산동 아파트 24평, 매매 7억 2천, 전세 4억 5천, 2008년식, 650세대, 당산역까지 걸어서 8분…"></textarea>
-    <div class="btnrow"><button class="btn ghost sm" data-act="redo">${SR ? '다시 녹음' : '지우기'}</button><button class="btn sm" data-act="save">정리하기</button></div>
+  : `<div class="hint">이 브라우저는 실시간 받아쓰기를 지원하지 않아요. 아래 칸을 누르고 키보드의 🎤 음성 입력으로 말하거나 직접 적어 주세요.</div>`}
+  <div id="after" ${SR && !useDraft ? 'hidden' : ''}>
+    <div class="lab2">받아쓴 글 — 틀린 곳은 고칠 수 있어요</div>
+    <textarea class="edit" id="edit" style="margin-top:6px" placeholder="예) 지금 문래자이 아파트 왔어. 대단지고 역 바로 앞이야…">${useDraft?esc(draft.text.trim()):''}</textarea>
+    <div class="btnrow"><button class="btn line sm" data-act="redo">${SR ? '다시 녹음' : '지우기'}</button><button class="btn sm" data-act="save">정리하기</button></div>
   </div>
-  <details class="samples"><summary>말하기 팁 · 샘플 녹음 듣기</summary>
-    <ul class="tip"><li>처음에 <b>단지 이름</b>을 말해 주세요 ("지금 문래자이 아파트 왔어")</li>
-      <li>그다음은 편하게: 좋았던 점, 아쉬운 점, 하자, 관리 상태, 주변 느낌</li>
-      <li>중개사에게 들은 <b>가격</b>이 있으면 말해 주세요. 없으면 최근 실거래가로 판정해요</li>
-      <li>녹음 중엔 화면이 꺼지지 않게 유지돼요. 중간에 끊겨도 내용은 저장돼요</li></ul>
-    ${SAMPLES.map(p=>`<div class="sample"><button class="play" data-play="${p.id}" aria-label="재생">${I.play}</button>
-      <div class="s"><b>${esc(nameOf(p))}</b><small>AI 음성 샘플</small></div><a class="go" href="#/p/${p.id}">정리 결과 ›</a></div>`).join('')}
+  <details class="tips"><summary>말하기 팁 · 샘플 녹음 듣기</summary>
+    <ul class="tip"><li>처음에 <b>단지 이름</b> ("지금 문래자이 아파트 왔어")</li><li>그다음 편하게: 좋았던 점, 아쉬운 점, 하자, 관리 상태, 주변 느낌</li>
+      <li>중개사에게 들은 <b>가격</b>이 있으면 말해 주세요 (없으면 최근 실거래가로 판정)</li><li>녹음 중엔 화면이 꺼지지 않고, 끊겨도 받아쓴 글은 저장돼요</li></ul>
+    ${SAMPLES.map(p=>`<div class="sample"><button class="play" data-play="${p.id}" aria-label="재생">${I.play}</button><div class="s"><b>${esc(nameOf(p))}</b><small>AI 음성 샘플</small></div><a class="link" href="#/p/${p.id}" style="font-size:13px">정리 결과 ›</a></div>`).join('')}
   </details>`);
+  if (useDraft) toast('끊겼던 녹음 내용을 불러왔어요');
 }
-function fmtTime(ms){ const s=Math.floor(ms/1000); return `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`; }
+const fmtTime = ms => { const s = Math.floor(ms/1000); return `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`; };
 function startRec(){
   const ed = document.getElementById('edit');
-  REC.prev = ed && ed.value.trim() ? ed.value.trim() + ' ' : '';   // 이어서 녹음하면 앞의 글(고친 글 포함) 뒤에 붙인다
-  REC.final = REC.prev;
+  REC.prev = ed && ed.value.trim() ? ed.value.trim()+' ' : ''; REC.final = REC.prev;
   const sr = new SR(); REC.sr = sr; REC.on = true; REC.start = Date.now();
   sr.lang = 'ko-KR'; sr.continuous = true; sr.interimResults = true;
   sr.onresult = e => {
     let fin = '', interim = '';
-    for (let i = 0; i < e.results.length; i++) { const r = e.results[i]; if (r.isFinal) fin += r[0].transcript + ' '; else interim += r[0].transcript; }
-    REC.final = (REC.prev + fin).replace(/\s+/g,' ');
-    saveDraft();
-    const live = document.getElementById('live');
-    if (live) { live.innerHTML = esc(REC.final) + `<span class="interim">${esc(interim)}</span>`; live.scrollTop = live.scrollHeight; }
+    for (let i = 0; i < e.results.length; i++) { const r = e.results[i]; if (r.isFinal) fin += r[0].transcript+' '; else interim += r[0].transcript; }
+    REC.final = (REC.prev + fin).replace(/\s+/g,' '); saveDraft();
+    const live = document.getElementById('live'); if (live) { live.innerHTML = esc(REC.final)+`<span class="interim">${esc(interim)}</span>`; live.scrollTop = live.scrollHeight; }
   };
   sr.onerror = e => {
-    if (e.error === 'not-allowed' || e.error === 'service-not-allowed') { toast('마이크 권한을 허용해 주세요 (주소창 옆 🔒 → 마이크)'); finishRec(); }
-    else if (e.error === 'audio-capture') { toast('마이크를 찾을 수 없어요'); finishRec(); }
-    else if (e.error === 'network') { toast('음성인식은 인터넷 연결이 필요해요'); finishRec(); }
+    if (e.error==='not-allowed'||e.error==='service-not-allowed') { toast('마이크 권한을 허용해 주세요 (주소창 🔒 → 마이크)'); finishRec(); }
+    else if (e.error==='audio-capture') { toast('마이크를 찾을 수 없어요'); finishRec(); }
+    else if (e.error==='network') { toast('음성인식은 인터넷 연결이 필요해요'); finishRec(); }
   };
-  sr.onend = () => { if (REC.on) { REC.prev = REC.final + ' '; try { sr.start(); } catch(_){} } };   // 말이 끊기면 자동으로 다시 듣기
-  try { sr.start(); } catch(e){ toast('녹음을 시작할 수 없어요'); REC.on = false; return; }
+  sr.onend = () => { if (REC.on) { REC.prev = REC.final+' '; try { sr.start(); } catch(_){} } };
+  try { sr.start(); } catch(e) { toast('녹음을 시작할 수 없어요'); REC.on = false; return; }
   keepAwake(true);
   const b = document.getElementById('bigmic'); b.classList.add('on'); b.setAttribute('aria-label','녹음 끝내기');
   b.innerHTML = '<svg class="ic" viewBox="0 0 24 24" fill="currentColor"><rect x="7" y="7" width="10" height="10" rx="2"/></svg>';
   document.getElementById('after').hidden = true;
-  REC.timer = setInterval(()=>{ const el=document.getElementById('rectime'); if(el) el.innerHTML = `<span class="recdot"></span>듣는 중 ${fmtTime(Date.now()-REC.start)}${wakeLock?' · 화면 켜짐 유지':''} · 다 말했으면 ■`; }, 300);
+  REC.timer = setInterval(() => { const el = document.getElementById('rectime'); if (el) el.innerHTML = `<span class="recdot"></span>듣는 중 ${fmtTime(Date.now()-REC.start)}${wakeLock?' · 화면 켜짐 유지':''} · 다 말했으면 ■`; }, 300);
 }
 function abortRec(){ REC.on = false; clearInterval(REC.timer); keepAwake(false); if (REC.sr) { try { REC.sr.abort(); } catch(_){} REC.sr = null; } }
 function finishRec(){
   const wasOn = REC.on; abortRec();
   const b = document.getElementById('bigmic'); if (!b) return;
-  b.classList.remove('on'); b.innerHTML = I.mic; b.setAttribute('aria-label','다시 녹음');
+  b.classList.remove('on'); b.innerHTML = I.mic; b.setAttribute('aria-label','이어서 녹음');
   document.getElementById('rectime').textContent = wasOn ? `녹음 ${fmtTime(Date.now()-REC.start)} · 다시 누르면 이어서 녹음` : '눌러서 녹음 시작';
-  const ed = document.getElementById('edit'); ed.value = REC.final.trim();
-  document.getElementById('after').hidden = false;
+  const ed = document.getElementById('edit'); ed.value = REC.final.trim(); document.getElementById('after').hidden = false;
   if (!ed.value) ed.placeholder = '들린 말이 없어요. 다시 녹음하거나 직접 적어 주세요.';
 }
 function saveRec(){
   const text = (document.getElementById('edit').value || '').trim();
   if (text.length < 4) { toast('정리할 내용이 없어요'); return; }
   const p = REC.target ? mergeInto(REC.target, text) : saveNew(text);
-  store.set('draft', null);
-  closeSheet(); location.hash = '#/p/' + p.id;
-  runAI(p.id);
+  store.set('draft', null); closeSheet(); location.hash = '#/p/'+p.id; runAI(p.id);
 }
+let audioEl = null, audioBtn = null;
+function stopAudio(){ if (audioEl) { audioEl.pause(); audioEl = null; } if (audioBtn) { audioBtn.innerHTML = I.play; audioBtn = null; } }
+function togglePlay(btn){ const same = audioBtn === btn; stopAudio(); if (same) return; audioEl = new Audio(byId[btn.dataset.play].audio); audioBtn = btn; btn.innerHTML = I.pause; audioEl.onended = stopAudio; audioEl.play().catch(() => { toast('음성 파일을 열 수 없어요'); stopAudio(); }); }
+function backup(){ const url = URL.createObjectURL(new Blob([JSON.stringify(MINE, null, 1)], {type:'application/json'})); const a = Object.assign(document.createElement('a'), {href:url, download:`zipnote_backup_${new Date().toISOString().slice(0,10)}.json`}); document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url), 2000); }
+let tt; function toast(m){ const t = document.getElementById('toast'); t.textContent = m; t.classList.add('on'); clearTimeout(tt); tt = setTimeout(()=>t.classList.remove('on'), 2400); }
 
-/* ───────── AI 정리 실행 ───────── */
+/* ═════════ AI 정리 ═════════ */
 const RUNNING = new Set();
-function saveMine(){ store.set('mine', MINE); }
-function rerenderIf(id){ const {parts} = parse(); if (parts[0]==='p' && parts[1]===id) render(); }
+function rerenderIf(id){ const {parts} = parse(); if (parts[0]==='p' && parts[1]===id) render(true); }
 async function runAI(id){
   const p = MINE.find(x=>x.id===id); if (!p || RUNNING.has(id)) return;
   const key = store.get('apikey','');
-  if (!key) { p.status = 'handoff'; saveMine(); reload(); rerenderIf(id); return; }   // 키 없으면 Claude·ChatGPT 넘겨주기
-  RUNNING.add(id); p.status = 'analyzing'; p.step = '단지를 찾고 있어요'; p.error = null; saveMine(); reload(); rerenderIf(id);
-  try {
-    const r = await ZipAI.analyze(key, p.transcript, step => { p.step = step; saveMine(); rerenderIf(id); });
-    applyReport(p, r); p.status = 'done';
-    toast('정리 완료');
-  } catch(e) { p.status = 'error'; p.error = ZipAI.friendlyError(e); }
+  if (!key) { p.status = 'handoff'; saveMine(); rerenderIf(id); return; }
+  RUNNING.add(id); p.status = 'analyzing'; p.step = '단지를 찾고 있어요'; p.error = null; saveMine(); rerenderIf(id);
+  try { const r = await ZipAI.analyze(key, p.transcript || `단지명: ${nameOf(p)} (방문 전, 단지 정보만 찾기)`, s => { p.step = s; saveMine(); rerenderIf(id); }); applyReport(p, r); p.status = 'done'; toast('정리 완료'); }
+  catch(e) { p.status = 'error'; p.error = ZipAI.friendlyError(e); }
   finally { RUNNING.delete(id); saveMine(); reload(); rerenderIf(id); }
 }
 function applyReport(p, r){
   const c = r.complex || {}, m = r.market || {}, v = r.visit || {};
-  p.ai = r; p.geo = undefined;   // 새 단지 정보로 지도 위치를 다시 찾는다
+  p.ai = r; p.geo = undefined; p.updated = Date.now();
   if (c.name) p.complex_name = c.name;
   p.sido = c.sido || p.sido; p.sigungu = c.sigungu || p.sigungu; p.dong = c.dong || p.dong;
   p.property_type = p.property_type || '아파트';
   p.area_pyeong = v.said_area_pyeong ?? m.area_pyeong ?? p.area_pyeong;
-  p.sale_price = v.said_sale ?? m.sale_recent ?? null;   p.sale_src = v.said_sale != null ? '녹음' : m.sale_recent != null ? '실거래' : null;
+  p.sale_price = v.said_sale ?? m.sale_recent ?? null; p.sale_src = v.said_sale != null ? '녹음' : m.sale_recent != null ? '실거래' : null;
   p.jeonse_price = v.said_jeonse ?? m.jeonse_recent ?? null; p.jeonse_src = v.said_jeonse != null ? '녹음' : m.jeonse_recent != null ? '실거래' : null;
-  for (const [k, ck] of [['households','households'],['built_year','built_year'],['parking_per_household','parking_per_household'],['station_name','nearest_station'],['station_walk_min','station_walk_min']])
-    p[k] = c[ck] ?? p[k] ?? null;
+  for (const [k, ck] of [['households','households'],['built_year','built_year'],['parking_per_household','parking_per_household'],['station_name','nearest_station'],['station_walk_min','station_walk_min']]) p[k] = c[ck] ?? p[k] ?? null;
   p.defects = v.defects || [];
   const reg = ZipEngine.normalizeRegion(p.sido, p.sigungu, p.dong, [c.address, p.transcript].filter(Boolean).join(' '));
-  p.sido = reg.sido || p.sido;
-  p.zone = ZipEngine.classify(reg, [c.address, p.dong].filter(Boolean).join(' '));
-}
-// 앱을 다시 열었을 때 '정리 중'으로 멈춘 매물은 다시 시도할 수 있게
-for (const p of MINE) if (p.status === 'analyzing') { p.status = 'error'; p.error = '정리가 중간에 멈췄어요. 다시 시도해 주세요.'; }
-saveMine();
-function backup(){
-  const url = URL.createObjectURL(new Blob([JSON.stringify(MINE, null, 1)], {type:'application/json'}));
-  const a = Object.assign(document.createElement('a'), {href:url, download:`zipnote_backup_${new Date().toISOString().slice(0,10)}.json`});
-  document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url), 2000);
-}
-function settingsSheet(){
-  openSheet(`<h3 class="disp">내 조건</h3>${records().split('<h2 class="sec">')[0].replace(/<h1[\s\S]*?<\/h1>/,'').replace('style="margin-top:4px"','style="margin-top:0;background:transparent;padding:0"')}
-  <button class="btn" data-act="close" style="margin-top:14px">적용</button>`);
+  p.sido = reg.sido || p.sido; p.zone = ZipEngine.classify(reg, [c.address, p.dong].filter(Boolean).join(' '));
 }
 
-let audioEl = null, audioBtn = null;
-function stopAudio(){ if(audioEl){ audioEl.pause(); audioEl=null; } if(audioBtn){ audioBtn.innerHTML=I.play; audioBtn=null; } }
-function togglePlay(btn){
-  const id = btn.dataset.play; const same = audioBtn===btn; stopAudio(); if(same) return;
-  audioEl = new Audio(byId[id].audio); audioBtn = btn; btn.innerHTML = I.pause;
-  audioEl.onended = stopAudio; audioEl.play().catch(()=>{ toast('음성 파일을 열 수 없어요'); stopAudio(); });
-}
-let tt; function toast(m){ const t=document.getElementById('toast'); t.textContent=m; t.classList.add('on'); clearTimeout(tt); tt=setTimeout(()=>t.classList.remove('on'),2200); }
-
-/* ───────── 라우터 · 이벤트 ───────── */
-function parse(){ const [path,qs] = (location.hash.slice(1)||'/').split('?'); return {parts:path.split('/').filter(Boolean), q:Object.fromEntries(new URLSearchParams(qs||''))}; }
-function setQ(patch){ const {parts,q} = parse(); const n={...q,...patch}; Object.keys(n).forEach(k=>n[k]==null&&delete n[k]); location.hash = '#/'+parts.join('/')+'?'+new URLSearchParams(n); }
-function render(){
-  const {parts,q} = parse(), v = document.getElementById('view');
-  const tab = parts[0]==='region'?'region':parts[0]==='records'?'records':parts[0]==='p'?'':'home';
-  v.innerHTML = parts[0]==='region'?region(q):parts[0]==='records'?records():parts[0]==='p'?detail(parts[1]):home();
-  document.querySelectorAll('#tabs a').forEach(a=>a.classList.toggle('on', a.dataset.t===tab));
-  document.getElementById('tabs').style.display = parts[0]==='p' ? 'none' : '';
-  if(q.ai){ const c=document.getElementById('aicard'); if(c){ c.scrollIntoView({block:'center'}); document.getElementById('apikey').focus(); } }
-  else if(!q.keep){ v.scrollTop = 0; window.scrollTo(0,0); }
+/* ═════════ 라우터 · 이벤트 ═════════ */
+function parse(){ const [path, qs] = (location.hash.slice(1)||'/').split('?'); return {parts:path.split('/').filter(Boolean), q:Object.fromEntries(new URLSearchParams(qs||''))}; }
+function setQ(patch, keep){ const {parts, q} = parse(); const n = {...q, ...patch}; Object.keys(n).forEach(k => n[k]==null && delete n[k]); keepScroll = !!keep; location.hash = '#/'+parts.join('/')+'?'+new URLSearchParams(n); }
+let keepScroll = false;
+function render(stay){
+  const {parts, q} = parse(), v = document.getElementById('view'), pg = parts[0];
+  const y = scrollY;
+  v.innerHTML = pg==='region' ? region(q) : pg==='records' ? records(q) : pg==='me' ? me() : pg==='p' ? detail(parts[1], q) : home();
+  const t = pg==='region'||pg==='p' ? 'region' : pg==='records' ? 'records' : pg==='me' ? 'me' : 'home';
+  document.querySelectorAll('[data-t]').forEach(a => a.classList.toggle('on', a.dataset.t === t));
+  if (q.ai) { const c = document.getElementById('aicard'); c && c.scrollIntoView({block:'center'}); }
+  else if (stay || keepScroll) scrollTo(0, y); else scrollTo(0, 0);
+  keepScroll = false;
+  const qi = document.getElementById('q'); if (qi && q.q !== undefined && document.activeElement !== qi && !q.q) qi.focus();
 }
 document.addEventListener('click', e => {
-  const t = e.target.closest('[data-act],[data-sido],[data-grp],[data-spot],[data-f],[data-set],[data-play],[data-del],[data-rename],[data-delphoto]'); if(!t) return;
-  if(t.dataset.delphoto){ const p=MINE.find(x=>x.id===t.dataset.id); if(p && confirm('이 사진을 지울까요?')){ p.photos=(p.photos||[]).filter(k=>k!==t.dataset.delphoto); PhotoDB.del(t.dataset.delphoto); saveMine(); reload(); render(); } return; }
-  if(t.dataset.rename){ const p=MINE.find(x=>x.id===t.dataset.rename); if(!p) return;
-    const v=prompt('매물 이름 (예: 문래자이 32평)', nameOf(p)); if(v!=null){ p.custom_name=v.trim()||null; store.set('mine',MINE); reload(); render(); toast('이름을 바꿨어요'); } return; }
-  if(t.dataset.act==='rec') recSheet(t.dataset.target);
-  else if(t.dataset.act==='settings') settingsSheet();
-  else if(t.dataset.act==='close') closeSheet();
-  else if(t.dataset.act==='mic') REC.on ? finishRec() : startRec();
-  else if(t.dataset.act==='redo'){ document.getElementById('edit').value=''; REC.prev = REC.final = ''; const l=document.getElementById('live'); if(l) l.innerHTML=''; if(SR) startRec(); }
-  else if(t.dataset.act==='save') saveRec();
-  else if(t.dataset.act==='backup') backup();
-  else if(t.dataset.act==='reai'){ if(!store.get('apikey','')){ const p=MINE.find(x=>x.id===t.dataset.id); if(p){ p.ai=null; p.status='handoff'; saveMine(); reload(); render(); } } else runAI(t.dataset.id); }
-  else if(t.dataset.act==='handoff'){
-    const p = MINE.find(x=>x.id===t.dataset.id); if(!p) return;
-    const prompt = ZipAI.handoffPrompt(p.transcript), enc = encodeURIComponent(prompt);
+  const t = e.target.closest('[data-act],[data-f],[data-set],[data-play],[data-del],[data-rename],[data-delphoto],[data-tab]'); if (!t) return;
+  const act = t.dataset.act, id = t.dataset.id;
+  if (t.dataset.tab) { setQ({tab:t.dataset.tab}, true); return; }
+  if (t.dataset.delphoto) { const p = MINE.find(x=>x.id===id); if (p && confirm('이 사진을 지울까요?')) { p.photos = (p.photos||[]).filter(k=>k!==t.dataset.delphoto); PhotoDB.del(t.dataset.delphoto); saveMine(); render(true); } return; }
+  if (t.dataset.rename) { const p = MINE.find(x=>x.id===t.dataset.rename); if (!p) return; const nv = prompt('매물 이름', nameOf(p)); if (nv != null) { p.custom_name = nv.trim() || null; saveMine(); reload(); render(true); toast('이름을 바꿨어요'); } return; }
+  if (t.dataset.del) { if (confirm('이 매물을 삭제할까요? 이 폰에서 지워지고 되돌릴 수 없어요.')) { removeMine(t.dataset.del); location.hash = '#/'; toast('삭제했어요'); } return; }
+  if (t.dataset.f) { setQ({f:t.dataset.f}, true); return; }
+  if (t.dataset.play) { togglePlay(t); return; }
+  if (t.dataset.set) { const k = t.dataset.set; S[k] = k==='buyer' ? t.dataset.v : k==='samples' ? t.dataset.v==='1' : +t.dataset.v; store.set('settings', S); reload();
+    if (sheet.classList.contains('open')) settingsSheet(); render(true); toast('조건을 바꿨어요 · 판정을 다시 계산했어요'); return; }
+  if (act==='rec') recSheet(t.dataset.target);
+  else if (act==='plan') planSheet();
+  else if (act==='plan-save') { const name = document.getElementById('pname').value.trim(); if (!name) { toast('단지명을 적어 주세요'); return; }
+    const area = document.getElementById('parea').value.trim(), memo = document.getElementById('pmemo').value.trim();
+    const r = ZipEngine.normalizeRegion(null, null, null, `${area} ${name}`);
+    const p = newProp({custom_name:name, visit:'planned', memo:memo||null, sido:r.sido, sigungu:[r.city, r.gu].filter(Boolean).join(' ')||null, dong:(area.match(/[가-힣]+동/)||[])[0]||null, zone:ZipEngine.classify(r, `${area} ${name}`)});
+    closeSheet(); location.hash = '#/p/'+p.id; toast('방문 예정으로 저장했어요'); }
+  else if (act==='memo') memoSheet(id);
+  else if (act==='memo-save') { const p = MINE.find(x=>x.id===id); if (p) { p.memo = document.getElementById('memoedit').value.trim() || null; p.updated = Date.now(); saveMine(); reload(); } closeSheet(); render(true); toast('메모를 저장했어요'); }
+  else if (act==='settings') settingsSheet();
+  else if (act==='close') closeSheet();
+  else if (act==='mic') REC.on ? finishRec() : startRec();
+  else if (act==='redo') { document.getElementById('edit').value = ''; REC.prev = REC.final = ''; const l = document.getElementById('live'); if (l) l.innerHTML = ''; if (SR) startRec(); }
+  else if (act==='save') saveRec();
+  else if (act==='backup') backup();
+  else if (act==='reai') { if (!store.get('apikey','')) { const p = MINE.find(x=>x.id===id); if (p) { p.ai = null; p.status = 'handoff'; saveMine(); reload(); render(true); } } else runAI(id); }
+  else if (act==='handoff') { const p = MINE.find(x=>x.id===id); if (!p) return;
+    const prompt = ZipAI.handoffPrompt(p.transcript || `단지명: ${nameOf(p)}${p.sigungu?' ('+p.sigungu+')':''} — 아직 방문 전. 단지 정보와 최근 시세만 찾아 주세요.`), enc = encodeURIComponent(prompt);
     const base = t.dataset.to==='claude' ? 'https://claude.ai/new' : 'https://chatgpt.com/';
-    const url = enc.length < 12000 ? `${base}?q=${enc}` : base;   // 너무 길면 빈 대화를 열고 붙여넣기
-    const copy = navigator.clipboard ? navigator.clipboard.writeText(prompt) : Promise.reject();
-    copy.then(()=>toast('질문을 복사했어요 · 열리는 앱에 붙여넣기 하세요'), ()=>toast('복사가 안 되면 녹음 원문을 직접 복사해 주세요'));
-    window.open(url, '_blank', 'noopener');
-  }
-  else if(t.dataset.act==='apply-paste'){
-    const p = MINE.find(x=>x.id===t.dataset.id); const txt = (document.getElementById('paste').value||'').trim();
-    if(!p || !txt){ toast('답을 먼저 붙여넣어 주세요'); return; }
-    try { const r = ZipAI.parseHandoff(txt); applyReport(p, r); p.status='done'; p.error=null; saveMine(); reload(); render(); toast('정리 완료'); }
-    catch(e){ toast(e.message); }
-  }
-  else if(t.dataset.act==='aikey-save'){ const v=document.getElementById('apikey').value.trim(); store.set('apikey', v); toast(v?'키를 저장했어요':'키를 지웠어요');
-    MINE.filter(p=>p.status==='nokey').forEach(p=>runAI(p.id)); }
-  else if(t.dataset.act==='aikey-test'){ const v=document.getElementById('apikey').value.trim(); if(!v){ toast('키를 먼저 넣어 주세요'); return; }
-    t.textContent='확인 중…'; ZipAI.testKey(v).then(()=>{ toast('연결됐어요 ✓'); store.set('apikey', v); }).catch(e=>toast(ZipAI.friendlyError(e))).finally(()=>{ t.textContent='연결 확인'; }); }
-  else if(t.dataset.del){ if(confirm('이 매물을 삭제할까요? 이 폰에서 지워지고 되돌릴 수 없어요.')){ removeMine(t.dataset.del); location.hash='#/'; toast('삭제했어요'); } }
-  else if(t.dataset.sido){ store.set('homeSido', t.dataset.sido); render(); }
-  else if(t.dataset.grp){ const open = t.getAttribute('aria-expanded')==='true'; t.setAttribute('aria-expanded', !open); document.getElementById('grp'+t.dataset.grp).hidden = open; }
-  else if(t.dataset.spot) setQ({spot:t.dataset.spot});
-  else if(t.dataset.f) setQ({f:t.dataset.f, keep:1});
-  else if(t.dataset.play) togglePlay(t);
-  else if(t.dataset.set){ const k=t.dataset.set; S[k] = k==='buyer' ? t.dataset.v : k==='samples' ? t.dataset.v==='1' : +t.dataset.v; store.set('settings', S); reload();
-    if(sheet.classList.contains('open')) settingsSheet(); render(); toast('조건을 바꿨어요 · 판정이 다시 계산됐어요'); }
+    (navigator.clipboard ? navigator.clipboard.writeText(prompt) : Promise.reject()).then(() => toast('질문을 복사했어요 · 열리는 앱에 붙여넣기 하세요'), () => toast('복사가 안 되면 녹음 원문을 직접 복사해 주세요'));
+    window.open(enc.length < 12000 ? `${base}?q=${enc}` : base, '_blank', 'noopener'); }
+  else if (act==='apply-paste') { const p = MINE.find(x=>x.id===id), txt = (document.getElementById('paste').value||'').trim();
+    if (!p || !txt) { toast('답을 먼저 붙여넣어 주세요'); return; }
+    try { applyReport(p, ZipAI.parseHandoff(txt)); p.status = 'done'; p.error = null; saveMine(); reload(); render(); toast('정리 완료'); } catch(err) { toast(err.message); } }
+  else if (act==='aikey-save') { const nv = document.getElementById('apikey').value.trim(); store.set('apikey', nv); toast(nv ? '키를 저장했어요' : '키를 지웠어요'); }
+  else if (act==='aikey-test') { const nv = document.getElementById('apikey').value.trim(); if (!nv) { toast('키를 먼저 넣어 주세요'); return; }
+    t.textContent = '확인 중…'; ZipAI.testKey(nv).then(() => { toast('연결됐어요 ✓'); store.set('apikey', nv); }).catch(err => toast(ZipAI.friendlyError(err))).finally(() => { t.textContent = '연결 확인'; }); }
 });
 document.addEventListener('change', e => {
-  const up = e.target.closest('input[data-addphoto]'); if (up) { addPhotos(up.dataset.addphoto, [...up.files]).catch(()=>toast('사진을 저장하지 못했어요')); return; }
-  const s=e.target.closest('select[data-q]'); if(!s) return;
-  setQ(s.dataset.q==='sido' ? {sido:s.value, gu:null, spot:null} : {gu:s.value, spot:null}); });
+  const up = e.target.closest('input[data-addphoto]'); if (up) { addPhotos(up.dataset.addphoto, [...up.files]).catch(() => toast('사진을 저장하지 못했어요')); return; }
+  const s = e.target.closest('select[data-q]'); if (!s) return;
+  setQ(s.dataset.q==='sido' ? {sido:s.value, gu:null, spot:null} : s.dataset.q==='gu' ? {gu:s.value, spot:null} : {spot:s.value}, true);
+});
+let st_; document.addEventListener('input', e => { if (e.target.id === 'q') { clearTimeout(st_); const v = e.target.value; st_ = setTimeout(() => { setQ({q:v}, true); setTimeout(() => { const qi = document.getElementById('q'); if (qi) { qi.focus(); qi.setSelectionRange(v.length, v.length); } }, 0); }, 300); } });
 window.addEventListener('hashchange', () => { closeSheet(); render(); });
 render();
 </script>
