@@ -1,0 +1,9 @@
+﻿조건,모델,음성,용어힌트,평균 CER,1건 평균 시간(초)
+small_clean_noprompt,small,clean,False,0.0528,3.19
+small_clean_prompt,small,clean,True,0.0339,2.80
+small_noisy_noprompt,small,noisy,False,0.0509,2.82
+small_noisy_prompt,small,noisy,True,0.0393,2.72
+turbo_clean_noprompt,turbo,clean,False,0.0218,1.78
+turbo_clean_prompt,turbo,clean,True,0.0230,1.59
+turbo_noisy_noprompt,turbo,noisy,False,0.4939,2.00
+turbo_noisy_prompt,turbo,noisy,True,0.0260,1.66

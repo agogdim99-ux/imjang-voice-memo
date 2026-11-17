@@ -15,9 +15,15 @@
 
 ## 결과 미리보기
 
-<!-- ✏️ outputs/report.html 을 브라우저로 열어 캡처한 뒤 docs/ 폴더에 저장 -->
-![비교표](docs/screenshot_table.png)
-![자금 판정](docs/screenshot_cards.png)
+소음을 섞은 AI 음성 → Whisper turbo 받아쓰기 → 규칙 기반 추출로 만든 실제 결과 (`outputs/report.html`):
+
+![비교표와 자금 판정](docs/screenshot_full.png)
+
+**검증 요약** ([03_검증결과.md](03_검증결과.md))
+- 1건 처리 시간: 손 정리 15~30분 → **약 1.7초** (받아쓰기 포함, Colab T4)
+- 항목 추출 정확도: **97%** (75칸 중 73칸, turbo + 소음 + 용어 힌트) — 목표 85% 달성
+- 누락 항목 '확인 필요' 표시: 17/17 전부 정확
+- 자금 판정: 수계산과 5건 모두 일치
 
 같은 시드(1억~3억, 무주택)로 돌린 예:
 
@@ -42,7 +48,8 @@
 4. 마지막 칸에서 `imjang_stt_results.zip` 이 내려받아진다.
 5. 압축을 풀어 `transcripts/` 안의 파일은 `data/transcripts/`, `audio/` 는 `data/audio/` 에 넣는다.
 
-> 이 저장소에는 이미 실행 결과가 들어 있으므로, 1단계를 건너뛰고 2단계부터 해도 같은 결과가 나온다.
+> 이 저장소의 `data/transcripts/` 에 이미 8개 조건의 받아쓰기 결과가 들어 있으므로, 1단계를 건너뛰고 2단계부터 해도 같은 결과가 나온다.
+> 바로 열기: [Colab에서 열기](https://colab.research.google.com/github/agogdim99-ux/imjang-voice-memo/blob/main/colab/01_%EC%9D%8C%EC%84%B1%EC%83%9D%EC%84%B1_%EB%B0%9B%EC%95%84%EC%93%B0%EA%B8%B0.ipynb)
 
 ### 2단계 — 내 컴퓨터: 비교표 만들기 (설치 거의 없음)
 
@@ -58,6 +65,12 @@ python run.py
 
 ```bash
 python run.py --transcripts data/transcripts/turbo_noisy_prompt.json --seed 2 --buyer 무주택 --income 0
+```
+
+8개 조건 전부 돌리고 채점하기 (Git Bash):
+
+```bash
+for f in data/transcripts/*.json; do python run.py --transcripts "$f" --seed 2 --buyer 무주택 --income 0 --method rules; done; python run.py --seed 2 --buyer 무주택 --income 0 --method rules; python evaluate.py
 ```
 
 | 옵션 | 값 |
@@ -94,8 +107,10 @@ API 키를 환경변수 `ANTHROPIC_API_KEY` 로 넣고 `--method llm` 으로 실
 ├─ data/
 │   ├─ scripts.json                  대본 5개 (허구의 매물)
 │   ├─ ground_truth.json             항목 정답표 (75칸)
-│   ├─ audio/                        AI 음성 샘플 (Colab 결과)
-│   └─ transcripts/                  받아쓰기 결과 (Colab 결과)
+│   ├─ audio/clean/                  AI 음성 샘플 (tools/make_audio.py)
+│   └─ transcripts/                  받아쓰기 결과 8조건 + stt_results.csv (Colab 결과)
+├─ audio_clean.zip                   Colab이 내려받는 음성 묶음
+├─ docs/                             결과 화면 캡처
 ├─ imjang/
 │   ├─ schema.py                     고정 항목표
 │   ├─ extract_rules.py              규칙 기반 추출기
