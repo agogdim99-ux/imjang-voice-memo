@@ -7,15 +7,15 @@
 | extracted_qwen_scripts.json | Qwen/Qwen2.5-7B-Instruct (오픈소스 LLM) | `data/scripts.json` | **73/75 (97%)** | 17/17 | 19.5초 |
 | extracted_qwen_small_noisy_noprompt.json | Qwen/Qwen2.5-7B-Instruct (오픈소스 LLM) | `data/transcripts/small_noisy_noprompt.json` | **65/75 (87%)** | 17/17 | 21.7초 |
 | extracted_qwen_turbo_noisy_prompt.json | Qwen/Qwen2.5-7B-Instruct (오픈소스 LLM) | `data/transcripts/turbo_noisy_prompt.json` | **69/75 (92%)** | 17/17 | 20.8초 |
-| extracted_rules_scripts.json | 규칙 기반 | `data/scripts.json` | **74/75 (99%)** | 17/17 | 0.0초 |
-| extracted_rules_small_clean_noprompt.json | 규칙 기반 | `data/transcripts/small_clean_noprompt.json` | **64/75 (85%)** | 17/17 | 3.2초 |
-| extracted_rules_small_clean_prompt.json | 규칙 기반 | `data/transcripts/small_clean_prompt.json` | **69/75 (92%)** | 17/17 | 2.8초 |
-| extracted_rules_small_noisy_noprompt.json | 규칙 기반 | `data/transcripts/small_noisy_noprompt.json` | **63/75 (84%)** | 17/17 | 2.8초 |
-| extracted_rules_small_noisy_prompt.json | 규칙 기반 | `data/transcripts/small_noisy_prompt.json` | **67/75 (89%)** | 17/17 | 2.7초 |
-| extracted_rules_turbo_clean_noprompt.json | 규칙 기반 | `data/transcripts/turbo_clean_noprompt.json` | **69/75 (92%)** | 17/17 | 1.8초 |
-| extracted_rules_turbo_clean_prompt.json | 규칙 기반 | `data/transcripts/turbo_clean_prompt.json` | **73/75 (97%)** | 17/17 | 1.6초 |
-| extracted_rules_turbo_noisy_noprompt.json | 규칙 기반 | `data/transcripts/turbo_noisy_noprompt.json` | **68/75 (91%)** | 17/17 | 2.0초 |
-| extracted_rules_turbo_noisy_prompt.json | 규칙 기반 | `data/transcripts/turbo_noisy_prompt.json` | **73/75 (97%)** | 17/17 | 1.7초 |
+| extracted_rules_scripts.json | 규칙 기반 | `data/scripts.json` | **75/75 (100%)** | 17/17 | 0.0초 |
+| extracted_rules_small_clean_noprompt.json | 규칙 기반 | `data/transcripts/small_clean_noprompt.json` | **65/75 (87%)** | 17/17 | 3.2초 |
+| extracted_rules_small_clean_prompt.json | 규칙 기반 | `data/transcripts/small_clean_prompt.json` | **70/75 (93%)** | 17/17 | 2.8초 |
+| extracted_rules_small_noisy_noprompt.json | 규칙 기반 | `data/transcripts/small_noisy_noprompt.json` | **64/75 (85%)** | 17/17 | 2.8초 |
+| extracted_rules_small_noisy_prompt.json | 규칙 기반 | `data/transcripts/small_noisy_prompt.json` | **68/75 (91%)** | 17/17 | 2.7초 |
+| extracted_rules_turbo_clean_noprompt.json | 규칙 기반 | `data/transcripts/turbo_clean_noprompt.json` | **70/75 (93%)** | 17/17 | 1.8초 |
+| extracted_rules_turbo_clean_prompt.json | 규칙 기반 | `data/transcripts/turbo_clean_prompt.json` | **74/75 (99%)** | 17/17 | 1.6초 |
+| extracted_rules_turbo_noisy_noprompt.json | 규칙 기반 | `data/transcripts/turbo_noisy_noprompt.json` | **69/75 (92%)** | 17/17 | 2.0초 |
+| extracted_rules_turbo_noisy_prompt.json | 규칙 기반 | `data/transcripts/turbo_noisy_prompt.json` | **74/75 (99%)** | 17/17 | 1.7초 |
 
 ## 틀린 칸 — extracted_qwen_scripts.json
 
@@ -52,9 +52,7 @@
 
 ## 틀린 칸 — extracted_rules_scripts.json
 
-| 매물 | 항목 | 정답 | 추출값 |
-|---|---|---|---|
-| s5 | 전세가 | 36000 | 38000 |
+없음
 
 ## 틀린 칸 — extracted_rules_small_clean_noprompt.json
 
@@ -68,7 +66,6 @@
 | s3 | 매매가 | 28000 | None |
 | s4 | 평형 | 27 | None |
 | s5 | 매매가 | 99000 | None |
-| s5 | 전세가 | 36000 | 38000 |
 | s5 | 연식 | 1995 | None |
 | s5 | 융자 유무 | True | None |
 
@@ -80,7 +77,6 @@
 | s1 | 연식 | 2008 | None |
 | s1 | 역 도보(분) | 8 | None |
 | s4 | 평형 | 27 | None |
-| s5 | 전세가 | 36000 | 38000 |
 | s5 | 연식 | 1995 | None |
 
 ## 틀린 칸 — extracted_rules_small_noisy_noprompt.json
@@ -96,7 +92,6 @@
 | s3 | 매매가 | 28000 | None |
 | s4 | 평형 | 27 | None |
 | s5 | 매매가 | 99000 | None |
-| s5 | 전세가 | 36000 | 38000 |
 | s5 | 연식 | 1995 | None |
 | s5 | 융자 유무 | True | None |
 
@@ -110,7 +105,6 @@
 | s1 | 역 도보(분) | 8 | None |
 | s1 | 융자 유무 | False | True |
 | s4 | 평형 | 27 | None |
-| s5 | 전세가 | 36000 | 38000 |
 | s5 | 연식 | 1995 | None |
 
 ## 틀린 칸 — extracted_rules_turbo_clean_noprompt.json
@@ -122,14 +116,12 @@
 | s2 | 주차(1대 기준) | 1대 이상 | None |
 | s3 | 주차(1대 기준) | 1대 미만 | None |
 | s4 | 평형 | 27 | None |
-| s5 | 전세가 | 36000 | 38000 |
 
 ## 틀린 칸 — extracted_rules_turbo_clean_prompt.json
 
 | 매물 | 항목 | 정답 | 추출값 |
 |---|---|---|---|
 | s4 | 평형 | 27 | None |
-| s5 | 전세가 | 36000 | 38000 |
 
 ## 틀린 칸 — extracted_rules_turbo_noisy_noprompt.json
 
@@ -140,7 +132,6 @@
 | s2 | 주차(1대 기준) | 1대 이상 | None |
 | s3 | 주차(1대 기준) | 1대 미만 | None |
 | s4 | 평형 | 27 | None |
-| s5 | 전세가 | 36000 | 38000 |
 | s5 | 엘리베이터 | True | None |
 
 ## 틀린 칸 — extracted_rules_turbo_noisy_prompt.json
@@ -148,4 +139,3 @@
 | 매물 | 항목 | 정답 | 추출값 |
 |---|---|---|---|
 | s4 | 평형 | 27 | None |
-| s5 | 전세가 | 36000 | 38000 |

@@ -73,7 +73,7 @@
       },
       "_id": "s1",
       "_title": "서울 영등포",
-      "_seconds": 3.04,
+      "_seconds": 3.03,
       "_stt_seconds": 3.03
     },
     {
@@ -284,7 +284,7 @@
       "dong": "정자동",
       "property_type": null,
       "sale_price": 99000,
-      "jeonse_price": 38000,
+      "jeonse_price": 36000,
       "wolse_deposit": null,
       "wolse_monthly": null,
       "seller_loan_exists": true,

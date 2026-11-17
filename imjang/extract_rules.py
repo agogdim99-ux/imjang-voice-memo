@@ -1,7 +1,7 @@
 """규칙 기반(정규식) 추출기 — API 키 없이 돌아가는 기본 추출기이자, LLM과 비교할 기준선.
 
-일부러 '평범한 사람이 짤 법한' 규칙으로 만들었다: 키워드 뒤 첫 번째 숫자를 잡는다.
-그래서 "3억 8천, 아 아니다 3억 6천"처럼 말을 고친 경우는 첫 값을 잡아 틀린다(실패 사례).
+기본은 '키워드 뒤 첫 번째 숫자'. v1에서는 "3억 8천, 아 아니다 3억 6천"처럼 말을 고친 경우 첫 값을 잡아 틀렸고(실패 사례),
+v2에서 가격에 한해 '같은 키워드를 다시 말하고 그 사이에 아니다/정정이 있으면 마지막 값' 규칙을 추가했다.
 """
 import re
 
@@ -61,15 +61,18 @@ def extract(text: str) -> dict:
     m = re.search(r"아파트|빌라|오피스텔|다세대|주택", t)
     d["property_type"] = m.group(0) if m else None
 
-    # 가격 (키워드 뒤 첫 금액)
-    for key, kws in (("sale_price", ["매매가", "매매"]), ("jeonse_price", ["전세가", "전세"])):
-        for kw in kws:
-            seg = _after(t, kw)
-            if seg:
-                v = parse_money(seg)
-                if v:
-                    d[key] = v
-                    break
+    # 가격: 키워드 뒤 첫 금액. 단, 같은 키워드로 다시 말하고 그 사이에 "아니다/정정"이 있으면 마지막 값(정정 반영)
+    for key, kw in (("sale_price", "매매"), ("jeonse_price", "전세")):
+        vals, i = [], t.find(kw)
+        while i >= 0:
+            v = parse_money(t[i + len(kw): i + len(kw) + 14])
+            if v:
+                vals.append((i, v))
+            i = t.find(kw, i + 1)
+        if vals:
+            d[key] = vals[0][1]
+            if len(vals) > 1 and re.search(r"아니|정정|잘못", t[vals[0][0]:vals[-1][0]]):
+                d[key] = vals[-1][1]
     seg = _after(t, "월세", 20)
     if seg:
         m = re.search(rf"({NUM})\s*에\s*({NUM})", seg)
