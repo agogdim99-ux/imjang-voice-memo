@@ -1,26 +1,44 @@
-# 임장 음성메모 → 매물 비교표 + "내 자금으로 가능한가" 판정
+# 집노트 — 임장 음성메모를 매물 비교표와 "내 자금으로 가능한가" 판정으로
 
-> 현장에서 말로 남긴 임장 녹음을 넣으면, **같은 항목의 비교표**와 **토허구역을 반영한 필요자금 판정**이 자동으로 나온다.
+> 현장에서 말로 남긴 임장 녹음을 넣으면 **같은 항목의 매물 정리**, **토지거래허가구역을 반영한 필요 자금 판정**이 자동으로 나온다.
+> 상업용 부동산 PM 4년 경력의 투자 준비자가 직접 쓰려고 만든 PoC.
 
-```
-음성 녹음 ─▶ ① Whisper 받아쓰기 ─▶ ② 항목 추출(규칙 / Claude) ─▶ ③ 토허 판정 · 자금 계산 ─▶ 비교표(HTML/MD)
-            (Colab, GPU)            (내 컴퓨터)                  (내 컴퓨터, 규정값 고정)
-```
+**데모 (폰에서 열기): https://agogdim99-ux.github.io/imjang-voice-memo/app/**
 
-| 문서 | 내용 |
+| 제출물 | 파일 |
 |---|---|
-| [01_문제정의서.md](01_문제정의서.md) | 도메인, 현재 문제, 개선 가설, 대상 사용자, 성공 기준 |
-| [02_모델선정.md](02_모델선정.md) | Whisper·edge-tts·추출 방식 선정 근거, 후보 비교 |
-| [03_검증결과.md](03_검증결과.md) | 시간·정확도 비교, 자금 판정 수계산 대조, 실패 사례, 한계 |
+| 문제 정의서 | [01_문제정의서.md](01_문제정의서.md) — 도메인, 현재 문제, 개선 가설, 대상 사용자, 성공 기준 |
+| 모델 선정 근거 | [02_모델선정.md](02_모델선정.md) — Whisper·edge-tts·Qwen2.5-7B·폰 음성인식 선정 이유, 후보 비교 |
+| PoC 코드·노트북 | [`colab/`](colab) 노트북 2개, [`imjang/`](imjang) 파이프라인, [`app/`](app) 폰 웹앱 |
+| 개선 효과 검증 | [03_검증결과.md](03_검증결과.md) — 시간·정확도 비교, 받아쓰기 8조건, LLM 비교, 실제 녹음 검증, 실패 사례, 한계 |
+| 실행 방법·시연 | 이 문서 |
 
-## 모바일 웹앱 — 집노트
+---
 
-**📱 데모: https://agogdim99-ux.github.io/imjang-voice-memo/app/** (폰에서 열기 → 홈 화면에 추가하면 앱처럼 사용)
+## 결과 요약 (성공 기준 대비)
 
-임장 기록 앱. 하단 탭: 홈 · 매물(지역별) · 녹음 · 기록(검색·비교표) · 내 정보(내 조건·설정). 매물은 '방문 예정 → 임장 완료'로 관리하고, 상세는 기본 정보 · 현장 메모 · 자금 비교 탭으로 본다 (PC에서는 3칸 나란히).
-'내 조건'에서 시드·보유 상태·소득 구간을 바꾸면 자금 판정이 앱 안에서 바로 다시 계산된다.
+| 성공 기준 (문제 정의서 5장) | 목표 | 결과 | |
+|---|---|---|---|
+| 매물 1건 정리 시간 | 2분 이내 | 손 정리 15~30분 → **약 1.7초** (Whisper 받아쓰기 포함) / 폰 앱은 녹음 끝나면 즉시 | 달성 |
+| 항목 추출 정확도 | 85% 이상 | **99%** (75칸 중 74칸, Whisper turbo + 소음 + 용어 힌트) | 달성 |
+| 비교 가능성 | 전 매물 동일 항목 표 | 모든 매물이 같은 항목표로 출력 | 달성 |
+| 누락 항목 안내 | 미언급 항목 "확인 필요" | 17칸 중 17칸 정확 | 달성 |
+| 자금 판정 | 시드 구간 대비 자동 판정 | 수계산과 5건 모두 일치 | 달성 |
+| 가독성 | 표만 봐도 이해 | 실제 녹음 2건: 혼잣말 121단어 → 주제별 14줄 + 핵심 태그 9개 | 정성 확인 |
 
-| 홈 | 지역별 매물 | 매물 상세 |
+```
+[PoC 검증]  AI 음성 ─▶ ① Whisper 받아쓰기 ─▶ ② 항목 추출 (규칙 / Qwen2.5-7B) ─▶ ③ 토허 판정·자금 계산 ─▶ 비교표
+            (edge-tts)   (Colab T4, 8조건 비교)                                    (규정값 고정, 코드 계산)
+
+[폰 앱]     내 목소리 ─▶ 폰 음성인식(실시간) ─▶ 받아쓰기 교정 ─▶ 혼잣말 정리 ─▶ 기본 정보 · 현장 메모 · 자금 비교
+                                                                 (선택) Claude + 웹 검색: 단지 정보·실거래가
+```
+
+---
+
+## 시연 — 폰 웹앱 '집노트'
+
+| 홈 | 지역별 매물 | 매물 상세 (현장 메모) |
 |---|---|---|
 | ![](docs/app_1_home.png) | ![](docs/app_2_region.png) | ![](docs/app_3_detail.png) |
 
@@ -28,151 +46,104 @@ PC 화면 (왼쪽 메뉴 + 기본 정보 · 현장 메모 · 자금 비교 3칸)
 
 ![PC 화면](docs/app_4_desktop.png)
 
-**내 폰으로 직접 쓰기** — 녹음 시작 → 평소처럼 말하기("지금 문래자이 왔어, 대단지고 역 바로 앞…") → 정리하기 → **키·인터넷 서버 없이 폰 안에서 바로 정리**:
-- **한눈에 보기**: 핵심 태그(초역세권 · 대단지 · 50평 · 관리비 저렴 · ⚠ 누수…), 👍/⚖️/👎 개수, 할 일(사진 첨부하기, 매매가 확인…)
-- **현장 메모**: 띄어쓰기·문장부호 없는 혼잣말을 문장으로 나누고, 군말(음·뭐·막·이거 뭐야)과 고쳐 말한 앞말("뒤편으로는 아니 근처로는")을 빼고, 메모체로 다듬어("~인 거 같고" → "~인 것 같음") **교통·입지 / 주차 / 관리 / 하자·내부 / 학군 / 생활·상권 / 가격**으로 묶고 👍좋음 · 👎아쉬움 · ⚖️장단점을 표시
-- **받아쓰기 교정**: 임장에서 자주 틀리는 말 교정 (몰래→문래, 상관→상권, 메매→매매, 초프마→초품아 …)
-- **자금 비교**: 토허 판정 + 내 시드 기준 필요자금 (선택: Claude API 키를 넣으면 단지 정보·최근 실거래가를 웹에서 찾아 채움)
-- 받아쓰기: 폰 브라우저 내장 음성인식(Web Speech API, ko-KR). 녹음 중 화면 꺼짐 방지(Wake Lock), 끊겨도 받아쓴 글은 자동 임시 저장.
-- 단지 검색·정리: **Claude(`claude-opus-5-5`) + 웹 검색 도구**를 폰 브라우저에서 직접 호출 ([`app/ai.js`](app/ai.js)). 결과는 고정 양식(strict tool)으로 받아 화면이 깨지지 않는다. API 키는 '내 기록 → AI 설정'에 넣고 폰에만 저장된다.
-- 토허 판정·자금 계산: [`app/engine.js`](app/engine.js)가 폰 안에서 규정값으로 계산 (AI가 숫자를 지어내지 않게 계산은 코드가 한다). 키가 없으면 규칙 기반 정리로 대신한다.
-- 저장: 내 매물은 **이 폰에만** 저장된다(서버로 보내지 않음). '내 기록'에서 백업 파일을 받을 수 있다.
-- 홈 화면에 추가하면 앱처럼 쓸 수 있다 (Android Chrome: 메뉴 → 홈 화면에 추가 / iPhone Safari: 공유 → 홈 화면에 추가).
-- 마이크는 https 주소에서만 켜진다 → GitHub Pages 배포 주소로 연다.
+**쓰는 방법**
+1. 녹음 시작 → 처음에 단지 이름을 말하고, 본 것을 평소처럼 말한다 ("지금 문래자이 왔어, 대단지고 역 바로 앞…")
+2. 말하는 동안 실시간으로 글자가 나온다. 녹음 중엔 화면이 꺼지지 않고, 끊겨도 받아쓴 글은 임시 저장된다.
+3. 정리하기 → 키·서버 없이 폰 안에서 바로 정리된다.
 
-내 컴퓨터에서 실행 (저장소 폴더에서):
+**정리 결과**
+- **한눈에 보기**: 핵심 태그(초역세권 · 대단지 · 50평 · 관리비 저렴 · 누수 …), 좋음(+) · 장단점(±) · 아쉬움(−) 개수, 할 일(사진 첨부하기, 매매가 확인 …)
+- **기본 정보**: 단지명·위치·평형·규모·준공·역/교통·출퇴근·주차·관리비·관리 상태·내부·학교·생활 편의·토허 구분 (녹음에서 나온 값은 '녹음' 표시)
+- **현장 메모**: 혼잣말을 문장으로 나누고 군말(음·뭐·막·이거 뭐야)과 고쳐 말한 앞말을 빼고 메모체로 다듬어, 교통·입지 / 주차 / 관리 / 하자·내부 / 학군 / 생활·상권 / 가격으로 묶는다
+- **자금 비교**: 토허 판정 + 내 시드·주택 보유·소득 구간 기준 필요 자금 (가능 / 조금 부족 / 많이 부족)
 
-```bash
-python -m http.server 8000
-```
+**그 밖의 기능**: 사진 여러 장(카메라·앨범, 크게 보기), 단지 위치 지도, 방문 예정 → 임장 완료 관리, 메모 작성, 기록 검색과 한눈에 비교표, A4 한 장 PDF 저장, 홈 화면에 추가(앱처럼 사용), 홈에서 뒤로 두 번 누르면 종료
 
-브라우저에서 `http://localhost:8000/app/` 을 연다. 샘플 데이터 갱신은 `python tools/export_app.py`.
-- 사진은 아직 없음(다음 단계: 사진 업로드 연결).
-
-## 결과 미리보기 (PC용 비교표)
-
-소음을 섞은 AI 음성 → Whisper turbo 받아쓰기 → 규칙 기반 추출로 만든 실제 결과 (`outputs/report.html`):
-
-![비교표와 자금 판정](docs/screenshot_full.png)
-
-**검증 요약** ([03_검증결과.md](03_검증결과.md))
-- 1건 처리 시간: 손 정리 15~30분 → **약 1.7초** (받아쓰기 포함, Colab T4)
-- 항목 추출 정확도: **99%** (75칸 중 74칸, turbo + 소음 + 용어 힌트, 규칙 v2) — 목표 85% 달성 (v1은 97%)
-- 누락 항목 '확인 필요' 표시: 17/17 전부 정확
-- 자금 판정: 수계산과 5건 모두 일치
-- 오픈소스 LLM(Qwen2.5-7B) 추출과 비교: 정정한 말("아 아니다 3억 6천")은 LLM만 맞혔고, 정해진 말투에서는 규칙 기반이 더 정확·빠름
-
-같은 시드(1억~3억, 무주택)로 돌린 예:
-
-| 매물 | 토허 구분 | 갭투자 | 실거주 매수 |
-|---|---|---|---|
-| 서울 영등포 7.2억 | A 토허구역 | 불가 | 🔴 많이 부족 (3억 3,200만원) |
-| 인천 부평 5.3억 | B 비대상 | 🟡 조금 부족 (5,000만원) | 🟡 조금 부족 (5,900만원) |
-| 부천 원미구 빌라 2.8억 | B 비대상 | 🟢 가능 | 🟢 가능 |
-| 인천 송도 | C 개별 지정 | 매매가 확인 필요 | — |
-| 성남 분당 9.9억 | A 토허구역 | 불가 | 🔴 많이 부족 (4억 9,400만원) |
+**개인정보**: 녹음 내용·사진·매물은 그 폰의 브라우저에만 저장되고 서버로 보내지 않는다. 시드는 실제 금액이 아닌 구간만 저장한다. (선택 기능인 Claude 자동 정리를 켤 때만 녹음 글이 Anthropic API로 전송된다.)
 
 ---
 
 ## 실행 방법
 
-### 1단계 — Colab: 샘플 음성 만들기 + 받아쓰기 (약 10분)
+### A. 폰 앱 (설치 없음)
+위 데모 주소를 폰 Chrome(Android) 또는 Safari(iPhone)로 연다. 마이크 권한을 허용하면 바로 녹음할 수 있다. (iPhone은 Siri가 켜져 있어야 음성인식이 된다. 음성인식은 인터넷 연결 필요.)
 
-1. [`colab/01_음성생성_받아쓰기.ipynb`](colab/01_음성생성_받아쓰기.ipynb) 를 Colab에서 연다 (colab.research.google.com → 파일 → 노트북 업로드).
-2. `런타임 → 런타임 유형 변경 → T4 GPU`
-3. 위에서부터 ▶ 를 차례로 실행. "2. AI 목소리 샘플 올리기" 칸에서 저장소의 **`audio_clean.zip`** 을 고른다.
-   (음성은 `python tools/make_audio.py` 로 edge-tts를 써서 만든 것. Colab에서는 edge-tts 서버 연결이 막히는 경우가 있어 미리 만들어 둠)
-4. 마지막 칸에서 `imjang_stt_results.zip` 이 내려받아진다.
-5. 압축을 풀어 `transcripts/` 안의 파일은 `data/transcripts/`, `audio/` 는 `data/audio/` 에 넣는다.
-
-> 이 저장소의 `data/transcripts/` 에 이미 8개 조건의 받아쓰기 결과가 들어 있으므로, 1단계를 건너뛰고 2단계부터 해도 같은 결과가 나온다.
-> 바로 열기: [Colab에서 열기](https://colab.research.google.com/github/agogdim99-ux/imjang-voice-memo/blob/main/colab/01_%EC%9D%8C%EC%84%B1%EC%83%9D%EC%84%B1_%EB%B0%9B%EC%95%84%EC%93%B0%EA%B8%B0.ipynb)
-
-### 2단계 — 내 컴퓨터: 비교표 만들기 (설치 거의 없음)
-
-Python 3.10 이상만 있으면 된다. 추가 패키지 설치는 필요 없다.
+내 컴퓨터에서 띄우기:
 
 ```bash
-python run.py
+python -m http.server 8000
 ```
 
-질문 3개(시드 구간 · 주택 보유 상태 · 연소득 구간)에 번호로 답하면 `outputs/report.html` 이 만들어진다. 브라우저로 열면 된다.
+브라우저에서 `http://localhost:8000/app/` 을 연다.
 
-질문 없이 한 번에 실행:
+### B. PoC 검증 재현
+
+**1단계 — Colab: 받아쓰기 8조건 (약 10분, T4 GPU)**
+
+[Colab에서 열기](https://colab.research.google.com/github/agogdim99-ux/imjang-voice-memo/blob/main/colab/01_%EC%9D%8C%EC%84%B1%EC%83%9D%EC%84%B1_%EB%B0%9B%EC%95%84%EC%93%B0%EA%B8%B0.ipynb) → `런타임 → 런타임 유형 변경 → T4 GPU` → `런타임 → 모두 실행`.
+음성(`audio_clean.zip`)은 저장소에서 자동으로 내려받는다. 결과는 이미 [`data/transcripts/`](data/transcripts)에 들어 있으므로 건너뛰어도 된다.
+
+**2단계 — 내 컴퓨터: 비교표 만들기 (Python 3.10+, 추가 설치 없음)**
 
 ```bash
-python run.py --transcripts data/transcripts/turbo_noisy_prompt.json --seed 2 --buyer 무주택 --income 0
+python run.py --transcripts data/transcripts/turbo_noisy_prompt.json --seed 2 --buyer 무주택 --income 0 --method rules
 ```
 
-8개 조건 전부 돌리고 채점하기 (Git Bash):
-
-```bash
-for f in data/transcripts/*.json; do python run.py --transcripts "$f" --seed 2 --buyer 무주택 --income 0 --method rules; done; python run.py --seed 2 --buyer 무주택 --income 0 --method rules; python evaluate.py
-```
+`outputs/report.html` 을 브라우저로 연다. 옵션 없이 `python run.py` 로 실행하면 질문에 번호로 답하면 된다.
 
 | 옵션 | 값 |
 |---|---|
-| `--transcripts` | 받아쓰기 결과 JSON. 생략하면 대본 원문(`data/scripts.json`) |
+| `--transcripts` | 받아쓰기 결과 JSON (생략하면 대본 원문) |
 | `--seed` | 1: 1억 미만 · 2: 1억~3억 · 3: 3억~5억 · 4: 5억~7억 · 5: 7억~10억 · 6: 10억 이상 |
 | `--buyer` | 무주택 · 생애최초 · 다주택 |
 | `--income` | 0: 미입력 · 1: 3천 미만 · 2: 3천~5천 · 3: 5천~7천 · 4: 7천~1억 · 5: 1억 이상 (만원) |
-| `--method` | `rules` 규칙 기반 · `qwen` 오픈소스 LLM(Colab 결과) · `llm` Claude · `auto`(기본: Claude 키나 저장된 결과가 있으면 Claude, 아니면 규칙) |
+| `--method` | `rules` 규칙 기반 · `qwen` 오픈소스 LLM 결과 · `llm` Claude(API 키 필요) |
 
-### 3단계 — 정확도 채점
+**3단계 — 정확도 채점**
 
 ```bash
+for f in data/transcripts/*.json data/scripts.json; do python run.py --transcripts "$f" --seed 2 --buyer 무주택 --income 0 --method rules; done
 python evaluate.py
 ```
 
-`outputs/` 의 모든 추출 결과를 정답표와 비교해 `outputs/evaluation.md` 를 만든다.
+`outputs/evaluation.md` 에 조건별 정확도와 틀린 칸이 정리된다.
 
-### (선택) 오픈소스 LLM(Qwen2.5-7B) 추출로 비교하기
+**(선택) 오픈소스 LLM 비교** — [Colab에서 열기](https://colab.research.google.com/github/agogdim99-ux/imjang-voice-memo/blob/main/colab/02_LLM_%ED%95%AD%EB%AA%A9%EC%B6%94%EC%B6%9C.ipynb) (Qwen2.5-7B, 약 15분). 결과는 [`data/llm_extracted/qwen.json`](data/llm_extracted/qwen.json)에 있고 `--method qwen` 으로 채점된다.
 
-[`colab/02_LLM_항목추출.ipynb`](colab/02_LLM_항목추출.ipynb)를 Colab T4에서 실행하면 된다 ([Colab에서 열기](https://colab.research.google.com/github/agogdim99-ux/imjang-voice-memo/blob/main/colab/02_LLM_%ED%95%AD%EB%AA%A9%EC%B6%94%EC%B6%9C.ipynb), 약 15분). 실행 결과는 이미 `data/llm_extracted/qwen.json` 에 들어 있다.
-
-```bash
-python run.py --transcripts data/transcripts/turbo_noisy_prompt.json --seed 2 --buyer 무주택 --income 0 --method qwen
-```
-
-### (선택) Claude 추출 켜기
+**(선택) 앱 엔진 검사** — 폰 앱(JS)이 Python 파이프라인과 같은 결과를 내는지:
 
 ```bash
-pip install -r requirements.txt
+node tools/test_engine.cjs
 ```
-
-API 키를 환경변수 `ANTHROPIC_API_KEY` 로 넣고 `--method llm` 으로 실행한다. 결과는 `outputs/cache_llm/` 에 저장되어 키가 없는 사람도 같은 결과를 재현한다.
 
 ---
 
 ## 폴더 구조
 
 ```
-├─ 01_문제정의서.md / 02_모델선정.md / 03_검증결과.md
-├─ colab/01_음성생성_받아쓰기.ipynb   ① 음성 내려받기 + 소음 섞기 + Whisper 8조건 비교
-├─ colab/02_LLM_항목추출.ipynb       ② 오픈소스 LLM(Qwen2.5-7B) 항목 추출
+├─ 01_문제정의서.md · 02_모델선정.md · 03_검증결과.md
+├─ app/                              폰 웹앱 '집노트' (GitHub Pages로 배포)
+│   ├─ index.html                    화면 (홈 · 매물 · 녹음 · 기록 · 내 정보, 상세 3탭)
+│   ├─ engine.js                     받아쓰기 교정 · 항목 추출 · 혼잣말 정리 · 지역/토허 판정
+│   ├─ ai.js                         (선택) Claude + 웹 검색 자동 정리
+│   └─ data.js                       샘플 매물 1건
+├─ colab/01_음성생성_받아쓰기.ipynb    Whisper small/turbo × 깨끗/소음 × 용어 힌트 8조건
+├─ colab/02_LLM_항목추출.ipynb        Qwen2.5-7B (4비트) 항목 추출
+├─ imjang/                           Python 파이프라인 (schema · extract_rules · extract_llm · extract_open · regions · finance · report)
+├─ run.py · evaluate.py              실행 · 채점
 ├─ data/
-│   ├─ scripts.json                  대본 5개 (허구의 매물)
-│   ├─ ground_truth.json             항목 정답표 (75칸)
-│   ├─ audio/clean/                  AI 음성 샘플 (tools/make_audio.py)
-│   └─ transcripts/                  받아쓰기 결과 8조건 + stt_results.csv (Colab 결과)
-├─ audio_clean.zip                   Colab이 내려받는 음성 묶음
-├─ docs/                             결과 화면 캡처
-├─ imjang/
-│   ├─ schema.py                     고정 항목표
-│   ├─ extract_rules.py              규칙 기반 추출기
-│   ├─ extract_llm.py                Claude 추출기 (구조화 출력)
-│   ├─ extract_open.py               Qwen 추출 결과 읽기
-│   ├─ regions.py                    수도권 지역 정규화 + 토허 A/B/C 판정
-│   ├─ finance.py                    LTV·절대 한도·DSR, 시드 구간 판정, 중개보수
-│   └─ report.py                     비교표 HTML/MD
-├─ run.py                            전체 실행
-├─ evaluate.py                       정확도 채점
-├─ tools/                            노트북 생성(build_notebook*.py), 음성 생성(make_audio.py), LLM 실행 스크립트
-└─ outputs/                          결과물 (report.html 등)
+│   ├─ scripts.json · ground_truth.json   대본 5건(허구 매물) · 정답표 75칸
+│   ├─ audio/clean/ · audio_clean.zip     AI 합성 음성
+│   ├─ transcripts/                       받아쓰기 8조건 결과 + stt_results.csv
+│   ├─ llm_extracted/qwen.json            Qwen 추출 결과
+│   └─ field/field_recordings.json        실제 현장 녹음 2건의 받아쓰기·정리 결과
+├─ outputs/                          비교표(report.html) · 채점(evaluation.md)
+├─ tools/                            노트북·음성·앱 데이터 생성, 앱 엔진 검사
+└─ docs/                             화면 캡처
 ```
 
 ## 주의
 
-- 모든 결과는 **참고용 개략치**이며 투자 판단의 근거가 아니다. 대출 한도는 소득·신용·부채에 따라 달라지므로 은행 상담이 필요하다.
+- 모든 결과는 **참고용 개략치**이며 투자 판단의 근거가 아니다. 대출 한도는 소득·신용·부채에 따라 달라지므로 은행 상담이 필요하다. 세금은 계산하지 않는다.
 - 토지거래허가구역 기준: **2026년 11월**. 지정은 2026-12-31 만료 예정(화성 동탄·구리·용인 기흥은 2027-12-31)이며, 지번 단위 구역은 판정하지 못한다. 거래 전 토지이음·서울부동산정보광장에서 직접 조회할 것.
-- 샘플 음성은 AI 합성이며 매물 정보는 허구다. 개인 목소리·실제 매물 정보는 저장소에 없다.
+- 검증용 샘플 음성은 AI 합성이며 매물 정보(가격 등)는 허구다. 실제 현장 녹음 2건은 받아쓴 글만 포함했고, 목소리 파일은 저장소에 없다.

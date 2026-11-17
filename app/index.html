@@ -129,29 +129,35 @@ nav.tabs .on{color:var(--blue);font-weight:800}
 .vbar button{color:#fff;font-weight:800;padding:8px 6px}
 .vnav{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:64px;color:#fff;font-size:40px;font-weight:300}
 .vnav.l{left:4px} .vnav.r{right:4px}
-#printpage{display:none}
+ol.sents{margin:4px 0 0;padding-left:22px} ol.sents li{padding:5px 0;font-size:15px;line-height:1.55;border-bottom:1px solid var(--line2)} ol.sents li:last-child{border-bottom:0}
+ol.sents li::marker{color:var(--blue);font-weight:800;font-size:13px}
+details.orig{margin-top:10px} details.orig summary{cursor:pointer;font-size:13px;font-weight:700;color:var(--ink2)} details.orig p{font-size:13.5px;color:var(--muted);white-space:pre-wrap;margin:8px 0 0}
+.shotprev{width:100%;border:1px solid var(--line);border-radius:10px;display:block;margin-top:6px;max-height:52dvh;object-fit:contain;background:#fff}
+/* 한 페이지(A4) 모양: 화면에서 캡처하거나 인쇄할 때 같이 쓴다 (A4 폭 = 794px) */
+#printpage{display:none;width:794px;padding:40px 42px;background:#fff;font-size:12.6px;color:#0F172A;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+#printpage.capture{display:block;position:fixed;left:-10000px;top:0;z-index:-1}
+#printpage header{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:2.5px solid var(--blue);padding-bottom:6px;margin-bottom:8px}
+#printpage .pl{font-size:11.3px;color:var(--blue);font-weight:800} #printpage h1{font-size:22.7px;margin:2px 0;font-weight:900}
+#printpage .pa{font-size:12.0px;color:#475467} #printpage .pd{text-align:right;font-size:11.3px;color:#475467}
+#printpage .pphotos{display:grid;gap:4px;margin-bottom:8px} .pphotos.n1{grid-template-columns:1fr} .pphotos.n2{grid-template-columns:1fr 1fr} .pphotos.n3,.pphotos.n4{grid-template-columns:repeat(4,1fr)}
+#printpage .pphotos img{width:100%;height:42mm;object-fit:cover;border-radius:4px} .pphotos.n1 img{height:55mm}
+#printpage .card{margin:0 0 8px;padding:8px 10px;border:1px solid #E4E8EF;border-radius:8px;break-inside:avoid;box-shadow:none;background:#fff}
+#printpage .pcols{display:grid;grid-template-columns:1fr 1.25fr 0.9fr;gap:6px;align-items:start}
+#printpage .pcols .pane{display:block!important}
+#printpage .ul-sm,#printpage .fine{display:none!important}
+#printpage .need-box{display:block!important;padding:4px 6px} #printpage .pricegrid{gap:3px 6px}
+#printpage .cardhd{font-size:14.0px;margin-bottom:4px} #printpage button,#printpage .edit-btn,#printpage .cond{display:none!important}
+#printpage table.info th,#printpage table.info td{padding:3px 6px;font-size:11.7px} #printpage table.info th{width:62px}
+#printpage .memo .lab{font-size:13.3px;margin:8px 0 2px} #printpage ul.olist li{padding:2px 0;font-size:11.7px;border:0}
+#printpage .htag{font-size:11.3px;padding:2px 7px} #printpage ul.todo li{padding:1px 0 1px 18px;font-size:11.7px} #printpage ul.todo li::before{top:4px;width:9px;height:9px}
+#printpage .scen{border:0;padding:3px 0} #printpage .scen .v{font-size:17.3px} #printpage .scen .d{font-size:10.0px}
+#printpage .pillv{font-size:10.4px;padding:2px 6px} #printpage .pricebox{padding:4px 8px} #printpage .pricebox b{font-size:16.0px}
+#printpage footer{margin-top:6px;font-size:10.0px;color:#98A2B3;text-align:center}
 @media print {
-  @page{size:A4;margin:11mm}
+  @page{size:A4;margin:0}
   html,body{background:#fff!important}
-  .app,.sheet,.scrim,.toast,nav.tabs,.viewer,.fab{display:none!important}
-  #printpage{display:block;font-size:9.5pt;color:#0F172A;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  #printpage header{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:2.5px solid var(--blue);padding-bottom:6px;margin-bottom:8px}
-  #printpage .pl{font-size:8.5pt;color:var(--blue);font-weight:800} #printpage h1{font-size:17pt;margin:2px 0;font-weight:900}
-  #printpage .pa{font-size:9pt;color:#475467} #printpage .pd{text-align:right;font-size:8.5pt;color:#475467}
-  #printpage .pphotos{display:grid;gap:4px;margin-bottom:8px} .pphotos.n1{grid-template-columns:1fr} .pphotos.n2{grid-template-columns:1fr 1fr} .pphotos.n3,.pphotos.n4{grid-template-columns:repeat(4,1fr)}
-  #printpage .pphotos img{width:100%;height:42mm;object-fit:cover;border-radius:4px} .pphotos.n1 img{height:55mm}
-  #printpage .card{margin:0 0 8px;padding:8px 10px;border:1px solid #E4E8EF;border-radius:8px;break-inside:avoid;box-shadow:none;background:#fff}
-  #printpage .pcols{display:grid;grid-template-columns:1fr 1.25fr 0.9fr;gap:6px;align-items:start}
-  #printpage .pcols .pane{display:block!important}
-  #printpage .ul-sm,#printpage .fine{display:none!important}
-  #printpage .need-box{display:block!important;padding:4px 6px} #printpage .pricegrid{gap:3px 6px}
-  #printpage .cardhd{font-size:10.5pt;margin-bottom:4px} #printpage button,#printpage .edit-btn,#printpage .cond{display:none!important}
-  #printpage table.info th,#printpage table.info td{padding:3px 6px;font-size:8.8pt} #printpage table.info th{width:62px}
-  #printpage .memo .lab{font-size:10pt;margin:8px 0 2px} #printpage ul.olist li{padding:2px 0;font-size:8.8pt;border:0}
-  #printpage .htag{font-size:8.5pt;padding:2px 7px} #printpage ul.todo li{padding:1px 0 1px 18px;font-size:8.8pt} #printpage ul.todo li::before{top:4px;width:9px;height:9px}
-  #printpage .scen{border:0;padding:3px 0} #printpage .scen .v{font-size:13pt} #printpage .scen .d{font-size:7.5pt}
-  #printpage .pillv{font-size:7.8pt;padding:2px 6px} #printpage .pricebox{padding:4px 8px} #printpage .pricebox b{font-size:12pt}
-  #printpage footer{margin-top:6px;font-size:7.5pt;color:#98A2B3;text-align:center}
+  .app,.sheet,.scrim,.toast,nav.tabs,.viewer,.fab,.shot{display:none!important}
+  #printpage{display:block!important;position:static!important}
 }
 .phdel{position:absolute;top:8px;right:8px;width:30px;height:30px;border-radius:50%;background:rgba(15,23,42,.55);color:#fff;font-size:18px}
 .mapbox{height:220px} .mapbox iframe{width:100%;height:100%;border:0;display:block}
@@ -584,7 +590,7 @@ function detail(id, q){
   const aiCard = '';
 
   return `
-  <div class="phd det"><a class="iconbtn back" href="javascript:history.length>1?history.back():location.hash='#/'" aria-label="뒤로">${I.back}</a><h1 style="font-size:17px">${esc(nameOf(p))}</h1>
+  <div class="phd det"><button class="iconbtn back" data-act="back" aria-label="뒤로">${I.back}</button><h1 style="font-size:17px">${esc(nameOf(p))}</h1>
     ${p.sample?'<span></span>':`<button class="iconbtn" data-rename="${p.id}" aria-label="이름 고치기">${I.pen}</button>`}</div>
   ${crumbs.length?`<div class="crumb">${crumbs.map(esc).join(' <span>›</span> ')}</div>`:''}
   <div class="dtop"><div class="ttl"><h1>${esc(nameOf(p))}</h1><div class="sub">${hh?hh.toLocaleString()+'세대':''}${stChip(p)}${p.zone?`<span class="zt ${zcls(p.zone.zone)}">${esc(p.zone.label)}</span>`:''}</div></div>
@@ -598,7 +604,13 @@ function detail(id, q){
   <div class="dtabs">${[['info','기본 정보'],['memo','현장 메모'],['fund','자금 비교']].map(([k,t])=>`<button class="${k===tab?'on':''}" data-tab="${k}">${t}</button>`).join('')}</div>
   <div class="cols">${info}${memo}${fund}</div>
   ${aiCard}
-  ${p.transcript?`<details class="raw"><summary>${I.mic.replace('class="ic"','class="ic" style="width:18px;height:18px"')} 녹음 원문</summary>${p.audio?`<audio controls preload="none" src="${esc(p.audio)}" style="width:100%;margin-bottom:8px"></audio>`:''}<p>${esc(p.transcript)}</p></details>`:''}
+  ${p.transcript ? (() => {
+    const fixed = ZipEngine.fixSTT(p.transcript);
+    const sents = ZipEngine.segment(fixed).map(ZipEngine.tidy).filter(s => s.replace(/\s/g, '').length >= 3);
+    return `<section class="card rawcard"><div class="cardhd">녹음 내용 <span class="src">문장 ${sents.length}개 · 군말 정리</span></div>
+      ${p.audio?`<audio controls preload="none" src="${esc(p.audio)}" style="width:100%;margin-bottom:8px"></audio>`:''}
+      <ol class="sents">${sents.map(s => `<li>${esc(s)}</li>`).join('')}</ol>
+      <details class="orig"><summary>받아쓴 그대로 보기</summary><p>${esc(p.raw_transcript || p.transcript)}</p></details></section>`; })() : ''}
   ${p.sample?'':`<div class="foot"><button class="danger" data-del="${p.id}">매물 삭제</button>${store.get('apikey','')&&p.status!=='analyzing'?`<button class="link" data-act="reai" data-id="${p.id}">자동 정리(검색) ↻</button>`:''}</div>`}`;
 }
 
@@ -733,7 +745,7 @@ function saveRec(){
   const text = (document.getElementById('edit').value || '').trim();
   if (text.length < 4) { toast('정리할 내용이 없어요'); return; }
   const p = REC.target ? mergeInto(REC.target, text) : saveNew(text);
-  store.set('draft', null); closeSheet(); location.hash = '#/p/'+p.id; runAI(p.id);
+  store.set('draft', null); closeSheet(); go('#/p/'+p.id); runAI(p.id);
 }
 let audioEl = null, audioBtn = null;
 function stopAudio(){ if (audioEl) { audioEl.pause(); audioEl = null; } if (audioBtn) { audioBtn.innerHTML = I.play; audioBtn = null; } }
@@ -770,7 +782,6 @@ function applyReport(p, r){
 
 /* ═════════ 라우터 · 이벤트 ═════════ */
 function parse(){ const [path, qs] = (location.hash.slice(1)||'/').split('?'); return {parts:path.split('/').filter(Boolean), q:Object.fromEntries(new URLSearchParams(qs||''))}; }
-function setQ(patch, keep){ const {parts, q} = parse(); const n = {...q, ...patch}; Object.keys(n).forEach(k => n[k]==null && delete n[k]); keepScroll = !!keep; location.hash = '#/'+parts.join('/')+'?'+new URLSearchParams(n); }
 let keepScroll = false;
 function render(stay){
   const {parts, q} = parse(), v = document.getElementById('view'), pg = parts[0];
@@ -778,7 +789,6 @@ function render(stay){
   v.innerHTML = pg==='region' ? region(q) : pg==='records' ? records(q) : pg==='me' ? me() : pg==='p' ? detail(parts[1], q) : home();
   const t = pg==='region'||pg==='p' ? 'region' : pg==='records' ? 'records' : pg==='me' ? 'me' : 'home';
   document.querySelectorAll('[data-t]').forEach(a => a.classList.toggle('on', a.dataset.t === t));
-  if (!pg) armExitGuard();
   if (pg==='p' && q.print) setTimeout(() => printPage(parts[1], q.print === 'preview'), 300);   // 링크로 바로 인쇄용 화면
   if (q.ai) { const c = document.getElementById('aicard'); c && c.scrollIntoView({block:'center'}); }
   else if (stay || keepScroll) scrollTo(0, y); else scrollTo(0, 0);
@@ -809,22 +819,56 @@ async function printPage(id, noDialog){
     ${photos ? `<div class="pphotos n${Math.min((p.photos||[]).length,4)}">${photos}</div>` : ''}
     ${v.querySelector('.glance')?.outerHTML || ''}<div class="pcols">${panes.join('')}</div>
     <footer>모든 수치는 녹음·검색 기반 참고용 추정입니다. 세금 미반영, 대출은 은행 상담 필수. 토허구역은 거래 전 직접 조회하세요.</footer>`;
+  pp.className = 'capture';
   await fillPhotos();
   await Promise.all([...pp.querySelectorAll('img')].map(im => im.complete ? 0 : new Promise(r => { im.onload = im.onerror = r; })));
   if (noDialog) return;
-  const old = document.title; document.title = `집노트_${nameOf(p)}`;   // PDF 파일 이름
-  window.print();
-  setTimeout(() => { document.title = old; }, 1000);
+  // 인쇄 기능은 카카오톡 안 브라우저 등에서 막혀 있어서, 앱이 직접 이미지·PDF 파일을 만든다
+  toast('한 페이지로 만드는 중…');
+  try {
+    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js');
+    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
+    const canvas = await window.html2canvas(pp, {scale: 2, backgroundColor: '#ffffff', useCORS: true, logging: false});
+    const jpg = canvas.toDataURL('image/jpeg', .92);
+    const pdf = new window.jspdf.jsPDF({unit: 'mm', format: 'a4'});
+    const w = 210, h = canvas.height * w / canvas.width, fit = Math.min(1, 297 / h);   // 길면 한 장에 맞게 줄인다
+    pdf.addImage(jpg, 'JPEG', (210 - w * fit) / 2, 0, w * fit, h * fit);
+    const name = `집노트_${nameOf(p).replace(/[\\/:*?"<>|]/g, '')}`;
+    SHOT = {name, pdf: pdf.output('blob'), img: await new Promise(r => canvas.toBlob(r, 'image/jpeg', .92))};
+    if (SHOT.url) URL.revokeObjectURL(SHOT.url);
+    SHOT.url = URL.createObjectURL(SHOT.img);
+    openSheet(`<h3>한 페이지로 저장</h3>
+      <img class="shotprev" src="${SHOT.url}" alt="한 페이지 미리보기">
+      <div class="duo" style="margin-top:12px"><button class="btn sm" data-act="shot-share">공유하기</button><button class="btn line sm" data-act="shot-pdf">PDF 저장</button></div>
+      <button class="btn line sm" data-act="shot-img" style="margin-top:8px">이미지로 저장</button>
+      <p class="fine">저장이 안 되면 위 미리보기를 <b>길게 눌러 이미지 저장</b>하세요. 카카오톡 안에서 열었다면 오른쪽 위 메뉴 → <b>다른 브라우저로 열기</b>를 하면 PDF 저장이 잘 돼요.</p>`);
+  } catch (err) {
+    toast('파일을 만들지 못했어요. 인터넷 연결을 확인해 주세요.');
+  } finally { pp.className = ''; }
+}
+let SHOT = null;
+function loadScript(src){ return new Promise((res, rej) => { if ([...document.scripts].some(s => s.src === src)) return res(); const s = Object.assign(document.createElement('script'), {src, onload: res, onerror: rej}); document.head.appendChild(s); }); }
+function saveBlob(blob, filename){ const url = URL.createObjectURL(blob); const a = Object.assign(document.createElement('a'), {href: url, download: filename}); document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 4000); }
+async function shareShot(){
+  const files = [new File([SHOT.pdf], SHOT.name + '.pdf', {type: 'application/pdf'})];
+  if (navigator.canShare && navigator.canShare({files})) { try { await navigator.share({files, title: SHOT.name}); return; } catch (e) { if (e.name === 'AbortError') return; } }
+  const imgFile = [new File([SHOT.img], SHOT.name + '.jpg', {type: 'image/jpeg'})];
+  if (navigator.canShare && navigator.canShare({files: imgFile})) { try { await navigator.share({files: imgFile, title: SHOT.name}); return; } catch (e) { if (e.name === 'AbortError') return; } }
+  saveBlob(SHOT.pdf, SHOT.name + '.pdf'); toast('이 브라우저는 공유를 지원하지 않아 PDF로 내려받았어요');
 }
 
 document.addEventListener('click', e => {
   const t = e.target.closest('[data-act],[data-f],[data-set],[data-play],[data-del],[data-rename],[data-delphoto],[data-tab]'); if (!t) return;
   const act = t.dataset.act, id = t.dataset.id;
   if (act==='print') { printPage(id); return; }
+  if (act==='back') { goBack(); return; }
+  if (act==='shot-share') { shareShot(); return; }
+  if (act==='shot-pdf') { saveBlob(SHOT.pdf, SHOT.name + '.pdf'); toast('PDF를 저장했어요'); return; }
+  if (act==='shot-img') { saveBlob(SHOT.img, SHOT.name + '.jpg'); toast('이미지를 저장했어요'); return; }
   if (t.dataset.tab) { setQ({tab:t.dataset.tab}, true); return; }
   if (t.dataset.delphoto) { const p = MINE.find(x=>x.id===id); if (p && confirm('이 사진을 지울까요?')) { p.photos = (p.photos||[]).filter(k=>k!==t.dataset.delphoto); PhotoDB.del(t.dataset.delphoto); saveMine(); render(true); } return; }
   if (t.dataset.rename) { const p = MINE.find(x=>x.id===t.dataset.rename); if (!p) return; const nv = prompt('매물 이름', nameOf(p)); if (nv != null) { p.custom_name = nv.trim() || null; saveMine(); reload(); render(true); toast('이름을 바꿨어요'); } return; }
-  if (t.dataset.del) { if (confirm('이 매물을 삭제할까요? 이 폰에서 지워지고 되돌릴 수 없어요.')) { removeMine(t.dataset.del); location.hash = '#/'; toast('삭제했어요'); } return; }
+  if (t.dataset.del) { if (confirm('이 매물을 삭제할까요? 이 폰에서 지워지고 되돌릴 수 없어요.')) { removeMine(t.dataset.del); NAV.length = 0; go('#/', {replace:true}); toast('삭제했어요'); } return; }
   if (t.dataset.f) { setQ({f:t.dataset.f}, true); return; }
   if (t.dataset.play) { togglePlay(t); return; }
   if (t.dataset.set) { const k = t.dataset.set; S[k] = k==='buyer' ? t.dataset.v : k==='samples' ? t.dataset.v==='1' : +t.dataset.v; store.set('settings', S); reload();
@@ -835,7 +879,7 @@ document.addEventListener('click', e => {
     const area = document.getElementById('parea').value.trim(), memo = document.getElementById('pmemo').value.trim();
     const r = ZipEngine.normalizeRegion(null, null, null, `${area} ${name}`);
     const p = newProp({custom_name:name, visit:'planned', memo:memo||null, sido:r.sido, sigungu:[r.city, r.gu].filter(Boolean).join(' ')||null, dong:(area.match(/[가-힣]+동/)||[])[0]||null, zone:ZipEngine.classify(r, `${area} ${name}`)});
-    closeSheet(); location.hash = '#/p/'+p.id; toast('방문 예정으로 저장했어요'); }
+    closeSheet(); go('#/p/'+p.id); toast('방문 예정으로 저장했어요'); }
   else if (act==='memo') memoSheet(id);
   else if (act==='memo-save') { const p = MINE.find(x=>x.id===id); if (p) { p.memo = document.getElementById('memoedit').value.trim() || null; p.updated = Date.now(); saveMine(); reload(); } closeSheet(); render(true); toast('메모를 저장했어요'); }
   else if (act==='settings') settingsSheet();
@@ -863,21 +907,45 @@ document.addEventListener('change', e => {
   setQ(s.dataset.q==='sido' ? {sido:s.value, gu:null, spot:null} : s.dataset.q==='gu' ? {gu:s.value, spot:null} : {spot:s.value}, true);
 });
 let st_; document.addEventListener('input', e => { if (e.target.id === 'q') { clearTimeout(st_); const v = e.target.value; st_ = setTimeout(() => { setQ({q:v}, true); setTimeout(() => { const qi = document.getElementById('q'); if (qi) { qi.focus(); qi.setSelectionRange(v.length, v.length); } }, 0); }, 300); } });
-window.addEventListener('hashchange', () => { closeSheet(); document.getElementById('viewer')?.classList.remove('open'); render(); });
-
-/* 홈에서 뒤로 두 번 누르면 나가기: 홈 아래에 '경고용' 기록을 하나 깔아 둔다 */
-function armExitGuard(){
-  if (parse().parts.length) return;                        // 홈에서만
-  if (history.state && (history.state.guard || history.state.base)) return;
-  history.replaceState({base:1}, ''); history.pushState({guard:1}, '');
-}
-window.addEventListener('popstate', e => {
-  if (parse().parts.length || !(e.state && e.state.base)) return;
+/* ═════════ 화면 이동 · 뒤로 버튼: 앱이 직접 관리 ═════════
+   브라우저 기록은 [시작, 현재] 두 칸만 쓰고, 앱 안의 이동은 NAV 목록으로 기억한다.
+   → 폰의 뒤로 버튼: 시트·사진 닫기 → 이전 화면 → 홈 → "한 번 더 누르면 닫혀요" → 종료 */
+const NAV = [];
+let CUR = location.hash || '#/', lastBack = 0;
+const viewerOpen = () => document.getElementById('viewer')?.classList.contains('open');
+function ensureGuard(){ if (!(history.state && history.state.zguard)) history.pushState({zguard:1}, '', CUR); }
+function go(hash, opt = {}){
+  hash = hash || '#/';
+  if (!opt.replace && hash !== CUR) NAV.push(CUR);
+  if (NAV.length > 50) NAV.shift();
+  CUR = hash; keepScroll = !!opt.keep;
+  ensureGuard(); history.replaceState({zguard:1}, '', hash);
   closeSheet(); document.getElementById('viewer')?.classList.remove('open');
-  toast('한 번 더 누르면 앱이 닫혀요');
-  // 2초 안에 다시 누르면 그대로 나가지고, 지나면 경고를 다시 깐다
-  setTimeout(() => { if (!parse().parts.length && history.state && history.state.base) history.pushState({guard:1}, ''); }, 2000);
+  render();
+}
+function goBack(){ if (NAV.length) { CUR = NAV.pop(); } else CUR = '#/'; ensureGuard(); history.replaceState({zguard:1}, '', CUR); closeSheet(); render(); }
+function setQ(patch, keep){ const {parts, q} = parse(); const n = {...q, ...patch}; Object.keys(n).forEach(k => n[k]==null && delete n[k]); go('#/'+parts.join('/')+'?'+new URLSearchParams(n), {replace:true, keep}); }
+// 앱 안 링크는 기록을 쌓지 않고 go()로 이동
+document.addEventListener('click', e => {
+  const a = e.target.closest('a[href^="#"]'); if (!a || a.target === '_blank') return;
+  e.preventDefault(); go(a.getAttribute('href'));
+}, true);
+document.addEventListener('pointerdown', ensureGuard, {once:true, capture:true});   // 일부 브라우저는 터치 후에 깐 기록만 인정
+const isHome = h => !(h || '').replace(/^#\/?/, '').split('?')[0];
+window.addEventListener('popstate', e => {
+  if (e.state && e.state.zguard) return;
+  let rerender = false;
+  if (sheet.classList.contains('open')) closeSheet();
+  else if (viewerOpen()) document.getElementById('viewer').classList.remove('open');
+  else if (NAV.length) { CUR = NAV.pop(); rerender = true; }
+  else if (!isHome(CUR)) { CUR = '#/'; rerender = true; }
+  else if (Date.now() - lastBack < 2000) { history.back(); return; }          // 두 번째 → 종료
+  else { lastBack = Date.now(); toast('한 번 더 누르면 앱이 닫혀요'); }
+  history.pushState({zguard:1}, '', CUR);                                      // 경고용 칸을 다시 깐다
+  if (rerender) render();
 });
+window.addEventListener('hashchange', () => { CUR = location.hash || '#/'; closeSheet(); document.getElementById('viewer')?.classList.remove('open'); render(); });
+history.replaceState({zbase:1}, '', location.href); history.pushState({zguard:1}, '', CUR);
 render();
 </script>
 </body>
