@@ -65,9 +65,10 @@ import json, re, time
 
 def extract(text):
     msgs = [{"role": "system", "content": SYSTEM}, {"role": "user", "content": "받아쓴 임장 메모:\\n\\n" + text}]
-    ids = tok.apply_chat_template(msgs, add_generation_prompt=True, return_tensors="pt").to(model.device)
-    out = model.generate(ids, max_new_tokens=700, do_sample=False)   # 매번 같은 결과(재현성)
-    raw = tok.decode(out[0][ids.shape[1]:], skip_special_tokens=True)
+    enc = tok.apply_chat_template(msgs, add_generation_prompt=True, return_tensors="pt", return_dict=True)
+    enc = {k: v.to(model.device) for k, v in enc.items()}
+    out = model.generate(**enc, max_new_tokens=700, do_sample=False)   # 매번 같은 결과(재현성)
+    raw = tok.decode(out[0][enc["input_ids"].shape[1]:], skip_special_tokens=True)
     m = re.search(r"\\{[\\s\\S]*\\}", raw)
     try:
         return json.loads(m.group(0)), raw
