@@ -1,0 +1,45 @@
+{
+  "description": "대본 기준 정답표. null = 녹음에서 언급되지 않음 → 출력에서 '확인 필요'로 나와야 정답. 금액 단위는 만원. 시·군·구는 목록의 단어가 모두 들어 있으면 정답.",
+  "items": {
+    "s1": {
+      "sido": "서울특별시", "sigungu": ["영등포"], "dong": "당산동",
+      "sale_price": 72000, "jeonse_price": 45000,
+      "area_pyeong": 24, "built_year": 2008, "households": 650,
+      "mgmt_fee": 18, "parking_class": "1대 이상", "elevator": true,
+      "station_walk_min": 8, "chopuma": true, "seller_loan_exists": false,
+      "defects_mentioned": true
+    },
+    "s2": {
+      "sido": "인천광역시", "sigungu": ["부평"], "dong": "부평동",
+      "sale_price": 53000, "jeonse_price": 38000,
+      "area_pyeong": 32, "built_year": 2015, "households": 1200,
+      "mgmt_fee": 25, "parking_class": "1대 이상", "elevator": null,
+      "station_walk_min": 12, "chopuma": false, "seller_loan_exists": null,
+      "defects_mentioned": false
+    },
+    "s3": {
+      "sido": "경기도", "sigungu": ["부천"], "dong": "중동",
+      "sale_price": 28000, "jeonse_price": 23000,
+      "area_pyeong": 18, "built_year": 1998, "households": 24,
+      "mgmt_fee": 7, "parking_class": "1대 미만", "elevator": false,
+      "station_walk_min": 5, "chopuma": null, "seller_loan_exists": null,
+      "defects_mentioned": true
+    },
+    "s4": {
+      "sido": "인천광역시", "sigungu": ["연수"], "dong": "송도동",
+      "sale_price": null, "jeonse_price": 40000,
+      "area_pyeong": 27, "built_year": null, "households": null,
+      "mgmt_fee": null, "parking_class": null, "elevator": null,
+      "station_walk_min": null, "chopuma": null, "seller_loan_exists": null,
+      "defects_mentioned": false
+    },
+    "s5": {
+      "sido": "경기도", "sigungu": ["성남", "분당"], "dong": "정자동",
+      "sale_price": 99000, "jeonse_price": 36000,
+      "area_pyeong": 23, "built_year": 1995, "households": 800,
+      "mgmt_fee": 15, "parking_class": "1대 미만", "elevator": true,
+      "station_walk_min": 6, "chopuma": null, "seller_loan_exists": true,
+      "defects_mentioned": false
+    }
+  }
+}
