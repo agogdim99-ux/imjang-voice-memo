@@ -1,0 +1,353 @@
+{
+  "settings": {
+    "method": "Qwen/Qwen2.5-7B-Instruct (오픈소스 LLM)",
+    "source": "data/scripts.json",
+    "seed": 2,
+    "buyer": "무주택",
+    "income": 0
+  },
+  "items": [
+    {
+      "sido": "서울특별시",
+      "sigungu": "영등포구",
+      "dong": "당산동",
+      "property_type": "아파트",
+      "sale_price": 72000,
+      "jeonse_price": 45000,
+      "wolse_deposit": null,
+      "wolse_monthly": null,
+      "seller_loan_exists": false,
+      "seller_loan_amount": null,
+      "area_pyeong": 24.0,
+      "built_year": 2008,
+      "floor": null,
+      "facing": "남향",
+      "households": 650,
+      "mgmt_fee": 18.0,
+      "parking_per_household": 1.2,
+      "elevator": true,
+      "mgmt_office": null,
+      "station_name": "당산역",
+      "station_walk_min": 8,
+      "elementary": "단지 바로 옆 초등학교",
+      "chopuma": true,
+      "middle_high": null,
+      "commercial": null,
+      "defects": [
+        "베란다 쪽에 누수 흔적"
+      ],
+      "uncertain": [],
+      "_llm_seconds": 21.3,
+      "_zone": {
+        "zone": "A",
+        "label": "A 토허구역",
+        "gap_allowed": false,
+        "regulated": true,
+        "reason": "서울 25개 자치구 전역 토지거래허가구역 (2026-12-31까지, 연장 미정)",
+        "caution": "지번 단위 지정 구역(공공주택지구·재개발 후보지 등)은 판정하지 못함 — 거래 전 토지이음·서울부동산정보광장에서 직접 조회"
+      },
+      "_finance": {
+        "scenarios": [
+          {
+            "name": "갭투자",
+            "need": null,
+            "verdict": "불가 (토허구역)",
+            "level": "na",
+            "detail": "서울 25개 자치구 전역 토지거래허가구역 (2026-12-31까지, 연장 미정)"
+          },
+          {
+            "name": "실거주 매수",
+            "need": 43200,
+            "verdict": "많이 부족 (3억 3,200만원)",
+            "level": "bad",
+            "shortfall": 33200,
+            "note": "",
+            "detail": "매매 7억 2,000만원 − 주담대 추정 2억 8,800만원",
+            "loan_basis": "LTV 40% = 2억 8,800만원 · 절대 한도 6억원 → 가장 작은 값 2억 8,800만원 (DSR 미반영: 소득이 낮으면 더 줄어듦)"
+          }
+        ],
+        "comments": [
+          "시중은행 주담대 기준 — 한도는 LTV·절대 한도·DSR 중 가장 작은 값으로 결정",
+          "토허구역: 허가 후 4개월 내 입주·2년 실거주 의무 → 전세 끼고 매수 불가"
+        ],
+        "fee": "상한 0.4% ≈ 288만원"
+      },
+      "_id": "s1",
+      "_title": "서울 영등포",
+      "_seconds": 21.3,
+      "_stt_seconds": null
+    },
+    {
+      "sido": "인천광역시",
+      "sigungu": "인천광역시 부평구 부평동",
+      "dong": "부평동",
+      "property_type": "아파트",
+      "sale_price": 53000,
+      "jeonse_price": 38000,
+      "wolse_deposit": null,
+      "wolse_monthly": null,
+      "seller_loan_exists": null,
+      "seller_loan_amount": null,
+      "area_pyeong": 32.0,
+      "built_year": 2015,
+      "floor": "9층",
+      "facing": "동향",
+      "households": 1200,
+      "mgmt_fee": 25.0,
+      "parking_per_household": 1.4,
+      "elevator": null,
+      "mgmt_office": "깔끔하게 잘 돌아가는 관리사무소",
+      "station_name": "부평역",
+      "station_walk_min": 12,
+      "elementary": "길 하나 건너야함",
+      "chopuma": false,
+      "middle_high": "걸어서 10분",
+      "commercial": "단지 앞에 상가랑 학원가",
+      "defects": [],
+      "uncertain": [
+        "역세권은 애매해"
+      ],
+      "_llm_seconds": 21.4,
+      "_zone": {
+        "zone": "B",
+        "label": "B 비대상",
+        "gap_allowed": true,
+        "regulated": false,
+        "reason": "인천은 일괄 지정 제외 · 2022-11 이후 비규제지역",
+        "caution": "지번 단위 지정 구역(공공주택지구·재개발 후보지 등)은 판정하지 못함 — 거래 전 토지이음·서울부동산정보광장에서 직접 조회"
+      },
+      "_finance": {
+        "scenarios": [
+          {
+            "name": "갭투자",
+            "need": 15000,
+            "verdict": "조금 부족 (5,000만원)",
+            "level": "warn",
+            "shortfall": 5000,
+            "note": "시드가 구간 상단(1억~3억)에 가까우면 가능",
+            "detail": "매매 5억 3,000만원 − 전세 3억 8,000만원"
+          },
+          {
+            "name": "실거주 매수",
+            "need": 15900,
+            "verdict": "조금 부족 (5,900만원)",
+            "level": "warn",
+            "shortfall": 5900,
+            "note": "시드가 구간 상단(1억~3억)에 가까우면 가능",
+            "detail": "매매 5억 3,000만원 − 주담대 추정 3억 7,100만원",
+            "loan_basis": "LTV 70% = 3억 7,100만원 · 절대 한도 6억원 → 가장 작은 값 3억 7,100만원 (DSR 미반영: 소득이 낮으면 더 줄어듦)"
+          }
+        ],
+        "comments": [
+          "주택가격 6억 이하 → 보금자리론 대상 가능성, 시중은행 주담대와 금리 비교 권장"
+        ],
+        "fee": "상한 0.4% ≈ 212만원"
+      },
+      "_id": "s2",
+      "_title": "인천 부평",
+      "_seconds": 21.4,
+      "_stt_seconds": null
+    },
+    {
+      "sido": "경기도",
+      "sigungu": "부천시 원미구",
+      "dong": "중동",
+      "property_type": "빌라",
+      "sale_price": 28000,
+      "jeonse_price": 23000,
+      "wolse_deposit": null,
+      "wolse_monthly": null,
+      "seller_loan_exists": null,
+      "seller_loan_amount": null,
+      "area_pyeong": 18.0,
+      "built_year": 1998,
+      "floor": "4층",
+      "facing": null,
+      "households": 24,
+      "mgmt_fee": 70.0,
+      "parking_per_household": 0.7,
+      "elevator": false,
+      "mgmt_office": null,
+      "station_name": null,
+      "station_walk_min": 5,
+      "elementary": null,
+      "chopuma": null,
+      "middle_high": null,
+      "commercial": null,
+      "defects": [
+        "화장실 타일 깨짐",
+        "창틀 곰팡이"
+      ],
+      "uncertain": [],
+      "_llm_seconds": 19.3,
+      "_zone": {
+        "zone": "B",
+        "label": "B 비대상",
+        "gap_allowed": true,
+        "regulated": false,
+        "reason": "경기 부천시 원미구는 토허 지정 목록에 없음 (비규제)",
+        "caution": "지번 단위 지정 구역(공공주택지구·재개발 후보지 등)은 판정하지 못함 — 거래 전 토지이음·서울부동산정보광장에서 직접 조회"
+      },
+      "_finance": {
+        "scenarios": [
+          {
+            "name": "갭투자",
+            "need": 5000,
+            "verdict": "가능",
+            "level": "ok",
+            "shortfall": 0,
+            "note": "",
+            "detail": "매매 2억 8,000만원 − 전세 2억 3,000만원"
+          },
+          {
+            "name": "실거주 매수",
+            "need": 8400,
+            "verdict": "가능",
+            "level": "ok",
+            "shortfall": 0,
+            "note": "",
+            "detail": "매매 2억 8,000만원 − 주담대 추정 1억 9,600만원",
+            "loan_basis": "LTV 70% = 1억 9,600만원 · 절대 한도 6억원 → 가장 작은 값 1억 9,600만원 (DSR 미반영: 소득이 낮으면 더 줄어듦)"
+          }
+        ],
+        "comments": [
+          "주택가격 6억 이하 → 보금자리론 대상 가능성, 시중은행 주담대와 금리 비교 권장"
+        ],
+        "fee": "상한 0.4% ≈ 112만원"
+      },
+      "_id": "s3",
+      "_title": "부천 원미구 빌라",
+      "_seconds": 19.3,
+      "_stt_seconds": null
+    },
+    {
+      "sido": "인천광역시",
+      "sigungu": "인천광역시 연수구",
+      "dong": "송도동",
+      "property_type": "아파트",
+      "sale_price": null,
+      "jeonse_price": 40000,
+      "wolse_deposit": null,
+      "wolse_monthly": null,
+      "seller_loan_exists": null,
+      "seller_loan_amount": null,
+      "area_pyeong": 27.0,
+      "built_year": null,
+      "floor": null,
+      "facing": null,
+      "households": null,
+      "mgmt_fee": null,
+      "parking_per_household": null,
+      "elevator": null,
+      "mgmt_office": null,
+      "station_name": null,
+      "station_walk_min": null,
+      "elementary": null,
+      "chopuma": null,
+      "middle_high": null,
+      "commercial": null,
+      "defects": [],
+      "uncertain": [
+        " SALE_PRICE",
+        " BUILT_YEAR"
+      ],
+      "_llm_seconds": 17.3,
+      "_zone": {
+        "zone": "C",
+        "label": "C 개별 지정",
+        "gap_allowed": false,
+        "regulated": false,
+        "reason": "인천경제자유구역(송도·청라·영종) 별도 고시 토허구역 — 구역 경계는 지번 확인",
+        "caution": "지번 단위 지정 구역(공공주택지구·재개발 후보지 등)은 판정하지 못함 — 거래 전 토지이음·서울부동산정보광장에서 직접 조회"
+      },
+      "_finance": {
+        "scenarios": [
+          {
+            "name": "판정 불가",
+            "need": null,
+            "verdict": "매매가 확인 필요",
+            "level": "na",
+            "detail": "녹음에 매매가가 없음"
+          }
+        ],
+        "comments": [],
+        "fee": null
+      },
+      "_id": "s4",
+      "_title": "인천 송도",
+      "_seconds": 17.3,
+      "_stt_seconds": null
+    },
+    {
+      "sido": "경기도",
+      "sigungu": "성남시 분당구 정자동",
+      "dong": null,
+      "property_type": null,
+      "sale_price": 99000,
+      "jeonse_price": 36000,
+      "wolse_deposit": null,
+      "wolse_monthly": null,
+      "seller_loan_exists": true,
+      "seller_loan_amount": 10000,
+      "area_pyeong": 23.0,
+      "built_year": 1995,
+      "floor": null,
+      "facing": null,
+      "households": 800,
+      "mgmt_fee": 15.0,
+      "parking_per_household": 0.8,
+      "elevator": true,
+      "mgmt_office": null,
+      "station_name": "정자역",
+      "station_walk_min": 6,
+      "elementary": null,
+      "chopuma": null,
+      "middle_high": null,
+      "commercial": null,
+      "defects": [],
+      "uncertain": [
+        "전세가격"
+      ],
+      "_llm_seconds": 18.3,
+      "_zone": {
+        "zone": "A",
+        "label": "A 토허구역",
+        "gap_allowed": false,
+        "regulated": true,
+        "reason": "경기 성남시 분당구 토지거래허가구역",
+        "caution": "지번 단위 지정 구역(공공주택지구·재개발 후보지 등)은 판정하지 못함 — 거래 전 토지이음·서울부동산정보광장에서 직접 조회"
+      },
+      "_finance": {
+        "scenarios": [
+          {
+            "name": "갭투자",
+            "need": null,
+            "verdict": "불가 (토허구역)",
+            "level": "na",
+            "detail": "경기 성남시 분당구 토지거래허가구역"
+          },
+          {
+            "name": "실거주 매수",
+            "need": 59400,
+            "verdict": "많이 부족 (4억 9,400만원)",
+            "level": "bad",
+            "shortfall": 49400,
+            "note": "",
+            "detail": "매매 9억 9,000만원 − 주담대 추정 3억 9,600만원",
+            "loan_basis": "LTV 40% = 3억 9,600만원 · 절대 한도 6억원 → 가장 작은 값 3억 9,600만원 (DSR 미반영: 소득이 낮으면 더 줄어듦)"
+          }
+        ],
+        "comments": [
+          "시중은행 주담대 기준 — 한도는 LTV·절대 한도·DSR 중 가장 작은 값으로 결정",
+          "토허구역: 허가 후 4개월 내 입주·2년 실거주 의무 → 전세 끼고 매수 불가",
+          "매도인 융자 1억원 — 잔금 때 말소(상환) 조건을 계약서에 명시"
+        ],
+        "fee": "상한 0.5% ≈ 495만원"
+      },
+      "_id": "s5",
+      "_title": "성남 분당",
+      "_seconds": 18.3,
+      "_stt_seconds": null
+    }
+  ]
+}

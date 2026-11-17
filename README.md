@@ -24,6 +24,7 @@
 - 항목 추출 정확도: **97%** (75칸 중 73칸, turbo + 소음 + 용어 힌트) — 목표 85% 달성
 - 누락 항목 '확인 필요' 표시: 17/17 전부 정확
 - 자금 판정: 수계산과 5건 모두 일치
+- 오픈소스 LLM(Qwen2.5-7B) 추출과 비교: 정정한 말("아 아니다 3억 6천")은 LLM만 맞혔고, 정해진 말투에서는 규칙 기반이 더 정확·빠름
 
 같은 시드(1억~3억, 무주택)로 돌린 예:
 
@@ -79,7 +80,7 @@ for f in data/transcripts/*.json; do python run.py --transcripts "$f" --seed 2 -
 | `--seed` | 1: 1억 미만 · 2: 1억~3억 · 3: 3억~5억 · 4: 5억~7억 · 5: 7억~10억 · 6: 10억 이상 |
 | `--buyer` | 무주택 · 생애최초 · 다주택 |
 | `--income` | 0: 미입력 · 1: 3천 미만 · 2: 3천~5천 · 3: 5천~7천 · 4: 7천~1억 · 5: 1억 이상 (만원) |
-| `--method` | `rules` 규칙 기반 · `llm` Claude · `auto`(기본: 키나 저장된 결과가 있으면 Claude) |
+| `--method` | `rules` 규칙 기반 · `qwen` 오픈소스 LLM(Colab 결과) · `llm` Claude · `auto`(기본: Claude 키나 저장된 결과가 있으면 Claude, 아니면 규칙) |
 
 ### 3단계 — 정확도 채점
 
@@ -88,6 +89,14 @@ python evaluate.py
 ```
 
 `outputs/` 의 모든 추출 결과를 정답표와 비교해 `outputs/evaluation.md` 를 만든다.
+
+### (선택) 오픈소스 LLM(Qwen2.5-7B) 추출로 비교하기
+
+[`colab/02_LLM_항목추출.ipynb`](colab/02_LLM_항목추출.ipynb)를 Colab T4에서 실행하면 된다 ([Colab에서 열기](https://colab.research.google.com/github/agogdim99-ux/imjang-voice-memo/blob/main/colab/02_LLM_%ED%95%AD%EB%AA%A9%EC%B6%94%EC%B6%9C.ipynb), 약 15분). 실행 결과는 이미 `data/llm_extracted/qwen.json` 에 들어 있다.
+
+```bash
+python run.py --transcripts data/transcripts/turbo_noisy_prompt.json --seed 2 --buyer 무주택 --income 0 --method qwen
+```
 
 ### (선택) Claude 추출 켜기
 
@@ -103,7 +112,8 @@ API 키를 환경변수 `ANTHROPIC_API_KEY` 로 넣고 `--method llm` 으로 실
 
 ```
 ├─ 01_문제정의서.md / 02_모델선정.md / 03_검증결과.md
-├─ colab/01_음성생성_받아쓰기.ipynb   ① TTS 샘플 생성 + 소음 섞기 + Whisper 8조건 비교
+├─ colab/01_음성생성_받아쓰기.ipynb   ① 음성 내려받기 + 소음 섞기 + Whisper 8조건 비교
+├─ colab/02_LLM_항목추출.ipynb       ② 오픈소스 LLM(Qwen2.5-7B) 항목 추출
 ├─ data/
 │   ├─ scripts.json                  대본 5개 (허구의 매물)
 │   ├─ ground_truth.json             항목 정답표 (75칸)
@@ -115,12 +125,13 @@ API 키를 환경변수 `ANTHROPIC_API_KEY` 로 넣고 `--method llm` 으로 실
 │   ├─ schema.py                     고정 항목표
 │   ├─ extract_rules.py              규칙 기반 추출기
 │   ├─ extract_llm.py                Claude 추출기 (구조화 출력)
+│   ├─ extract_open.py               Qwen 추출 결과 읽기
 │   ├─ regions.py                    수도권 지역 정규화 + 토허 A/B/C 판정
 │   ├─ finance.py                    LTV·절대 한도·DSR, 시드 구간 판정, 중개보수
 │   └─ report.py                     비교표 HTML/MD
 ├─ run.py                            전체 실행
 ├─ evaluate.py                       정확도 채점
-├─ tools/build_notebook.py           대본 → Colab 노트북 생성
+├─ tools/                            노트북 생성(build_notebook*.py), 음성 생성(make_audio.py), LLM 실행 스크립트
 └─ outputs/                          결과물 (report.html 등)
 ```
 
