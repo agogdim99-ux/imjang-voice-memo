@@ -173,6 +173,14 @@ textarea.edit:focus{outline:none;border-color:var(--blue)}
 details.samples summary{list-style:none;cursor:pointer;font-weight:700;font-size:13px;color:var(--ink2);padding:14px 0 4px}
 .tip{font-size:12.5px;color:var(--ink2);margin:4px 0 0;padding-left:18px}
 .tip li{margin:3px 0}
+.kvgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px 12px;padding-top:12px}
+.kv2{display:flex;flex-direction:column;font-size:13.5px} .kv2 span{font-size:12px;color:var(--ink2)} .kv2 b{font-weight:600}
+.pricebox{margin-top:14px;padding:12px;background:var(--surface);border-radius:12px}
+.pr{flex:1;display:flex;flex-direction:column} .pr span{font-size:12px;color:var(--ink2)} .pr b{font-size:22px;font-weight:800;letter-spacing:-.02em} .pr small{color:var(--muted);font-size:11.5px}
+details.srcs{margin-top:10px;font-size:12.5px} details.srcs summary{cursor:pointer;color:var(--ink2);font-weight:600}
+details.srcs a{display:block;color:var(--blue);padding:4px 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.spinner{width:36px;height:36px;margin:0 auto;border-radius:50%;border:4px solid var(--blue-soft);border-top-color:var(--blue);animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 </style>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
@@ -193,6 +201,7 @@ details.samples summary{list-style:none;cursor:pointer;font-weight:700;font-size
 
 <script src="data.js"></script>
 <script src="engine.js"></script>
+<script src="ai.js"></script>
 <script>
 /* ───────── 데이터·설정 ───────── */
 const D = window.ZIPNOTE_DATA || {properties: []};
@@ -219,8 +228,7 @@ let MINE = store.get('mine', []);
 })();
 let P = [], byId = {};
 function reload(){
-  MINE = store.get('mine', []);
-  P = MINE.slice().sort((a,b)=>b.created-a.created).concat(S.samples ? SAMPLES : []);
+  P =MINE.slice().sort((a,b)=>b.created-a.created).concat(S.samples ? SAMPLES : []);
   byId = Object.fromEntries(MINE.concat(SAMPLES).map(p => [p.id, p]));
 }
 reload();
@@ -370,6 +378,7 @@ function region(q){
 function detail(id){
   const p = byId[id]; if(!p) return `<div class="empty">매물을 찾을 수 없어요.</div>`;
   const r = recent().filter(x=>x!==id); r.unshift(id); store.set('recent', r);
+  if (!p.sample) return detailMine(p);
   const f = finance(p), miss = missing(p);
   const stat = (k,v) => `<div class="stat"><div class="k">${k}</div><div class="v ${v?'':'need'}">${v||'확인 필요'}</div></div>`;
   const kv = (k,v) => `<dt>${k}</dt><dd>${v==null||v===''?'<span class="needtxt">확인 필요</span>':esc(v)}</dd>`;
@@ -417,6 +426,70 @@ function detail(id){
   <div class="cta"><button class="btn" data-act="rec" data-target="${p.sample?'':p.id}">${I.mic} 이 매물에 녹음 추가</button></div>`;
 }
 
+/* ───────── 화면: 내 매물 상세 (AI 정리) ───────── */
+function detailMine(p){
+  const a = p.ai, c = a?.complex || {}, m = a?.market || {}, v = a?.visit || {};
+  const head = `
+  <div class="dethd"><a class="iconbtn" href="javascript:history.length>1?history.back():location.hash='#/'" aria-label="뒤로">${I.back}</a><span class="t">${esc(nameOf(p))}</span></div>
+  <div class="row" style="align-items:flex-start;margin-top:8px"><h1 class="disp dtitle" style="flex:1;margin-top:6px">${esc(nameOf(p))}</h1>
+    <button class="iconbtn" style="margin-top:8px" data-rename="${p.id}" aria-label="이름 고치기"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/></svg></button></div>
+  <div class="loc">${I.pin}<span>${esc(c.address || [SIDO_SHORT[p.sido]||p.sido, p.sigungu, p.dong].filter(Boolean).join(' ') || '위치 확인 필요')}</span></div>
+  <div class="row" style="margin-top:8px;flex-wrap:wrap"><span class="zdot ${zcls(p.zone.zone)}">${esc(p.zone.label)}</span>
+    ${a?`<span class="zdot zq">AI 단지 확인: ${esc(c.confidence||'')}</span>`:''}${c.heard_as && c.heard_as!==c.name?`<span class="small muted">"${esc(c.heard_as)}"(으)로 들림</span>`:''}</div>`;
+
+  const raw = `<details class="raw"><summary>${I.mic} 녹음 원문 보기</summary><p style="white-space:pre-wrap">${esc(p.transcript)}</p></details>
+    <div class="row" style="justify-content:space-between;margin-top:6px"><button class="danger" data-del="${p.id}">이 매물 삭제</button>
+    ${p.status!=='analyzing'?`<button class="go" data-act="reai" data-id="${p.id}">AI로 다시 정리 ↻</button>`:''}</div>
+    <div style="height:70px"></div>
+    <div class="cta"><button class="btn" data-act="rec" data-target="${p.id}">${I.mic} 이 매물에 녹음 추가</button></div>`;
+
+  if (p.status === 'analyzing') return head + `
+    <section class="card" style="text-align:center;padding:28px 16px"><div class="spinner"></div>
+      <div style="font-weight:700;margin-top:14px">${esc(p.step||'정리 중')}</div>
+      <p class="small muted" style="margin:6px 0 0">단지 정보와 최근 실거래가를 검색하고 녹음을 정리하고 있어요. 보통 30초~1분 걸려요. 다른 화면으로 가도 계속 진행돼요.</p></section>` + raw;
+  if (p.status === 'nokey' || p.status === 'error') return head + `
+    <section class="card"><div class="cardhd">${p.status==='nokey'?'AI 설정이 필요해요':'정리하지 못했어요'}</div>
+      <p class="small" style="margin:10px 0">${p.status==='nokey'?'단지 검색과 녹음 정리는 Claude API 키가 있어야 해요. 키를 넣으면 이 녹음을 바로 정리해요.':esc(p.error)}</p>
+      <div class="btnrow">${p.status==='nokey'?'<a class="btn ghost sm" href="#/records?ai=1">키 넣으러 가기</a>':'<span></span>'}<button class="btn sm" data-act="reai" data-id="${p.id}">다시 시도</button></div></section>` + raw;
+  if (!a) return head + `<section class="card"><div class="cardhd">아직 AI로 정리하지 않은 녹음</div>
+      <p class="small" style="margin:10px 0">예전 방식(규칙)으로 저장된 매물이에요. AI로 정리하면 단지 정보·시세·임장 요약이 채워져요.</p>
+      <button class="btn sm" data-act="reai" data-id="${p.id}">AI로 정리하기</button></section>` + raw;
+
+  const st = (k, val) => `<div class="kv2"><span>${k}</span><b class="${val==null?'needtxt':''}">${val==null?'못 찾음':esc(val)}</b></div>`;
+  const list = (icon, title, arr) => arr && arr.length ? `<div class="sublbl">${icon} ${title}</div><ul class="bul">${arr.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>` : '';
+  const f = finance(p);
+  const priceNote = p.sale_src==='녹음' ? '녹음에서 들은 가격 기준' : p.sale_src==='실거래' ? `검색한 최근 실거래가 기준${m.sale_date?` (${esc(m.sale_date)})`:''}` : '';
+  return head + `
+  <section class="card"><div class="cardhd">${I.bld}단지 정보 <span class="more" style="color:var(--muted)">웹 검색</span></div>
+    <div class="stats" style="grid-template-columns:repeat(3,1fr)">
+      <div class="stat"><div class="k">세대수</div><div class="v ${c.households?'':'need'}">${c.households?c.households.toLocaleString():'못 찾음'}</div></div>
+      <div class="stat"><div class="k">준공</div><div class="v ${c.built_year?'':'need'}">${c.built_year?c.built_year+'년':'못 찾음'}</div></div>
+      <div class="stat"><div class="k">역</div><div class="v ${c.station_walk_min!=null?'':'need'}" style="font-size:16px">${c.station_walk_min!=null?'도보 '+c.station_walk_min+'분':'못 찾음'}</div></div></div>
+    <div class="kvgrid">${st('가까운 역', c.nearest_station)}${st('동 수 · 최고층', c.buildings||c.floors_max?[c.buildings?c.buildings+'개 동':null,c.floors_max?c.floors_max+'층':null].filter(Boolean).join(' · '):null)}
+      ${st('세대당 주차', c.parking_per_household!=null?c.parking_per_household+'대 ('+(c.parking_per_household>=1?'1대 이상':'1대 미만')+')':null)}${st('시공사', c.builder)}${st('난방', c.heating)}
+      ${st('연차', c.built_year?(2026-c.built_year)+'년차':null)}</div>
+    <div class="pricebox"><div class="sublbl" style="margin-top:0">최근 시세 ${m.area_pyeong?`· ${m.area_pyeong}평`:''}</div>
+      <div class="row" style="gap:10px"><div class="pr"><span>매매</span><b>${short(m.sale_recent)||'못 찾음'}</b><small>${esc(m.sale_date||'')}</small></div>
+        <div class="pr"><span>전세</span><b>${short(m.jeonse_recent)||'못 찾음'}</b><small>${esc(m.jeonse_date||'')}</small></div></div>
+      ${m.note?`<p class="small" style="margin:8px 0 0;color:var(--ink2)">${esc(m.note)}</p>`:''}</div>
+    ${(a.sources||[]).length?`<details class="srcs"><summary>출처 ${a.sources.length}개</summary>${a.sources.map(s=>`<a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.title||s.url)}</a>`).join('')}</details>`:''}
+    <p class="fine">AI가 웹에서 찾은 정보예요. 틀릴 수 있으니 거래 전 국토부 실거래가·등기부로 확인하세요.</p></section>
+
+  <section class="card"><div class="cardhd">${I.memo}내 임장 정리</div>
+    <p style="margin:10px 0 0;font-size:15px;line-height:1.65">${esc(v.summary||'')}</p>
+    ${list('👍','좋았던 점',v.pros)}${list('👎','아쉬운 점',v.cons)}${list('🔧','하자 · 수리',v.defects)}${list('🏢','관리 상태',v.management)}${list('📍','입지',v.location)}
+    ${(v.to_check||[]).length?`<div class="sublbl">다시 확인할 것</div><div class="tags">${v.to_check.map(x=>`<span class="tag">${esc(x)}</span>`).join('')}</div>`:''}</section>
+
+  <section class="card"><div class="cardhd">${I.coin}살 수 있을까?</div>
+    ${priceNote?`<p class="small muted" style="margin:10px 0 0">${priceNote}${p.jeonse_src?` · 전세는 ${p.jeonse_src==='녹음'?'녹음에서 들은 값':'최근 실거래'}`:''}</p>`:''}
+    ${f.scen.map(s=>`<div class="scen"><div><div class="nm">${s.name}${s.need!=null?' · 필요 자금':''}</div>
+      ${s.need!=null?`<div class="need">${short(s.need)}</div>`:`<div class="na">${s.na}</div>`}${s.detail?`<div class="small muted">${esc(s.detail)}</div>`:''}</div>
+      ${s.need!=null?`<span class="pill ${s.level}">${s.verdict}</span>`:''}</div>${s.note?`<div class="small muted" style="margin-top:-6px;padding-bottom:8px">↳ ${s.note}</div>`:''}`).join('')}
+    <button class="cond" data-act="settings"><span>내 조건 <b>시드 ${SEED[S.seed][0]}</b> · ${BUYER[S.buyer]}</span><span style="color:var(--blue);font-weight:700">변경</span></button>
+    ${f.tips?`<ul class="bul small">${f.tips.map(t=>`<li>${esc(t)}</li>`).join('')}</ul>`:''}
+    <p class="fine">${f.basis?'대출 추정: '+esc(f.basis)+'<br>':''}${esc(p.zone.reason)}<br>참고용 추정 · 세금 미반영 · 대출은 은행 상담 필수 · ${esc(p.zone.caution)}</p></section>` + raw;
+}
+
 /* ───────── 화면: 내 기록 (내 조건 + 비교표) ───────── */
 function records(){
   const rows = [['위치',p=>[SIDO_SHORT[p.sido],p.sigungu].filter(Boolean).join(' ')||null],['구분',p=>p.zone.label],['매매',p=>short(p.sale_price)],['전세',p=>short(p.jeonse_price)],
@@ -437,7 +510,13 @@ function records(){
   ${P.length?'':'<div class="empty">비교할 매물이 없어요.</div>'}
   <div class="tblwrap" ${P.length?'':'hidden'}><table class="cmp"><thead><tr><th>항목</th>${P.map(p=>`<th><a href="#/p/${p.id}" style="color:var(--blue)">${esc(nameOf(p))}</a></th>`).join('')}</tr></thead>
     <tbody>${rows.map(([k,fn])=>`<tr><td>${k}</td>${P.map(p=>{const v=fn(p); return v==null?'<td class="need">확인 필요</td>':`<td>${esc(v)}</td>`;}).join('')}</tr>`).join('')}</tbody></table></div>
-  <p class="note">${I.info}<span>샘플: Whisper 받아쓰기(${esc(D.source)}) · 내 녹음: 폰 음성인식 · 추출은 둘 다 규칙 기반</span></p>`;
+  <p class="note">${I.info}<span>샘플: Whisper 받아쓰기 + 규칙 기반 정리 · 내 녹음: 폰 음성인식 + Claude(웹 검색) 정리</span></p>
+  <section class="card" id="aicard"><div class="cardhd">AI 설정 (Claude)</div>
+    <p class="small" style="margin:10px 0 6px">녹음 정리·단지 검색에 Claude API 키가 필요해요. <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener" style="color:var(--blue);font-weight:700">키 발급 ›</a></p>
+    <input id="apikey" type="password" autocomplete="off" placeholder="sk-ant-..." value="${esc(store.get('apikey',''))}"
+      style="width:100%;height:46px;border:1.5px solid var(--line);border-radius:12px;padding:0 12px;font:inherit;background:var(--surface)">
+    <div class="btnrow"><button class="btn ghost sm" data-act="aikey-test">연결 확인</button><button class="btn sm" data-act="aikey-save">저장</button></div>
+    <p class="fine">키는 이 폰에만 저장되고 Anthropic으로만 전송돼요. 매물 1건 정리에 약 300~500원(웹 검색 포함, 추정)이 들어요. 모델: ${ZipAI.MODEL}</p></section>`;
 }
 
 /* ───────── 바텀시트 ───────── */
@@ -449,11 +528,27 @@ document.addEventListener('keydown', e => { if(e.key==='Escape') closeSheet(); }
 
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 const REC = {sr:null, on:false, prev:'', final:'', start:0, timer:null, target:''};
+/* 녹음 중 화면 꺼짐 방지 (Wake Lock) */
+let wakeLock = null;
+async function keepAwake(on){
+  try {
+    if (on && 'wakeLock' in navigator) { wakeLock = await navigator.wakeLock.request('screen'); }
+    else if (!on && wakeLock) { await wakeLock.release(); wakeLock = null; }
+  } catch(_) {}
+}
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && REC.on) { keepAwake(true); try { REC.sr && REC.sr.start(); } catch(_){} }
+});
+function saveDraft(){ store.set('draft', {text: REC.final, target: REC.target, t: Date.now()}); }
+
 function recSheet(target){
   REC.target = target || ''; REC.prev = REC.final = '';
   const t = target && byId[target];
+  const draft = store.get('draft', null);
+  const useDraft = draft && draft.text && draft.text.trim().length > 3 && Date.now() - draft.t < 2*86400000 && (draft.target||'') === REC.target;
+  setTimeout(() => { if (useDraft) { const ed = document.getElementById('edit'); ed.value = draft.text.trim(); document.getElementById('after').hidden = false; toast('끊겼던 녹음 내용을 불러왔어요'); } }, 50);
   openSheet(`<h3 class="disp">${t ? '녹음 추가' : '녹음으로 매물 남기기'}</h3>
-  <p class="muted small" style="margin:0">${t ? esc(nameOf(t))+'에 빠진 정보를 말해 주세요. 새로 말한 값이 기존 값보다 우선해요.' : '지역 · 가격 · 평수 · 연식 · 세대수 · 관리비 · 주차 · 역까지 거리 · 하자를 편하게 말해 주세요.'}</p>
+  <p class="muted small" style="margin:0">${t ? esc(nameOf(t))+'에 대해 더 본 것을 말해 주세요. 기존 녹음과 합쳐서 다시 정리해요.' : '단지 이름과 본 것을 평소처럼 말하세요. 단지 정보와 시세는 AI가 찾아와요.'}</p>
   ${SR ? `<div class="recmain"><button class="bigmic" id="bigmic" data-act="mic" aria-label="녹음 시작">${I.mic}</button>
       <span class="rectime" id="rectime">눌러서 녹음 시작</span></div>
     <div class="live" id="live" data-ph="말하면 여기에 바로 글자로 나와요."></div>`
@@ -464,9 +559,10 @@ function recSheet(target){
     <div class="btnrow"><button class="btn ghost sm" data-act="redo">${SR ? '다시 녹음' : '지우기'}</button><button class="btn sm" data-act="save">정리하기</button></div>
   </div>
   <details class="samples"><summary>말하기 팁 · 샘플 녹음 듣기</summary>
-    <ul class="tip"><li>"매매 7억 2천", "전세 4억 5천"처럼 <b>항목 이름 + 숫자</b>로 말해요</li>
-      <li><b>단지 이름</b>("문래자이 아파트")과 <b>구·동</b>("영등포구 문래동")을 같이 말하면 가장 정확해요. 동네 이름만 말해도 대표 지역(문래·잠실·분당 등)은 알아들어요</li>
-      <li>"세대당 1.2대", "역까지 걸어서 8분", "650세대", "2008년식"</li></ul>
+    <ul class="tip"><li>처음에 <b>단지 이름</b>을 말해 주세요 ("지금 문래자이 아파트 왔어")</li>
+      <li>그다음은 편하게: 좋았던 점, 아쉬운 점, 하자, 관리 상태, 주변 느낌</li>
+      <li>중개사에게 들은 <b>가격</b>이 있으면 말해 주세요. 없으면 최근 실거래가로 판정해요</li>
+      <li>녹음 중엔 화면이 꺼지지 않게 유지돼요. 중간에 끊겨도 내용은 저장돼요</li></ul>
     ${SAMPLES.map(p=>`<div class="sample"><button class="play" data-play="${p.id}" aria-label="재생">${I.play}</button>
       <div class="s"><b>${esc(nameOf(p))}</b><small>AI 음성 샘플</small></div><a class="go" href="#/p/${p.id}">정리 결과 ›</a></div>`).join('')}
   </details>`);
@@ -482,6 +578,7 @@ function startRec(){
     let fin = '', interim = '';
     for (let i = 0; i < e.results.length; i++) { const r = e.results[i]; if (r.isFinal) fin += r[0].transcript + ' '; else interim += r[0].transcript; }
     REC.final = (REC.prev + fin).replace(/\s+/g,' ');
+    saveDraft();
     const live = document.getElementById('live');
     if (live) { live.innerHTML = esc(REC.final) + `<span class="interim">${esc(interim)}</span>`; live.scrollTop = live.scrollHeight; }
   };
@@ -492,12 +589,13 @@ function startRec(){
   };
   sr.onend = () => { if (REC.on) { REC.prev = REC.final + ' '; try { sr.start(); } catch(_){} } };   // 말이 끊기면 자동으로 다시 듣기
   try { sr.start(); } catch(e){ toast('녹음을 시작할 수 없어요'); REC.on = false; return; }
+  keepAwake(true);
   const b = document.getElementById('bigmic'); b.classList.add('on'); b.setAttribute('aria-label','녹음 끝내기');
   b.innerHTML = '<svg class="ic" viewBox="0 0 24 24" fill="currentColor"><rect x="7" y="7" width="10" height="10" rx="2"/></svg>';
   document.getElementById('after').hidden = true;
-  REC.timer = setInterval(()=>{ const el=document.getElementById('rectime'); if(el) el.innerHTML = `<span class="recdot"></span>듣는 중 ${fmtTime(Date.now()-REC.start)} · 다 말했으면 ■`; }, 300);
+  REC.timer = setInterval(()=>{ const el=document.getElementById('rectime'); if(el) el.innerHTML = `<span class="recdot"></span>듣는 중 ${fmtTime(Date.now()-REC.start)}${wakeLock?' · 화면 켜짐 유지':''} · 다 말했으면 ■`; }, 300);
 }
-function abortRec(){ REC.on = false; clearInterval(REC.timer); if (REC.sr) { try { REC.sr.abort(); } catch(_){} REC.sr = null; } }
+function abortRec(){ REC.on = false; clearInterval(REC.timer); keepAwake(false); if (REC.sr) { try { REC.sr.abort(); } catch(_){} REC.sr = null; } }
 function finishRec(){
   const wasOn = REC.on; abortRec();
   const b = document.getElementById('bigmic'); if (!b) return;
@@ -511,9 +609,46 @@ function saveRec(){
   const text = (document.getElementById('edit').value || '').trim();
   if (text.length < 4) { toast('정리할 내용이 없어요'); return; }
   const p = REC.target ? mergeInto(REC.target, text) : saveNew(text);
+  store.set('draft', null);
   closeSheet(); location.hash = '#/p/' + p.id;
-  setTimeout(()=>toast(`정리 완료 · 다시 물어볼 것 ${missing(p).length}개`), 250);
+  runAI(p.id);
 }
+
+/* ───────── AI 정리 실행 ───────── */
+const RUNNING = new Set();
+function saveMine(){ store.set('mine', MINE); }
+function rerenderIf(id){ const {parts} = parse(); if (parts[0]==='p' && parts[1]===id) render(); }
+async function runAI(id){
+  const p = MINE.find(x=>x.id===id); if (!p || RUNNING.has(id)) return;
+  const key = store.get('apikey','');
+  if (!key) { p.status = 'nokey'; saveMine(); reload(); rerenderIf(id); return; }
+  RUNNING.add(id); p.status = 'analyzing'; p.step = '단지를 찾고 있어요'; p.error = null; saveMine(); reload(); rerenderIf(id);
+  try {
+    const r = await ZipAI.analyze(key, p.transcript, step => { p.step = step; saveMine(); rerenderIf(id); });
+    applyReport(p, r); p.status = 'done';
+    toast('정리 완료');
+  } catch(e) { p.status = 'error'; p.error = ZipAI.friendlyError(e); }
+  finally { RUNNING.delete(id); saveMine(); reload(); rerenderIf(id); }
+}
+function applyReport(p, r){
+  const c = r.complex || {}, m = r.market || {}, v = r.visit || {};
+  p.ai = r;
+  if (c.name) p.complex_name = c.name;
+  p.sido = c.sido || p.sido; p.sigungu = c.sigungu || p.sigungu; p.dong = c.dong || p.dong;
+  p.property_type = p.property_type || '아파트';
+  p.area_pyeong = v.said_area_pyeong ?? m.area_pyeong ?? p.area_pyeong;
+  p.sale_price = v.said_sale ?? m.sale_recent ?? null;   p.sale_src = v.said_sale != null ? '녹음' : m.sale_recent != null ? '실거래' : null;
+  p.jeonse_price = v.said_jeonse ?? m.jeonse_recent ?? null; p.jeonse_src = v.said_jeonse != null ? '녹음' : m.jeonse_recent != null ? '실거래' : null;
+  for (const [k, ck] of [['households','households'],['built_year','built_year'],['parking_per_household','parking_per_household'],['station_name','nearest_station'],['station_walk_min','station_walk_min']])
+    p[k] = c[ck] ?? p[k] ?? null;
+  p.defects = v.defects || [];
+  const reg = ZipEngine.normalizeRegion(p.sido, p.sigungu, p.dong, [c.address, p.transcript].filter(Boolean).join(' '));
+  p.sido = reg.sido || p.sido;
+  p.zone = ZipEngine.classify(reg, [c.address, p.dong].filter(Boolean).join(' '));
+}
+// 앱을 다시 열었을 때 '정리 중'으로 멈춘 매물은 다시 시도할 수 있게
+for (const p of MINE) if (p.status === 'analyzing') { p.status = 'error'; p.error = '정리가 중간에 멈췄어요. 다시 시도해 주세요.'; }
+saveMine();
 function backup(){
   const url = URL.createObjectURL(new Blob([JSON.stringify(MINE, null, 1)], {type:'application/json'}));
   const a = Object.assign(document.createElement('a'), {href:url, download:`zipnote_backup_${new Date().toISOString().slice(0,10)}.json`});
@@ -542,7 +677,8 @@ function render(){
   v.innerHTML = parts[0]==='region'?region(q):parts[0]==='records'?records():parts[0]==='p'?detail(parts[1]):home();
   document.querySelectorAll('#tabs a').forEach(a=>a.classList.toggle('on', a.dataset.t===tab));
   document.getElementById('tabs').style.display = parts[0]==='p' ? 'none' : '';
-  if(!q.keep){ v.scrollTop = 0; window.scrollTo(0,0); }
+  if(q.ai){ const c=document.getElementById('aicard'); if(c){ c.scrollIntoView({block:'center'}); document.getElementById('apikey').focus(); } }
+  else if(!q.keep){ v.scrollTop = 0; window.scrollTo(0,0); }
 }
 document.addEventListener('click', e => {
   const t = e.target.closest('[data-act],[data-sido],[data-grp],[data-spot],[data-f],[data-set],[data-play],[data-del],[data-rename]'); if(!t) return;
@@ -555,6 +691,11 @@ document.addEventListener('click', e => {
   else if(t.dataset.act==='redo'){ document.getElementById('edit').value=''; REC.prev = REC.final = ''; const l=document.getElementById('live'); if(l) l.innerHTML=''; if(SR) startRec(); }
   else if(t.dataset.act==='save') saveRec();
   else if(t.dataset.act==='backup') backup();
+  else if(t.dataset.act==='reai') runAI(t.dataset.id);
+  else if(t.dataset.act==='aikey-save'){ const v=document.getElementById('apikey').value.trim(); store.set('apikey', v); toast(v?'키를 저장했어요':'키를 지웠어요');
+    MINE.filter(p=>p.status==='nokey').forEach(p=>runAI(p.id)); }
+  else if(t.dataset.act==='aikey-test'){ const v=document.getElementById('apikey').value.trim(); if(!v){ toast('키를 먼저 넣어 주세요'); return; }
+    t.textContent='확인 중…'; ZipAI.testKey(v).then(()=>{ toast('연결됐어요 ✓'); store.set('apikey', v); }).catch(e=>toast(ZipAI.friendlyError(e))).finally(()=>{ t.textContent='연결 확인'; }); }
   else if(t.dataset.del){ if(confirm('이 매물을 삭제할까요? 이 폰에서 지워지고 되돌릴 수 없어요.')){ removeMine(t.dataset.del); location.hash='#/'; toast('삭제했어요'); } }
   else if(t.dataset.sido){ store.set('homeSido', t.dataset.sido); render(); }
   else if(t.dataset.grp){ const open = t.getAttribute('aria-expanded')==='true'; t.setAttribute('aria-expanded', !open); document.getElementById('grp'+t.dataset.grp).hidden = open; }
